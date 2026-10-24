@@ -1,0 +1,31 @@
+{
+  "schema_id": "gwc.universal-runtime.default-profile.v2",
+  "schema_version": 2,
+  "runtime_family": "UNIVERSAL_V2",
+  "runtime_protocol": "gwc.universal.controller/v2",
+  "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+  "lifecycle_profile": {
+    "id": "gwc.universal-run.v2",
+    "version": 2
+  },
+  "lifecycle_gates": [
+    "UR.G0",
+    "UR.G1",
+    "UR.G2",
+    "UR.G3",
+    "UR.G4",
+    "UR.G5",
+    "UR.G6"
+  ],
+  "default_entrypoint": "tools.node_architect.agent_runtime_cli:main",
+  "controller_entrypoint": "tools.node_architect.universal_run_controller:UniversalController",
+  "executor_entrypoint": "tools.node_architect.universal_run_execution:UniversalExecutor",
+  "q0_qualification_profile_ref": "core/node-architect/q0-live-qualification-profile.json",
+  "legacy_gwc_v1": {
+    "load_by_default": false,
+    "authority": "NONE",
+    "fallback": "GWC_RUNTIME_DEFECT",
+    "replay_policy": "EXPLICIT_HISTORICAL_PROFILE_ONLY"
+  },
+  "profile_digest": "sha256:c724c6b036a9c0cfae5a5738554d6ee1fc075fa81b6b09e132761cc18df33881"
+}

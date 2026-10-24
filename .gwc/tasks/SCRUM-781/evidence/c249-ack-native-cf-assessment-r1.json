@@ -1,0 +1,164 @@
+{
+  "report_kind": "C249_ACK_REFUSAL_AND_NATIVE_CF_COMPATIBILITY",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "source_parent": "aa8b12206b67f619855f7d537793d23c90da3bf1",
+  "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+  "authority_granted": false,
+  "native_effects_executed": [],
+  "tested_file_sha256": {
+    "tools/node_architect/delivery_outbox.py": "42ecf01a9dbe40a0dead2fdc3a16c0954f96768d2b7afb3e870a15067b41cf60",
+    "tests/test_delivery_outbox.py": "51cc0c490546c897d43702e7e07ac6912069b660347089fce688f60173d43e54"
+  },
+  "contract_file_sha256": {
+    "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json": "08028c21107c7abbd8e0ab3525f5d5a32b66e5f314d949f45a385541de6c3f06",
+    "tools/node_architect/q0_qualification.py": "b9fd29179b4034c6c5df3e133867a8f488f19d53ebf59089a17cdcb6bafdaf73",
+    "core/node-architect/q0-live-qualification-profile.json": "aaab03dc97119243e962c90c0f640031589b9024e0f468e35143ffbba972c1c3",
+    "tools/node_architect/agent_runtime_cli.py": "a853475341635480a15a49a9e8dc1c1dde743d17b64895079ff8836ced8f02c6",
+    "tools/node_architect/agent_provider_bridge.py": "d190d60b933305bd9a921ad3e8ef85938b212a943f1a2c3c49a9e8fc915c4c80",
+    ".gwc/tasks/SCRUM-781/fixtures/dwo-login-auth-r1/manifest-v1.json": "d2c5a5eda73bc684f31203da56bd41a3b93fadf21ed9ffa4ef57879a223e32cf",
+    "tools/node_architect/ledger_replay_verifier.py": "78e5657a70bcfd184bd030a6658c51cfb09168f550138fed653db49dd46b881f"
+  },
+  "ack_correction": {
+    "entrypoints": [
+      "delivery_outbox.verify_ack",
+      "delivery_outbox.transition(to_state=ACK_CONFIRMED)"
+    ],
+    "old_observed": "Truthy self-attested signature_proof returned ACK_VERIFIED; source/payload/request mismatches and NaN/future freshness accepted; direct ACK_CONFIRMED transition bypassed verification",
+    "new_observed": "Event source/payload bound to persisted outbox; request digest bound to latest actual persisted attempt; finite nonfuture freshness required. With no independent receiver verifier wired, otherwise consistent proof returns ACK_VERIFIER_UNAVAILABLE; direct ACK_CONFIRMED transition also refuses after current lease check. No callback/boolean/issuer/key was invented.",
+    "availability_change": "Positive ACK confirmation intentionally unavailable until a separately trusted delivery receiver verifier is actually integrated; this is fail-closed refusal, not a completed cryptographic verifier.",
+    "existing_primitive_boundary": "ledger_replay_verifier.verify_dsse_signature is an Ed25519 ledger-domain primitive consuming bootstrap keys; it supplies no independently pinned delivery-domain receiver trust binding. It was read, not transplanted or used to mint an issuer.",
+    "observer_changes": "ACK, persisted-lease, restart and readback observers now use encoded mode=ro/query_only connections and explicit closure; absent stores and uninitialized store journal policy are not materialized/changed. Existing WAL sidecar behavior is not globally certified.",
+    "remaining": "Full D3/store ownership/issuer authenticity, other workflow paths and real receiver trust remain unproved. Raw store access is not authenticated effect authority."
+  },
+  "engineering_evidence": {
+    "ack_red": "9 failed,2 passed in0.11s including unittest subtest failures; exit1",
+    "direct_transition_red": "1 failed in0.07s; exit1",
+    "observer_red": "5 failed,1 passed in0.09s including subtest failures; exit1",
+    "focused_green": "26 passed,11 subtests passed in2.35s; exit0",
+    "expanded_regression": "301 passed,11 subtests passed in16.55s; exit0 across15 test modules",
+    "raw_commands_and_logs": "~/.hermes/cache/scratch/q0-recovery-r1/c249-ack-provenance-r1/"
+  },
+  "native_cf_compatibility": {
+    "verdict": "SANDBOX_FACTS_REUSABLE_NOT_NATIVE_CF_ADMISSIBLE_AS_IS",
+    "candidate_path": ".gwc/tasks/SCRUM-781/evidence/c247-mutation-entrypoint-scenario-r1.json",
+    "candidate_sha256": "49f57b3b4c4b2b589bfbdb2d5342f60ad9cf16e97c0ce3935c6954efe25ca32c",
+    "actual_read_only_probe": {
+      "source_head": "aa8b12206b67f619855f7d537793d23c90da3bf1",
+      "observation_class": "READ_ONLY_COMPATIBILITY_NOT_NATIVE_CF_OR_AUTHORITY",
+      "actual_candidate_path": ".gwc/tasks/SCRUM-781/evidence/c247-mutation-entrypoint-scenario-r1.json",
+      "candidate_sha256": "49f57b3b4c4b2b589bfbdb2d5342f60ad9cf16e97c0ce3935c6954efe25ca32c",
+      "native_provenance_validator": "tools/node_architect/q0_qualification.py::_validate_replay_provenance",
+      "actual_candidate_disposition": "REPLAY_PROVENANCE_FIELDS_INVALID",
+      "validated_q0_profile_digest": "sha256:2a37d580c26305b74f742f45d25f4caeafae35da043a3b1307b2aedeac34932c",
+      "mandatory_matrix_entries": [
+        "fresh_boot",
+        "default_route",
+        "runtime_plan",
+        "node_allocation",
+        "node_architect_seam",
+        "effect_authority",
+        "exact_readback",
+        "typed_continuation",
+        "restart_recovery",
+        "self_fix_replay",
+        "stale_state_fail_closed",
+        "deterministic_replay",
+        "recursive_plan_dag_complete"
+      ],
+      "original_trace_status": "MISSING",
+      "qualification_granted": false,
+      "executed_effects": []
+    },
+    "requirements": [
+      {
+        "native_requirement": "CF-RED approved nonproduction scenario provenance",
+        "source": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json:119-125",
+        "available": "Actual standalone lease handoff failure/prestate/command trace in c247 evidence, distinguished from original DWO",
+        "disposition": "SANDBOX_FACTS_PRESENT_NATIVE_SELECTION_NOT_ADMITTED"
+      },
+      {
+        "native_requirement": "subject, scenario_id, observed_prestate_ref, observed_error_ref, defect_class, original_incident_replayed, authorization_ref, provenance_digest",
+        "source": "tools/node_architect/q0_qualification.py:600-624",
+        "available": "Candidate wrapper contains scenario and red/green trace facts but is not this native provenance record",
+        "disposition": "FORMAT_INCOMPATIBLE_AS_IS",
+        "observed_error": "REPLAY_PROVENANCE_FIELDS_INVALID",
+        "limits": "This is the exact result of passing the actual committed engineering artifact to the existing pure validator, not proof no legitimate future producer can bind those facts. No approved subject/authorization/digest was invented."
+      },
+      {
+        "native_requirement": "Loaded runtime identity equals exact candidate SHA; nonempty activation_id, source_root, runtime_session_id, runtime_process_id",
+        "source": "tools/node_architect/q0_qualification.py:643-648",
+        "available": "Sandbox subprocess and module byte hashes only; native_runtime_activation_id=null and native_load_proof=false in candidate",
+        "disposition": "NATIVE_LOAD_IDENTITY_NOT_ESTABLISHED"
+      },
+      {
+        "native_requirement": "loaded_profile_digest, loaded_module_identities, candidate_sha, loaded_source_sha bound to candidate/profile",
+        "source": "tools/node_architect/q0_qualification.py:649-654",
+        "available": "Current source Q0 profile was schema/digest validated; that does not prove a native activation loaded it",
+        "disposition": "SOURCE_PROFILE_VALIDATED_NOT_LOAD_PROOF"
+      },
+      {
+        "native_requirement": "Explicit Agent Host manifest.event and provider_name; host-owned registered provider",
+        "source": "tools/node_architect/agent_runtime_cli.py:81-108; tools/node_architect/agent_provider_bridge.py:46-82",
+        "available": "Standalone fixture imports delivery_outbox directly, not a bound native provider/NodeAllocation dispatch",
+        "disposition": "NO_NATIVE_HOST_DISPATCH_BINDING",
+        "limits": "Static tools/ Python literal scan found delivery_outbox references only in its defining module; aliases/external hosts/dynamic references not covered. Synthetic providers cannot establish LOAD_PROOF."
+      },
+      {
+        "native_requirement": "CF-REPLAY same frozen scenario after CF-LOAD; forward progress and full qualification matrix",
+        "source": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json:168-205; tools/node_architect/q0_qualification.py:655-669",
+        "available": "Same sandbox prestate/trace and stale-owner refusal proven; no native load/typed continuation/matrix acceptance",
+        "disposition": "SANDBOX_REPLAY_ONLY"
+      },
+      {
+        "native_requirement": "INJECTED_FAULT_RESILIENCE cannot satisfy self_fix_replay",
+        "source": "tools/node_architect/q0_qualification.py:661-664",
+        "available": "Observed genuine delivery-store race is not automatically an admitted GENUINE_GWC_RUNTIME_DEFECT in native campaign",
+        "disposition": "NO_DEFECT_CLASS_PROMOTION",
+        "limits": "Do not label it approved/genuine-native merely to bypass this rule."
+      }
+    ],
+    "no_native_provenance_or_receipts_created": true,
+    "not_a_global_unavailability_claim": true,
+    "qualification_results": {},
+    "native_activation_id": null,
+    "LOAD_PROOF": false,
+    "L3": false,
+    "UR_G6_accepted": false
+  },
+  "original_dwo_evidence": {
+    "manifest_path": ".gwc/tasks/SCRUM-781/fixtures/dwo-login-auth-r1/manifest-v1.json",
+    "original_trace_status": "MISSING",
+    "provenance_class": "RECONSTRUCTED_REQUIREMENTS_BOUND",
+    "oracle_refs": "Manifest links Notion design and Jira SCRUM-780 as requirements, not observed incident trace",
+    "jira_read": {
+      "issue": "SCRUM-780",
+      "fields_requested": "summary,status,attachment,issuelinks,updated",
+      "comment_limit": 0,
+      "update_history": false,
+      "returned_status": "In Progress",
+      "returned_updated": "2026-09-18 01:43:09 +07",
+      "attachment": "UNKNOWN_NOT_EXPOSED_BY_CURATED_RESPONSE",
+      "issuelinks": "UNKNOWN_NOT_EXPOSED_BY_CURATED_RESPONSE"
+    },
+    "authentic_incident_replayed": false,
+    "limits": "No exhaustive incident-absence claim. No description/comments/credentials read, no authenticated target replay or Jira writes. Fresh missing-field evidence is bounded to these canonical sources."
+  },
+  "impact_evidence": {
+    "ua_graph_sha256": "c3b95ad7583dfeedc99e44f0480eed3d9c19635cff7a8db22f9b3d5f93f51f63",
+    "ua_nodes": 1403,
+    "delivery_outbox_literal_matches": 0,
+    "graph_freshness": "NOT_ESTABLISHED",
+    "low_impact_claimed": false,
+    "source_scan": "tools/ Python literal scan of delivery_outbox/verify_ack showed defining module only; regression selected from observed call sites and affected existing suites; no specialist child under max_children0"
+  },
+  "preservation": {
+    "live_checkpoint_sha256": "d64617f56f513e6647e3e1215c2a1a4ba6a9d151a98a74a2234ce8a44e6be29c",
+    "preserved_untracked_files": 12,
+    "frozen_plan_unchanged": true
+  },
+  "live_only_boundary": {
+    "owner": "Native GWC authority/target owner via Controller",
+    "requires": "Independently trusted native effect/target grant and authentic target/incident/load bindings before live activation/checkpoint/selector/cursor/scheduler/replay",
+    "does_not_block": "Branch-local engineering, compatibility assessment and safe negative tests under existing UNIVERSAL_V2_DEVELOPMENT"
+  }
+}

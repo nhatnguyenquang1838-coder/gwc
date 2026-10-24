@@ -117,14 +117,29 @@ def test_effectful_step_rejects_whitespace_requested_action():
         executor.execute_step("commit", {}, authority=authority, requested_action="   ")
 
 
-def test_authority_revalidation_invokes_real_validator_allowed():
-    """B2: an effectful action with a scope that authorizes it is revalidated
-    by the GWC boundary check."""
+def test_authority_revalidation_invokes_real_validator_and_fails_closed_on_effectful_action():
+    """B2: the canonical GWC authority boundary evaluator IS invoked for an
+    effectful action. The evaluator is authority-negative: an effectful action
+    with no executable approval returns REQUIRE_APPROVAL, so the executor must
+    fail closed rather than set authority_revalidated=True on scope presence
+    alone (SCRUM-674 commit 68b45bd)."""
     step = _plan_step("commit", allowed_actions=("commit",))
     plan = _plan({"commit": step})
     authority = _authority(allowed_actions=["commit"], gate="G3_PR")
     executor = PlanBoundRuntimeExecutor(plan=plan, authority=authority)
-    result = executor.execute_step("commit", {}, authority=authority, requested_action="commit")
+    with pytest.raises(PlanBoundRuntimeError, match="authority revalidation failed: AUTHORITY_APPROVAL_REQUIRED"):
+        executor.execute_step("commit", {}, authority=authority, requested_action="commit")
+
+
+def test_authority_revalidation_allows_read_only_when_validator_permits():
+    """B2 positive: a read-only action whose scope authorizes it reaches
+    ALLOW_PREPARATION from the canonical validator, so authority_revalidated
+    is True — proving the validator is actually invoked (not skipped)."""
+    step = _plan_step("inspect", allowed_actions=("read",))
+    plan = _plan({"inspect": step})
+    authority = _authority(allowed_actions=["read"], gate="G2_EXECUTION")
+    executor = PlanBoundRuntimeExecutor(plan=plan, authority=authority)
+    result = executor.execute_step("inspect", {}, authority=authority, requested_action="read")
     assert result["authority_revalidated"] is True
 
 

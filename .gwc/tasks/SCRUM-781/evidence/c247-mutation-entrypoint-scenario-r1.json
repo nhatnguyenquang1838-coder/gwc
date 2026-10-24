@@ -1,0 +1,279 @@
+{
+  "report_kind": "C247_PARTIAL_MUTATION_HARDENING_AND_SANDBOX_SCENARIO",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "session_id": "20261014_021304_0dc728",
+  "source_parent": "607c75bfc6f1bc021d6bd5051965bcbfb5340975",
+  "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+  "tested_file_sha256": {
+    "tools/node_architect/delivery_outbox.py": "e7ad6447b8f450ed06a04010aeb785417a154709910b3f4ab6a3d1a678edf59f",
+    "tools/node_architect/engineering_host_adapter.py": "c736c6925966df1b3560e695fe9e12d27f7bd3a6aee8b1307df80c54278ff907",
+    "tools/node_architect/controller_exchange_adapter.py": "5d3a84dbde6606096109b6edc2403474799e8deb2d603bc8df1dc95616d2625c",
+    "tests/test_delivery_outbox.py": "71b7f64bf51b1101cf24439f1d0e072bde084709fcd6a0ef509d407070328ca0",
+    "tests/test_engineering_frontier_host.py": "e41c362f2d75877d068aa771a251541ec5c384e5a1b2c1c2264634fa40d06eae",
+    "tests/test_exchange_outbox_transitions.py": "751e58b5819273560da9fc5b489bf722fbe5b6852657dec918b8ed4a7eb5cbf0"
+  },
+  "authority_granted": false,
+  "max_children": 0,
+  "native_effects_executed": [],
+  "entrypoints": [
+    {
+      "path": "tools/node_architect/delivery_outbox.py",
+      "entrypoints": [
+        "acquire_lease",
+        "transition"
+      ],
+      "observed_failure": "Stale A transition overwrote persisted B lease; zero-row CAS and exact-expiry acquisitions reported success without persisted owner match",
+      "negative_path_fix": "Serialize acquisition; require one updated row; transition CAS against persisted state, holder, exact lease expiration and current expiry cutoff under write lock",
+      "provenance_strength": "PERSISTED_STORE_FENCE_ONLY_NOT_GWC_EFFECT_AUTHORITY",
+      "remaining": "verify_ack truthy signature_proof is not authenticated proof; store ownership/authenticity and external delivery grants are not established"
+    },
+    {
+      "path": "tools/node_architect/engineering_host_adapter.py",
+      "entrypoints": [
+        "local_engineering_capabilities.preflight",
+        "local_engineering_capabilities.execute"
+      ],
+      "observed_failure": "Unbound fingerprint reached subprocess; ../ fingerprint overwrote a sentinel outside artifact directory in isolated test",
+      "negative_path_fix": "Require canonical work fingerprint and resolved artifact target containment before task subprocess; recheck target before artifact write",
+      "provenance_strength": "CONTENT_INTEGRITY_NOT_AUTHENTICATION",
+      "remaining": "guard callback remains host-injected; allowlisted command is not OS sandbox or native protected authority. Path checks are not an atomic filesystem TOCTOU proof."
+    },
+    {
+      "path": "tools/node_architect/controller_exchange_adapter.py",
+      "entrypoints": [
+        "ExchangeOutbox.record",
+        "execute_host_exchange"
+      ],
+      "observed_failure": "Wrong-session/incomplete/weak/resume-widening terminal receipts persisted; initial dispatch read unreserved request",
+      "negative_path_fix": "Use existing shared response validator before terminal durable update; reserve before observing/noting attempts, preserve duplicate suppression",
+      "provenance_strength": "COORDINATION_CORRELATION_ONLY_NOT_TYPED_NEXT",
+      "remaining": "Caller observation flags are not independently authenticated UI evidence or permission to resume native execution"
+    }
+  ],
+  "evidence": {
+    "delivery_red": "2 failed in 0.07s; exit1",
+    "expiry_red": "1 failed in 0.06s; exit1",
+    "host_red": "3 failed in 1.31s; exit1 (including missing fingerprint KeyError after subprocess and traversal DID NOT RAISE)",
+    "exchange_red": "4 failed,2 passed in 0.10s; exit1",
+    "bridge_preexisting_baseline": "Existing bridge test reproduced against byte-identical607c75bf adapter: EXCHANGE_NOT_RESERVED,1 failed in0.05s. Repaired in same scoped adapter.",
+    "delivery_green": "20 passed in2.33s",
+    "host_green": "12 passed in5.04s",
+    "expanded_regression": "295 passed in16.39s across15 modules; exit0",
+    "host_symlink_red": "1 failed in0.61s; exit1 before resolved-target refusal",
+    "raw_logs": "~/.hermes/cache/scratch/q0-recovery-r1/c247-mutation-cas-r1/"
+  },
+  "controlled_scenario": {
+    "status": "OBSERVED_SANDBOX_CANDIDATE_NOT_NATIVE_CF_QUALIFIED",
+    "fixture": ".gwc/tasks/SCRUM-781/fixtures/c247-lease-handoff-r1.py",
+    "fixture_sha256": "624ae5a2086827bfe9a4ec0474e2851adfec608975467ad62e951dca0b74a8ce",
+    "original_capture_fixture_sha256": "2071c4a2f6853e348de974fd3218bb3ce4ba83f1489278c85e39fdebac8abfde",
+    "published_fixture_equivalence": "Fresh pre-fix RED exit1 and fixed GREEN exit0; same frozen trace/prestate verified. published-red/published-green command and log captures retained.",
+    "command_shape": "python -B <fixture> tools/node_architect/delivery_outbox.py <new-directory-under-$HOME/.hermes/cache/scratch>",
+    "same_trace_prestate_sha256": "0704c1123c635afea193a59d80b02c93fa42654f192059254286facc9e1fd199",
+    "red_exit_code": 1,
+    "green_exit_code": 0,
+    "red": {
+      "authority_granted": false,
+      "clock_class": "DETERMINISTIC_SANDBOX_CLOCK",
+      "contract_satisfied": false,
+      "evidence_class": "SANDBOX_DELIVERY_RUNTIME_CANDIDATE_NOT_NATIVE_CF_QUALIFICATION",
+      "expected": "stale A refused; current B lease and IN_FLIGHT state preserved",
+      "external_network_calls": 0,
+      "final_state": {
+        "attempt_no": 0,
+        "backoff_ms": 1000,
+        "canonical_state_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "created_at": 1000.0,
+        "delivery_generation": 1,
+        "destination_id": "sandbox-no-network",
+        "destination_policy_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "event_id": "sandbox-controlled-handoff",
+        "event_payload_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "event_source": "gwc.node-architect.external-audit-projection.v1.0",
+        "jitter_ms": 250,
+        "lease_expires_at": null,
+        "lease_holder": null,
+        "lineage_json": "[]",
+        "max_age_s": 604800,
+        "max_attempts": 10,
+        "next_attempt_at": null,
+        "projection_target": "external-audit-projection",
+        "reason_class": null,
+        "state": "ACK_CONFIRMED",
+        "updated_at": 1002.0
+      },
+      "native_load_proof": false,
+      "original_dwo_failure_not_reproduced": true,
+      "scenario": "lease-handoff-between-check-and-update",
+      "source_sha256": "e9ac29c8972782ffbebaa597ef19ec3c7aeb75f3f5fc42ac7e2abc3ed6761a52",
+      "stale_worker_error": null,
+      "trace": [
+        {
+          "event": "A_checked_lease",
+          "state": {
+            "attempt_no": 0,
+            "backoff_ms": 1000,
+            "canonical_state_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "created_at": 1000.0,
+            "delivery_generation": 1,
+            "destination_id": "sandbox-no-network",
+            "destination_policy_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "event_id": "sandbox-controlled-handoff",
+            "event_payload_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "event_source": "gwc.node-architect.external-audit-projection.v1.0",
+            "jitter_ms": 250,
+            "lease_expires_at": 1001.0,
+            "lease_holder": "sandbox-worker-A",
+            "lineage_json": "[]",
+            "max_age_s": 604800,
+            "max_attempts": 10,
+            "next_attempt_at": null,
+            "projection_target": "external-audit-projection",
+            "reason_class": null,
+            "state": "IN_FLIGHT",
+            "updated_at": 1000.0
+          }
+        },
+        {
+          "event": "B_reclaimed_after_A_check",
+          "state": {
+            "attempt_no": 0,
+            "backoff_ms": 1000,
+            "canonical_state_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "created_at": 1000.0,
+            "delivery_generation": 1,
+            "destination_id": "sandbox-no-network",
+            "destination_policy_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "event_id": "sandbox-controlled-handoff",
+            "event_payload_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "event_source": "gwc.node-architect.external-audit-projection.v1.0",
+            "jitter_ms": 250,
+            "lease_expires_at": 1062.0,
+            "lease_holder": "sandbox-worker-B",
+            "lineage_json": "[]",
+            "max_age_s": 604800,
+            "max_attempts": 10,
+            "next_attempt_at": null,
+            "projection_target": "external-audit-projection",
+            "reason_class": null,
+            "state": "IN_FLIGHT",
+            "updated_at": 1002.0
+          }
+        }
+      ]
+    },
+    "green": {
+      "authority_granted": false,
+      "clock_class": "DETERMINISTIC_SANDBOX_CLOCK",
+      "contract_satisfied": true,
+      "evidence_class": "SANDBOX_DELIVERY_RUNTIME_CANDIDATE_NOT_NATIVE_CF_QUALIFICATION",
+      "expected": "stale A refused; current B lease and IN_FLIGHT state preserved",
+      "external_network_calls": 0,
+      "final_state": {
+        "attempt_no": 0,
+        "backoff_ms": 1000,
+        "canonical_state_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "created_at": 1000.0,
+        "delivery_generation": 1,
+        "destination_id": "sandbox-no-network",
+        "destination_policy_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "event_id": "sandbox-controlled-handoff",
+        "event_payload_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "event_source": "gwc.node-architect.external-audit-projection.v1.0",
+        "jitter_ms": 250,
+        "lease_expires_at": 1062.0,
+        "lease_holder": "sandbox-worker-B",
+        "lineage_json": "[]",
+        "max_age_s": 604800,
+        "max_attempts": 10,
+        "next_attempt_at": null,
+        "projection_target": "external-audit-projection",
+        "reason_class": null,
+        "state": "IN_FLIGHT",
+        "updated_at": 1002.0
+      },
+      "native_load_proof": false,
+      "original_dwo_failure_not_reproduced": true,
+      "scenario": "lease-handoff-between-check-and-update",
+      "source_sha256": "e7ad6447b8f450ed06a04010aeb785417a154709910b3f4ab6a3d1a678edf59f",
+      "stale_worker_error": "OUTBOX_LEASE_LOST",
+      "trace": [
+        {
+          "event": "A_checked_lease",
+          "state": {
+            "attempt_no": 0,
+            "backoff_ms": 1000,
+            "canonical_state_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "created_at": 1000.0,
+            "delivery_generation": 1,
+            "destination_id": "sandbox-no-network",
+            "destination_policy_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "event_id": "sandbox-controlled-handoff",
+            "event_payload_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "event_source": "gwc.node-architect.external-audit-projection.v1.0",
+            "jitter_ms": 250,
+            "lease_expires_at": 1001.0,
+            "lease_holder": "sandbox-worker-A",
+            "lineage_json": "[]",
+            "max_age_s": 604800,
+            "max_attempts": 10,
+            "next_attempt_at": null,
+            "projection_target": "external-audit-projection",
+            "reason_class": null,
+            "state": "IN_FLIGHT",
+            "updated_at": 1000.0
+          }
+        },
+        {
+          "event": "B_reclaimed_after_A_check",
+          "state": {
+            "attempt_no": 0,
+            "backoff_ms": 1000,
+            "canonical_state_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "created_at": 1000.0,
+            "delivery_generation": 1,
+            "destination_id": "sandbox-no-network",
+            "destination_policy_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "event_id": "sandbox-controlled-handoff",
+            "event_payload_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "event_source": "gwc.node-architect.external-audit-projection.v1.0",
+            "jitter_ms": 250,
+            "lease_expires_at": 1062.0,
+            "lease_holder": "sandbox-worker-B",
+            "lineage_json": "[]",
+            "max_age_s": 604800,
+            "max_attempts": 10,
+            "next_attempt_at": null,
+            "projection_target": "external-audit-projection",
+            "reason_class": null,
+            "state": "IN_FLIGHT",
+            "updated_at": 1002.0
+          }
+        }
+      ]
+    },
+    "native_runtime_activation_id": null,
+    "native_load_proof": false,
+    "approved_native_scenario_provenance": "NOT_ESTABLISHED",
+    "limitations": "Deterministic fault scheduling at actual delivery-store lease check; no external network, native Universal host firing, typed cursor, live checkpoint, protected activation or original DWO replay. Do not promote to CF-RED PASS, LOAD_PROOF, L3 or UR.G6."
+  },
+  "original_dwo_replay_prerequisites": {
+    "original_incident_trace": "MISSING",
+    "exact_authentic_target_binding": "NOT_VERIFIED_THIS_TURN",
+    "safe_authenticated_target_grant": "NOT_ADMITTED",
+    "native_activation_id": null,
+    "loaded_module_and_instruction_digests": "NOT_CAPTURED",
+    "incident_replay": "NOT_REPRODUCED",
+    "reconstructed_suite": "Only requirements-derived; not incident evidence"
+  },
+  "preservation": {
+    "checkpoint_sha256": "d64617f56f513e6647e3e1215c2a1a4ba6a9d151a98a74a2234ce8a44e6be29c",
+    "preserved_untracked_files": 12,
+    "frozen_runtime_plan": "UNCHANGED"
+  },
+  "live_only_boundary": {
+    "owner": "Native GWC authority/target owner via Controller",
+    "requires": "Exact independently trusted effect grant/target receipt for actual live checkpoint/selector/cursor/scheduler/activation and authentic replay; original incident inputs/load proof for L3",
+    "does_not_block": "Source-bound branch-local engineering under UNIVERSAL_V2_DEVELOPMENT"
+  }
+}

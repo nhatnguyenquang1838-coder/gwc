@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "evidence_class": "ENGINEERING_RED_GREEN_DOC_DRIFT_REPAIR_NOT_NATIVE_GATE_RECEIPT",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "session_id": "20261014_021304_0dc728",
+  "native_tick": 94,
+  "source_head": "f219d9b068640591cff46493104c9c8cfce16d08",
+  "collected_at": "2026-10-18T22:55:00Z",
+  "native_preflight": "ENGINEERING_PREFLIGHT_PASS",
+  "defect": "Q0_DOC_LITERAL_ASSERTION_DRIFT_FASTLANE",
+  "diagnosis": {
+    "failing_tests_before": [
+      "tests/test_fastlane_process_optimization.py::test_e2e_allows_autonomous_steps_after_g2_but_blocks_merge",
+      "tests/test_fastlane_process_optimization.py::test_chatgpt_overlay_requires_auto_ready_when_supported_then_g4_token",
+      "tests/test_fastlane_process_optimization.py::test_g5_exact_sha_fallback_blocks_pr_only_false_pending"
+    ],
+    "root_cause": "Three tests asserted exact literal substrings in canonical tracked docs (core/E2E_DRAFT_PR_DELIVERY_RULE.md, agents/chatgpt-agent/agent-instructions.md) that had since drifted to different but semantically equivalent wording. Examples: 'After valid approval, the agent may proceed without requesting confirmation' -> 'does not need additional approval for each permitted action'; 'G4 remains a separate human decision' -> 'it is a separate G4 action' (line-wrapped) + 'E2E/G2 does not itself authorize merge'; 'metadata transition from Draft to Ready for review after G3' -> 'Ready-for-review is G3 metadata completion only' + 'This transition is not merge approval'; 'fall back to a known `run_id`' in chatgpt overlay -> 'post-merge lookup cannot prove the target SHA' (the run_id fallback phrase lives in GATE_LIFECYCLE_CONTRACT and DWC instructions; the ChatGPT overlay uses the target-SHA phrasing).",
+    "source_of_truth": "The tracked docs are canonical; the tests bind literal assertions to them (document-literal contract), so the tests drifted, not the docs. Verified each replacement phrase exists verbatim in the live file before patching.",
+    "not_a_code_defect": true
+  },
+  "repair": {
+    "file": "tests/test_fastlane_process_optimization.py",
+    "red_verified": true,
+    "change": "Updated 5 literal assertions across 3 tests to the current canonical doc wording, preserving each test's semantic intent (G2 autonomy boundary no longer blocks post-approval steps; G4/G2 merge boundary; ChatGPT ready-for-review is G3 metadata completion not merge authority; G5 exact post-merge lookup fail-closed CONNECTOR_OBSERVABILITY_INCOMPLETE). No assertion weakened in meaning; every replacement was grep-verified in the live doc.",
+    "green_verified": true,
+    "focused_suite": "tests/test_fastlane_process_optimization.py: 5 passed"
+  },
+  "wide_suite": {
+    "command": "pytest tests/ --ignore=tests/test_g2-execution-library.py",
+    "passed": 3727,
+    "failed": 16,
+    "skipped": 7,
+    "subtests_passed": 576,
+    "failures_closed_this_tick": 3,
+    "cumulative_failures_closed_ticks_92_94": 4,
+    "new_failure_ids": 0,
+    "excluded_file": "tests/test_g2-execution-library.py — tracked Markdown file with .py suffix breaks unfiltered pytest collection; unchanged at parent HEAD, excluded by name only, not a repository pytest PASS"
+  },
+  "remaining_failures": {
+    "count": 16,
+    "classification": "LEGACY_GATE_FIXTURE_REJECTED_BY_V2",
+    "modules": [
+      "tests.test_agent_runtime_entrypoint_m1_m7 (1)",
+      "tests.test_scrum_566_agent_host_wiring (4)",
+      "tests.test_scrum_566_agent_runtime_loop (11)"
+    ],
+    "all_reproduced_in_prior_q0_baseline": true,
+    "all_closed": false,
+    "note": "All 16 are legacy v1 host/gate fixtures that the Universal V2 quarantine intentionally rejects (ValueError: UNIVERSAL_GATE_INVALID from live_runtime_bridge GATES allowlist). No new failure IDs introduced across ticks 89-94."
+  },
+  "foreign_files_preserved": 6,
+  "hashes_intact": true,
+  "single_writer": true,
+  "no_new_branch": true,
+  "no_core_or_plugin_edit": true,
+  "no_destructive_action": true,
+  "no_merge_or_deploy": true,
+  "m1_hold_unchanged": true,
+  "never_claimed": [
+    "LOAD_PROOF",
+    "original replay",
+    "L3",
+    "native gate receipt"
+  ]
+}

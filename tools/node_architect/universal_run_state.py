@@ -174,8 +174,8 @@ def create_run_state_record(
     """Create a sealed immutable RunStateRecord with no effect/authority semantics."""
     record: dict[str, Any] = {
         "record_id": record_id,
-        "schema_id": "gwc.universal-run.run-state-record",
-        "schema_version": 1,
+        "schema_id": "gwc.universal-run.run-state-record.v2",
+        "schema_version": 2,
         "run_id": run_id,
         "created_at": created_at,
         "created_by": copy.deepcopy(dict(created_by)),
@@ -204,7 +204,7 @@ def create_run_state_record(
 
 
 def verify_run_state_record(record: Mapping[str, Any]) -> bool:
-    if not isinstance(record, Mapping) or record.get("schema_id") != "gwc.universal-run.run-state-record":
+    if not isinstance(record, Mapping) or record.get("schema_id") != "gwc.universal-run.run-state-record.v2":
         return False
     if not verify_record_digest(record):
         return False

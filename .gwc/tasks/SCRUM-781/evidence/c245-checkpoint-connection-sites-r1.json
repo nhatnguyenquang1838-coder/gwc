@@ -1,0 +1,648 @@
+{
+  "source_head": "4087ee15eb1a3603ebd5c2f577ead44406b56eaa",
+  "scope": "all Python files under tools/node_architect; sqlite3.connect and _connect call expressions only; other aliases/external stores are not covered",
+  "sites": [
+    {
+      "path": "tools/node_architect/checkpoint_sqlite.py",
+      "source_sha256": "e54e5d48ccc43cf4c381befe0548bde9a30d9eb0df1cd7dc6cf2433c89f0b849",
+      "line": 40,
+      "enclosing_function": "_connect",
+      "call": "sqlite3.connect(str(path))",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/checkpoint_sqlite.py",
+      "source_sha256": "e54e5d48ccc43cf4c381befe0548bde9a30d9eb0df1cd7dc6cf2433c89f0b849",
+      "line": 83,
+      "enclosing_function": "write_checkpoint",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/checkpoint_sqlite.py",
+      "source_sha256": "e54e5d48ccc43cf4c381befe0548bde9a30d9eb0df1cd7dc6cf2433c89f0b849",
+      "line": 120,
+      "enclosing_function": "read_checkpoint",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/checkpoint_sqlite.py",
+      "source_sha256": "e54e5d48ccc43cf4c381befe0548bde9a30d9eb0df1cd7dc6cf2433c89f0b849",
+      "line": 148,
+      "enclosing_function": "store_meta_get",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/checkpoint_sqlite.py",
+      "source_sha256": "e54e5d48ccc43cf4c381befe0548bde9a30d9eb0df1cd7dc6cf2433c89f0b849",
+      "line": 158,
+      "enclosing_function": "store_meta_set",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/checkpoint_sqlite.py",
+      "source_sha256": "e54e5d48ccc43cf4c381befe0548bde9a30d9eb0df1cd7dc6cf2433c89f0b849",
+      "line": 50,
+      "enclosing_function": "init_store",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/controller_exchange_adapter.py",
+      "source_sha256": "55539f335ab7c02e64696e5721bff04677290ed48581cd760ad58b700205b328",
+      "line": 160,
+      "enclosing_function": "_db",
+      "call": "sqlite3.connect(str(self.path), timeout=10)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/delivery_outbox.py",
+      "source_sha256": "e9ac29c8972782ffbebaa597ef19ec3c7aeb75f3f5fc42ac7e2abc3ed6761a52",
+      "line": 142,
+      "enclosing_function": "_connect",
+      "call": "sqlite3.connect(str(path), timeout=5)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/delivery_outbox.py",
+      "source_sha256": "e9ac29c8972782ffbebaa597ef19ec3c7aeb75f3f5fc42ac7e2abc3ed6761a52",
+      "line": 346,
+      "enclosing_function": "_verify_lease",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/delivery_outbox.py",
+      "source_sha256": "e9ac29c8972782ffbebaa597ef19ec3c7aeb75f3f5fc42ac7e2abc3ed6761a52",
+      "line": 187,
+      "enclosing_function": "init_store",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/delivery_outbox.py",
+      "source_sha256": "e9ac29c8972782ffbebaa597ef19ec3c7aeb75f3f5fc42ac7e2abc3ed6761a52",
+      "line": 205,
+      "enclosing_function": "_readback_after_write",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/delivery_outbox.py",
+      "source_sha256": "e9ac29c8972782ffbebaa597ef19ec3c7aeb75f3f5fc42ac7e2abc3ed6761a52",
+      "line": 269,
+      "enclosing_function": "enqueue",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/delivery_outbox.py",
+      "source_sha256": "e9ac29c8972782ffbebaa597ef19ec3c7aeb75f3f5fc42ac7e2abc3ed6761a52",
+      "line": 309,
+      "enclosing_function": "acquire_lease",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/delivery_outbox.py",
+      "source_sha256": "e9ac29c8972782ffbebaa597ef19ec3c7aeb75f3f5fc42ac7e2abc3ed6761a52",
+      "line": 393,
+      "enclosing_function": "transition",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/delivery_outbox.py",
+      "source_sha256": "e9ac29c8972782ffbebaa597ef19ec3c7aeb75f3f5fc42ac7e2abc3ed6761a52",
+      "line": 423,
+      "enclosing_function": "record_attempt",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/delivery_outbox.py",
+      "source_sha256": "e9ac29c8972782ffbebaa597ef19ec3c7aeb75f3f5fc42ac7e2abc3ed6761a52",
+      "line": 451,
+      "enclosing_function": "verify_ack",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/delivery_outbox.py",
+      "source_sha256": "e9ac29c8972782ffbebaa597ef19ec3c7aeb75f3f5fc42ac7e2abc3ed6761a52",
+      "line": 491,
+      "enclosing_function": "discover_restart",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/delivery_outbox.py",
+      "source_sha256": "e9ac29c8972782ffbebaa597ef19ec3c7aeb75f3f5fc42ac7e2abc3ed6761a52",
+      "line": 512,
+      "enclosing_function": "quarantine",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_host_adapter.py",
+      "source_sha256": "c17e43b1ff107e084351e94758cd97c02dd5d2fef3f941235f03c7e2ba1cf28d",
+      "line": 243,
+      "enclosing_function": "_validate_agent_request",
+      "call": "sqlite3.connect(context['workflow']['checkpoint_ref'])",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_host_adapter.py",
+      "source_sha256": "c17e43b1ff107e084351e94758cd97c02dd5d2fef3f941235f03c7e2ba1cf28d",
+      "line": 252,
+      "enclosing_function": "_agent_transition",
+      "call": "sqlite3.connect(context['workflow']['checkpoint_ref'])",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_host_adapter.py",
+      "source_sha256": "c17e43b1ff107e084351e94758cd97c02dd5d2fef3f941235f03c7e2ba1cf28d",
+      "line": 263,
+      "enclosing_function": "_agent_transition",
+      "call": "sqlite3.connect(context['workflow']['checkpoint_ref'])",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_host_adapter.py",
+      "source_sha256": "c17e43b1ff107e084351e94758cd97c02dd5d2fef3f941235f03c7e2ba1cf28d",
+      "line": 329,
+      "enclosing_function": "verify_agent_execution",
+      "call": "sqlite3.connect(context['workflow']['checkpoint_ref'])",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_host_adapter.py",
+      "source_sha256": "c17e43b1ff107e084351e94758cd97c02dd5d2fef3f941235f03c7e2ba1cf28d",
+      "line": 193,
+      "enclosing_function": "read_source_bound_frontier",
+      "call": "sqlite3.connect(cp.as_uri() + '?mode=ro', uri=True)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 158,
+      "enclosing_function": "_connect",
+      "call": "sqlite3.connect(str(path), timeout=30)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 95,
+      "enclosing_function": "_historical_context_recovery",
+      "call": "sqlite3.connect(str(checkpoint_ref), timeout=30)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 125,
+      "enclosing_function": "resolve_prior_context",
+      "call": "sqlite3.connect(str(checkpoint_ref), timeout=30)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 185,
+      "enclosing_function": "run_engineering_workflow",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 790,
+      "enclosing_function": "run_engineering_workflow",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 793,
+      "enclosing_function": "run_engineering_workflow",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 862,
+      "enclosing_function": "reconcile_engineering_source_head",
+      "call": "sqlite3.connect(str(old['workflow']['checkpoint_ref']), timeout=30)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 874,
+      "enclosing_function": "reconcile_engineering_source_head",
+      "call": "_connect(old['workflow']['checkpoint_ref'])",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 884,
+      "enclosing_function": "reconcile_legacy_terminal_dispatches",
+      "call": "sqlite3.connect(str(checkpoint_ref))",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 931,
+      "enclosing_function": "reconcile_engineering_conversation_binding",
+      "call": "_connect(old['workflow']['checkpoint_ref'])",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 943,
+      "enclosing_function": "reconcile_engineering_conversation_binding",
+      "call": "_connect(old['workflow']['checkpoint_ref'])",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 984,
+      "enclosing_function": "reconcile_engineering_route_metadata",
+      "call": "_connect(old['workflow']['checkpoint_ref'])",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 999,
+      "enclosing_function": "reconcile_engineering_route_metadata",
+      "call": "_connect(old['workflow']['checkpoint_ref'])",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 1013,
+      "enclosing_function": "invalidate_engineering_work",
+      "call": "_connect(checkpoint_ref)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 1028,
+      "enclosing_function": "invalidate_engineering_work",
+      "call": "_connect(checkpoint_ref)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 1042,
+      "enclosing_function": "reconcile_interrupted_invocation",
+      "call": "_connect(checkpoint_ref)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 1055,
+      "enclosing_function": "reconcile_interrupted_invocation",
+      "call": "_connect(checkpoint_ref)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 1098,
+      "enclosing_function": "reconcile_engineering_plan_transition",
+      "call": "_connect(old['workflow']['checkpoint_ref'])",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 1121,
+      "enclosing_function": "reconcile_engineering_plan_transition",
+      "call": "_connect(old['workflow']['checkpoint_ref'])",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 1183,
+      "enclosing_function": "reconcile_engineering_worktree_relocation",
+      "call": "_connect(old['workflow']['checkpoint_ref'])",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 1196,
+      "enclosing_function": "reconcile_engineering_worktree_relocation",
+      "call": "_connect(old['workflow']['checkpoint_ref'])",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 177,
+      "enclosing_function": "run_engineering_workflow",
+      "call": "sqlite3.connect(checkpoint_uri, uri=True, timeout=30)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 201,
+      "enclosing_function": "_telemetry",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 214,
+      "enclosing_function": "_table_exists",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 217,
+      "enclosing_function": "_already_reported",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 222,
+      "enclosing_function": "_mark_reported",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 234,
+      "enclosing_function": "_is_verified",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 265,
+      "enclosing_function": "_successor_intent_approved",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 282,
+      "enclosing_function": "m3",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 377,
+      "enclosing_function": "m5",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 403,
+      "enclosing_function": "m5",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 449,
+      "enclosing_function": "m5",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 462,
+      "enclosing_function": "m6",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 501,
+      "enclosing_function": "m7",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 602,
+      "enclosing_function": "m8",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 836,
+      "enclosing_function": "reconcile_engineering_source_head",
+      "call": "sqlite3.connect(live_uri, uri=True, timeout=30)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 843,
+      "enclosing_function": "reconcile_engineering_source_head",
+      "call": "sqlite3.connect(str(target_copy), timeout=30)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 580,
+      "enclosing_function": "m8",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 655,
+      "enclosing_function": "m8",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 387,
+      "enclosing_function": "m5",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 437,
+      "enclosing_function": "m5",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "source_sha256": "e7a80ea79df84b50b973fb3c34ad3a50857b8d90a00da932bc9be230571ca5c0",
+      "line": 703,
+      "enclosing_function": "m8",
+      "call": "_connect(path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/q0_m1_m7_integration.py",
+      "source_sha256": "ad7c1d9e6aa7a67da80129ad5308fdd48c5c25da48e43f682cc95ddec7565e35",
+      "line": 561,
+      "enclosing_function": "_live_db_generation",
+      "call": "sqlite3.connect(f'file:{db_path}?mode=ro', uri=True)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/q0_m1_m7_integration.py",
+      "source_sha256": "ad7c1d9e6aa7a67da80129ad5308fdd48c5c25da48e43f682cc95ddec7565e35",
+      "line": 592,
+      "enclosing_function": "_reconcile_legacy_live_activation_journal",
+      "call": "sqlite3.connect(db_path)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/q0_m1_m7_integration.py",
+      "source_sha256": "ad7c1d9e6aa7a67da80129ad5308fdd48c5c25da48e43f682cc95ddec7565e35",
+      "line": 702,
+      "enclosing_function": "verify_live_activation_isolated",
+      "call": "sqlite3.connect(f'file:{db_path}?mode=ro', uri=True)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/q0_m1_m7_integration.py",
+      "source_sha256": "ad7c1d9e6aa7a67da80129ad5308fdd48c5c25da48e43f682cc95ddec7565e35",
+      "line": 1001,
+      "enclosing_function": "resolve_active_plan",
+      "call": "sqlite3.connect('file:' + str(checkpoint_path) + '?mode=ro', uri=True)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/q0_m1_m7_integration.py",
+      "source_sha256": "ad7c1d9e6aa7a67da80129ad5308fdd48c5c25da48e43f682cc95ddec7565e35",
+      "line": 327,
+      "enclosing_function": "_executor_validate",
+      "call": "sqlite3.connect(Path(checkpoint).resolve().as_uri() + '?mode=ro', uri=True)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/q0_m1_m7_integration.py",
+      "source_sha256": "ad7c1d9e6aa7a67da80129ad5308fdd48c5c25da48e43f682cc95ddec7565e35",
+      "line": 482,
+      "enclosing_function": "execute_live_activation",
+      "call": "sqlite3.connect(db_tmp)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/q0_native_g1_admission.py",
+      "source_sha256": "6d12c0ed3be55978ae3fce24d6655ad5c77af42d2ad830ddcd0dc778dc2dde8f",
+      "line": 361,
+      "enclosing_function": "read_back_genesis",
+      "call": "sqlite3.connect(str(path))",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/q0_native_g1_admission.py",
+      "source_sha256": "6d12c0ed3be55978ae3fce24d6655ad5c77af42d2ad830ddcd0dc778dc2dde8f",
+      "line": 60,
+      "enclosing_function": "_validate_predecessor",
+      "call": "sqlite3.connect(uri, uri=True)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/q0_native_g1_admission.py",
+      "source_sha256": "6d12c0ed3be55978ae3fce24d6655ad5c77af42d2ad830ddcd0dc778dc2dde8f",
+      "line": 271,
+      "enclosing_function": "materialize_native_g1_genesis",
+      "call": "sqlite3.connect(str(db_path))",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/task_context_binding.py",
+      "source_sha256": "11d07947cd74a1f50bd3bd342dcac7841211efeab64f6f48a0ecefda48802ccd",
+      "line": 111,
+      "enclosing_function": "seal_context_manifest",
+      "call": "sqlite3.connect(str(checkpoint_ref), timeout=30)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/task_context_binding.py",
+      "source_sha256": "11d07947cd74a1f50bd3bd342dcac7841211efeab64f6f48a0ecefda48802ccd",
+      "line": 126,
+      "enclosing_function": "load_context_manifests",
+      "call": "sqlite3.connect(str(checkpoint_ref), timeout=30)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/task_m1_m7_runner.py",
+      "source_sha256": "06515cd3d2789e0f4a3f5f9932490fb0106fad5046f98dc8ee282e23f5f099d4",
+      "line": 36,
+      "enclosing_function": "reconcile_source_head",
+      "call": "sqlite3.connect(old['workflow']['checkpoint_ref'], timeout=10)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/task_m1_m7_runner.py",
+      "source_sha256": "06515cd3d2789e0f4a3f5f9932490fb0106fad5046f98dc8ee282e23f5f099d4",
+      "line": 60,
+      "enclosing_function": "reconcile_source_head",
+      "call": "sqlite3.connect(old['workflow']['checkpoint_ref'], timeout=10)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/task_m1_m7_runner.py",
+      "source_sha256": "06515cd3d2789e0f4a3f5f9932490fb0106fad5046f98dc8ee282e23f5f099d4",
+      "line": 124,
+      "enclosing_function": "run_task_workflow",
+      "call": "sqlite3.connect(str(path), timeout=10)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    },
+    {
+      "path": "tools/node_architect/task_m1_m7_runner.py",
+      "source_sha256": "06515cd3d2789e0f4a3f5f9932490fb0106fad5046f98dc8ee282e23f5f099d4",
+      "line": 162,
+      "enclosing_function": "run_task_workflow",
+      "call": "sqlite3.connect(str(path), timeout=10)",
+      "classification": "STATIC_CONNECTION_SITE_NOT_AUTHORITY_PROOF"
+    }
+  ],
+  "authority_granted": false,
+  "evidence_class": "BASELINE_STATIC_CONNECTION_CENSUS_NOT_AUTHORIZATION_OR_COMPLETE_REACHABILITY_PROOF"
+}

@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "evidence_class": "ENGINEERING_NATIVE_COVERAGE_ADD_NOT_NATIVE_GATE_RECEIPT",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "session_id": "20261014_021304_0dc728",
+  "native_tick": 100,
+  "source_head": "304c6a2",
+  "collected_at": "2026-10-19T00:35:00Z",
+  "native_preflight": "ENGINEERING_PREFLIGHT_PASS",
+  "finding": "Q0_ROUTE_CONTEXT_BRANCHES_ZERO_COVERAGE",
+  "diagnosis": {
+    "gap": "Several validate_q0_route_context / resolve_q0_qualification_node / complete_q0_gate fail-closed branches had ZERO direct test coverage: Q0_RUN_BINDING_REQUIRED, Q0_UNIVERSAL_GATE_REQUIRED, Q0_READ_ONLY_ROUTE, Q0_BRANCH_EFFECT_AUTHORIZED, Q0_EFFECT_AUTHORITY_REQUIRED, Q0_EXTERNAL_EFFECT_OUT_OF_SCOPE, Q0_GATE_UNKNOWN.",
+    "not_a_code_defect": true,
+    "not_a_failure": true
+  },
+  "repair": {
+    "file": "tests/test_scrum781_q0_verify_functions_coverage.py",
+    "change": "Added _q0_ctx helper + 6 real native tests: missing run binding (Q0_RUN_BINDING_REQUIRED), non-Universal gate (Q0_UNIVERSAL_GATE_REQUIRED), read-only route permitted without authority (Q0_READ_ONLY_ROUTE), branch-local write requires exact authority (Q0_EFFECT_AUTHORITY_REQUIRED then Q0_BRANCH_EFFECT_AUTHORIZED), external effect out of scope (Q0_EXTERNAL_EFFECT_OUT_OF_SCOPE), unknown gate (Q0_GATE_UNKNOWN).",
+    "green_verified": true,
+    "focused_suite": "tests/test_scrum781_q0_verify_functions_coverage.py: 21 passed"
+  },
+  "wide_suite": {
+    "command": "pytest tests/ --ignore=tests/test_g2-execution-library.py",
+    "passed": 3760,
+    "failed": 16,
+    "skipped": 7,
+    "subtests_passed": 576,
+    "new_tests_added": 6,
+    "new_failure_ids": 0,
+    "excluded_file": "tests/test_g2-execution-library.py — tracked Markdown file with .py suffix breaks unfiltered pytest collection; unchanged at parent HEAD, excluded by name only, not a repository pytest PASS"
+  },
+  "remaining_failures": {
+    "count": 16,
+    "classification": "LEGACY_GATE_FIXTURE_REJECTED_BY_V2",
+    "modules": [
+      "tests.test_agent_runtime_entrypoint_m1_m7 (1)",
+      "tests.test_scrum_566_agent_host_wiring (4)",
+      "tests.test_scrum_566_agent_runtime_loop (11)"
+    ],
+    "all_reproduced_in_prior_q0_baseline": true,
+    "all_closed": false,
+    "note": "All 16 are legacy v1 host/gate fixtures that the Universal V2 quarantine intentionally rejects (ValueError: UNIVERSAL_GATE_INVALID from live_runtime_bridge GATES allowlist). No new failure IDs introduced across ticks 89-100."
+  },
+  "foreign_files_preserved": 6,
+  "hashes_intact": true,
+  "single_writer": true,
+  "no_new_branch": true,
+  "no_core_or_plugin_edit": true,
+  "no_destructive_action": true,
+  "no_merge_or_deploy": true,
+  "m1_hold_unchanged": true,
+  "never_claimed": [
+    "LOAD_PROOF",
+    "original replay",
+    "L3",
+    "native gate receipt"
+  ]
+}

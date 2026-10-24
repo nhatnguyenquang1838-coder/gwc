@@ -1,0 +1,137 @@
+{
+  "report_kind": "Q0_CHECKPOINT_ENGINEERING_C245",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+  "source_parent_sha": "4087ee15eb1a3603ebd5c2f577ead44406b56eaa",
+  "tested_file_sha256": {
+    "tools/node_architect/engineering_m1_m7_workflow.py": "c6c786e3fdbbc9973ed9a4321ec3eb10f826282fbbcaad2083b0036f984211f5",
+    "tools/node_architect/task_context_binding.py": "367f2119866c279a8714b1c9390f7528c2bee2aed16bc41f35b0bcd39adec323",
+    "tests/test_q0_context_binding_manifest.py": "41c281cd7ad43f509181656e33b5d343a246d2c7b316ad071edefab7e191ea09",
+    "tools/node_architect/checkpoint_sqlite.py": "a7f2d10af7dc88afd7b550ec6f079b955fe17c94627cd663e3f1636173aa7df7",
+    "tests/test_checkpoint_sqlite.py": "b2667e6417b0507d25bdb60fcfb26c3090d9a9f4be7cfaf278233cd0e38a41e9",
+    "tools/node_architect/q0_m1_m7_integration.py": "f200387af3549c51b94b6b9b2a3b97f23f3b3c35eaa473eaa5d460e844aa788b",
+    "tests/test_q0_native_g1_admission.py": "9fb5ae72b691ade91cbee0d6f16bddbe82dc598a507f33f8837881c8e6bcdcf3"
+  },
+  "authority_granted": false,
+  "status": "PARTIAL_HARDENING_VERIFIED_NOT_QUALIFICATION",
+  "inventory": {
+    "source_revision": "4087ee15eb1a3603ebd5c2f577ead44406b56eaa",
+    "scan_scope": "AST call expressions sqlite3.connect and bare _connect in all Python files under tools/node_architect",
+    "connection_sites": 80,
+    "source_bound_site_list": ".gwc/tasks/SCRUM-781/evidence/c245-checkpoint-connection-sites-r1.json",
+    "modules": 9,
+    "limits": "Static call-site census, not exhaustive authority/reachability proof. Aliases, external stores and host effects are not covered by this scanner. Counts bind pre-fix source, not post-fix site totals."
+  },
+  "entrypoint_matrix": [
+    {
+      "module": "checkpoint_sqlite.py",
+      "pre_fix_sites": 6,
+      "tested_entrypoints": [
+        "write_checkpoint",
+        "read_checkpoint",
+        "store_meta_get"
+      ],
+      "observed_red": "Denied lease/read paths created database/schema before refusal or empty read",
+      "fix": "Known invalid lease refused before init_store; reads use mode=ro/query_only without creating store/schema or changing WAL policy",
+      "status": "REGRESSION_VERIFIED",
+      "residual": "Caller lease_valid remains a consistency input, not authenticated issuer provenance"
+    },
+    {
+      "module": "task_context_binding.py",
+      "pre_fix_sites": 2,
+      "tested_entrypoints": [
+        "load_context_manifests",
+        "read_checkpoint"
+      ],
+      "observed_red": "Missing-checkpoint observation created database",
+      "fix": "Absent read returns empty without file creation; existing reads use mode=ro/query_only and close connection",
+      "status": "REGRESSION_VERIFIED",
+      "residual": "seal_context_manifest authorized boolean is not independently authenticated; sealed hashes are integrity, not permission"
+    },
+    {
+      "module": "engineering_m1_m7_workflow.py",
+      "pre_fix_sites": 42,
+      "tested_entrypoints": [
+        "_historical_context_recovery",
+        "resolve_prior_context",
+        "reconcile_legacy_terminal_dispatches"
+      ],
+      "observed_red": "Observers created missing checkpoint database",
+      "fix": "Missing-source disposition without creation; existing-source reads use read-only connection",
+      "status": "REGRESSION_VERIFIED_PARTIAL",
+      "residual": "Mutation helpers and generic refusal-fence caller inputs are not a complete trusted effect gate"
+    },
+    {
+      "module": "q0_m1_m7_integration.py",
+      "pre_fix_sites": 6,
+      "tested_entrypoints": [
+        "RealTargetActivationAdapter._canonical_issuer",
+        "RealTargetActivationAdapter.transition"
+      ],
+      "observed_red": "Parent-component/symlink issuer path escaped authority/grants and was accepted by loader",
+      "fix": "Canonical resolved path must remain in grant directory and source root; reject parent components",
+      "status": "LOADER_AND_TRANSITION_NEGATIVES_VERIFIED",
+      "residual": "Containment is not authentication/signature/revocation/one-use verification; no live trust anchor admitted"
+    },
+    {
+      "module": "controller_exchange_adapter.py",
+      "pre_fix_sites": 1,
+      "status": "INVENTORIED_ONLY",
+      "residual": "Not claimed effect-authority-qualified by this report"
+    },
+    {
+      "module": "delivery_outbox.py",
+      "pre_fix_sites": 11,
+      "status": "INVENTORIED_ONLY",
+      "residual": "Lease/CAS presence is not independent provenance proof"
+    },
+    {
+      "module": "engineering_host_adapter.py",
+      "pre_fix_sites": 5,
+      "status": "INVENTORIED_ONLY",
+      "residual": "No live Agent Host load/recipient qualification claim"
+    },
+    {
+      "module": "q0_native_g1_admission.py",
+      "pre_fix_sites": 3,
+      "status": "EXISTING_REGRESSION_RUN_NOT_LIVE_ADMISSION",
+      "residual": "No native activation or genesis writes to real target performed"
+    },
+    {
+      "module": "task_m1_m7_runner.py",
+      "pre_fix_sites": 4,
+      "status": "EXISTING_REGRESSION_RUN_NOT_PROTECTED_MODE_ADMISSION",
+      "residual": "No typed C/E event/cursor consumed or manufactured"
+    }
+  ],
+  "evidence": {
+    "red_observers": "4 failed in 0.09s, exit 1",
+    "red_store": "3 failed in 0.06s, exit 1",
+    "red_issuer": "2 failed in 0.11s, exit 1",
+    "expanded_regression": "254 passed in 13.07s, exit 0",
+    "unittest_checkpoint": "9 tests OK, exit 0",
+    "raw_logs": "~/.hermes/cache/scratch/q0-recovery-r1/c245-checkpoint-entrypoints-r1/",
+    "test_venue": "canonical Python 3.11; PYTHONPATH removed; disposable HERMES_HOME sibling to scratch pytest roots"
+  },
+  "qualification": {
+    "CF_RED": "NOT_QUALIFIED_ENGINEERING_RED_ONLY",
+    "authentic_original_DWO": "NOT_REPRODUCED_EXTERNAL_EVIDENCE_MISSING",
+    "LOAD_PROOF": "NOT_ESTABLISHED",
+    "L3": "NOT_ESTABLISHED",
+    "UR_G6": "NOT_ACCEPTED",
+    "executed_live_effects": []
+  },
+  "preservation": {
+    "live_checkpoint_sha256": "d64617f56f513e6647e3e1215c2a1a4ba6a9d151a98a74a2234ce8a44e6be29c",
+    "live_checkpoint_unchanged": true,
+    "preserved_untracked_files": 12,
+    "untracked_sha256_unchanged": true
+  },
+  "remaining_boundary": {
+    "effect": "Actual live activation/checkpoint/selector/cursor effect and original-target replay",
+    "owner": "Native GWC authority/target owner via Controller",
+    "release_trigger": "Exact independently trusted effect grant/consumer binding and authentic incident inputs/load evidence; not another generic approval loop",
+    "does_not_block": "Independent branch-local engineering under UNIVERSAL_V2_DEVELOPMENT"
+  }
+}

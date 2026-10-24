@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "evidence_class": "ENGINEERING_PROVENANCE_RESOLVE_NOT_NATIVE_GATE_RECEIPT",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "session_id": "20261014_021304_0dc728",
+  "native_tick": 92,
+  "source_head": "dbc4243af9c760613f876137814651a2a4858a58",
+  "collected_at": "2026-10-18T22:25:00Z",
+  "native_preflight": "ENGINEERING_PREFLIGHT_PASS",
+  "incident": "DWO-LOGIN-AUTH-R1",
+  "finding": "Q0_INCIDENT_PROVENANCE_RESOLVED_NOT_REPLAY",
+  "resolution": {
+    "provenance_class": "RECONSTRUCTED_REQUIREMENTS_BOUND",
+    "original_trace_status": "MISSING",
+    "authentic_incident_replay": false,
+    "original_failure_reproduced": false,
+    "fixture_baseline_sha": "93767709a148e137f60f7e3458c0872d076943dd",
+    "fixture_runtimeplan_sha256": "ac8e8b855d5564ec9e503f965cd73deb60b546caf70a7304c43140a315422500",
+    "runtimeplan_actual_sha256_at_head": "ac8e8b855d5564ec9e503f965cd73deb60b546caf70a7304c43140a315422500",
+    "runtimeplan_digest_match": true
+  },
+  "evidence": {
+    "manifest_path": ".gwc/tasks/SCRUM-781/fixtures/dwo-login-auth-r1/manifest-v1.json",
+    "oracle_sources": [
+      {
+        "id": "DWO_NOTION_ARCH_20260913",
+        "url": "https://app.notion.com/p/3d907c1c65b6814d87d4c296e592222b",
+        "scope": "Sections 9.1-9.4, 10: auth, SSR, guarded routes, redirect, logout, generic errors; approved design, not observed runtime"
+      },
+      {
+        "id": "SCRUM_780",
+        "url": "https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-780",
+        "scope": "Supabase email/password, /runs protection, SSR session, logout; excludes signup/OAuth/MFA/RBAC"
+      }
+    ],
+    "scenario_count": 16,
+    "scenarios_sha256": "462e7fe30fac5189bb13410bd9f156533084d88292528f9f2b27715015282145",
+    "contract": "DWO_LOGIN_AUTH_V1_REQUIREMENTS",
+    "dwo_projection_mode": "READ_ONLY",
+    "dwo_product_live": false,
+    "authentic_dwo_login_replay": false,
+    "q0_l3_qualified": false,
+    "native_gate_receipt": null,
+    "executed_effects": []
+  },
+  "tests": {
+    "focused_suite": {
+      "module": "tests/test_scrum781_q0_login_fixture.py tests/test_scrum781_q0_fixture_replay.py tests/test_scrum781_q0_source_reconcile.py tests/test_scrum781_q0_langgraph_checkpoint_resume.py tests/test_scrum781_q0_native_host.py",
+      "result": "53 passed, 1 skipped",
+      "new_failures": 0
+    },
+    "legacy_host_failures_unchanged": {
+      "module": "tests/test_scrum_566_agent_host_wiring.py",
+      "failures": 4,
+      "signature": "ValueError: UNIVERSAL_GATE_INVALID",
+      "classification": "LEGACY_GATE_FIXTURE_REJECTED_BY_V2",
+      "reproduced_in_prior_q0_baseline": true,
+      "closed": false
+    }
+  },
+  "interpretation": "The original DWO-LOGIN-AUTH-R1 incident is source-bound as RECONSTRUCTED_REQUIREMENTS_BOUND with original_trace_status=MISSING: no authentic original trace exists in this repository, so no replay against a real original failure state is possible or attempted. The fixture is a deterministic requirements oracle derived from two declared oracle sources (DWO Notion architecture 2026-09-13 and SCRUM-780), not observed runtime behavior. This is the canonical provenance state and is enforced fail-closed by four independent test modules; any attempt to upgrade provenance_class to ORIGINAL_RECOVERED, original_trace_status to RECOVERED, or parent_id to DWO-UNKNOWN raises PROVENANCE_INVALID / LOGIN_FIXTURE_BINDING_INVALID. The fixture baseline_sha 93767709a148e137f60f7e3458c0872d076943dd and runtimeplan digest ac8e8b855d5564ec9e503f965cd73deb60b546caf70a7304c43140a315422500 remain digest-matched at HEAD dbc4243.",
+  "never_claimed": [
+    "LOAD_PROOF",
+    "original replay",
+    "L3",
+    "native gate receipt"
+  ],
+  "foreign_files_preserved": 6,
+  "single_writer": true,
+  "no_new_branch": true,
+  "no_core_or_plugin_edit": true,
+  "no_destructive_action": true
+}

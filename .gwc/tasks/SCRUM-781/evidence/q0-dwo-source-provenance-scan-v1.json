@@ -1,0 +1,252 @@
+{
+  "format_id": "local-only.q0-source-provenance-scan/v1",
+  "format_version": 1,
+  "artifact_type": "q0-source-provenance-scan-evidence",
+  "notice": "Sanitized search evidence only. This is not a canonical Q0 verification receipt, a native GWC gate receipt, LOAD_PROOF, or certification.",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "task_id": "SCRUM-781",
+  "current_gate": "UR.G2",
+  "gate_advanced": false,
+  "artifact_grants_authority": false,
+  "source_binding": {
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+    "branch_head_at_scan": "d9ca6957ced604cd0fd3ef9ce79167cd78288004",
+    "tested_code_candidate": "22ef367d3fcf703e0fedf43a565de9928b4611d7",
+    "runtime_plan_path": "core/node-architect/scrum781-q0-fresh-execution-plan-r2.json",
+    "runtime_plan_sha256": "ac8e8b855d5564ec9e503f965cd73deb60b546caf70a7304c43140a315422500",
+    "q0_agents_sha256": "c632f021e5535e8667f67ffa2e953a45847552e3df02264d348b48b831e45c56",
+    "protected_main_sha_observed": "d665a5d127e48beffcbcc0347dc731d4a9c0679c",
+    "protected_main_agents_sha256": "73370fa1b3c4c92322e552d35478d81f47890d3fb8de5f206de20047e5c51cd5",
+    "worktree_clean_at_preflight": true
+  },
+  "coordination_binding": {
+    "active_issue": "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595",
+    "latest_same_run_seq_at_scan": 24,
+    "latest_kind": "REPORT",
+    "latest_url": "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6176806783",
+    "latest_body_sha256": "a96b4d941a613e396e39547f897bbc02439e70cca616144503deb902ab862ea3",
+    "typed_ce_or_ack_created": false
+  },
+  "search_scope": {
+    "exact_identifier": "DWO-LOGIN-AUTH-R1",
+    "repositories": [
+      {
+        "repository": "nhatnguyenquang1838-coder/gwc",
+        "protected_main_sha": "d665a5d127e48beffcbcc0347dc731d4a9c0679c",
+        "q0_branch_sha": "d9ca6957ced604cd0fd3ef9ce79167cd78288004"
+      },
+      {
+        "repository": "nhatnguyenquang1838-coder/DW-SuperApps",
+        "source_commit_from_PR574": "5c9720e2230da64660716e07ce8453575545ae23",
+        "current_main_sha": "a780fdf09f5260a1e2012113954b90424c075beb"
+      }
+    ],
+    "github_issue_search": {
+      "nhatnguyenquang1838-coder/gwc": [
+        {
+          "number": 595,
+          "title": "[SCRUM-781][Q0] GOAL: Certify GWC Universal V2 Runtime — active run + mailbox #595",
+          "role": "active coordination only"
+        },
+        {
+          "number": 575,
+          "title": "[SCRUM-781][Q0] GWC Runtime Recovery & Universal Runtime Qualification",
+          "role": "historical source evidence only"
+        }
+      ],
+      "nhatnguyenquang1838-coder/DW-SuperApps": [
+        {
+          "number": 126,
+          "title": "[TaskController][SCRUM-780] DWO Login Auth R1 — A2A Control",
+          "state": "closed",
+          "role": "historical audit/control only"
+        }
+      ]
+    },
+    "current_default_branch_code_search": {
+      "gwc:DWO-LOGIN-AUTH-R1": 0,
+      "gwc:DWO-LOGIN": 0,
+      "dw-superapps:DWO-LOGIN-AUTH-R1": 0,
+      "dw-superapps:DWO-LOGIN": 0,
+      "limitation": "Indexed current-branch search only; not a claim of global or deleted-history absence."
+    }
+  },
+  "candidate_assessments": [
+    {
+      "source": "GWC #575 issue body",
+      "url": "https://github.com/nhatnguyenquang1838-coder/gwc/issues/575",
+      "body_sha256": "52fe2ba03af0d378e733d62c0ce919eec34bfbd67556d17d88fed4e0f6726d6f",
+      "body_bytes": 3423,
+      "classification": "Q0_PLAN_AND_ACCEPTANCE_TEXT",
+      "contains_original_trace_payload": false,
+      "has_attachment_url_in_body": false
+    },
+    {
+      "source": "GWC #575 historical bootstrap comment",
+      "url": "https://github.com/nhatnguyenquang1838-coder/gwc/issues/575#issuecomment-5998389977",
+      "body_sha256": "9e2f034dfaebc8a8fbef55e33caa8cb37f371db978cda93240b327c73d301fcc",
+      "record_type": "dw.taskcontroller.mailbox/v2 execution_ack / ack_bootstrap",
+      "preserved_state_run_id": "scrum781-q0-20260920T074727Z",
+      "raw_trace_or_replay_payload_fields": false,
+      "attachment_url": false,
+      "classification": "HISTORICAL_CONTROL_METADATA"
+    },
+    {
+      "source": "GWC #575 historical controller bootstrap comment",
+      "url": "https://github.com/nhatnguyenquang1838-coder/gwc/issues/575#issuecomment-5998458853",
+      "body_sha256": "285c69062535f2a8d0729aa7d774b2c2fa0dc44235af1aa9dcc3471b1c25b17d",
+      "record_type": "dw.taskcontroller.mailbox/v2 ack_bootstrap",
+      "preserved_state_run_id": "scrum781-q0-20260920T074727Z",
+      "raw_trace_or_replay_payload_fields": false,
+      "attachment_url": false,
+      "classification": "HISTORICAL_CONTROL_METADATA"
+    },
+    {
+      "source": "GWC PR #574",
+      "url": "https://github.com/nhatnguyenquang1838-coder/gwc/pull/574",
+      "head_sha": "4ecaa9c8279cffda472e2c5a0758dd66b4b8731c",
+      "base_sha": "88fbcc3fc34efd3190d0475d6771aad5e6ca90e4",
+      "changed_file_count": 13,
+      "changed_paths": [
+        ".gwc/tasks/SCRUM-780/cr0/scope-freeze.json",
+        ".gwc/tasks/SCRUM-780/g0/context-snapshot.yaml",
+        ".gwc/tasks/SCRUM-780/g01-runtime-input.yaml",
+        ".gwc/tasks/SCRUM-780/g1/brainstorming/g1-options.yaml",
+        ".gwc/tasks/SCRUM-780/g1/decision/g1-decision-record.yaml",
+        ".gwc/tasks/SCRUM-780/g1/intake/g1-intake-brief.yaml",
+        ".gwc/tasks/SCRUM-780/g1/preflight/g1-preflight-report.yaml",
+        ".gwc/tasks/SCRUM-780/g2/approval-candidate.json",
+        ".gwc/tasks/SCRUM-780/g2/approval-request.yaml",
+        ".gwc/tasks/SCRUM-780/g2/execution-envelope.yaml",
+        "live_runtime_bridge.py",
+        "resolve_gate_node_route.py",
+        "semantic_agent_runtime.py"
+      ],
+      "classification": "PLANNING_AUTHORITY_AND_CR0_IMPLEMENTATION",
+      "original_incident_trace_or_fixture_path": false
+    },
+    {
+      "source": "DW-SuperApps source-linked Login Epic data",
+      "commit_refs": [
+        "5c9720e2230da64660716e07ce8453575545ae23",
+        "a780fdf09f5260a1e2012113954b90424c075beb"
+      ],
+      "raw_path": "login_epic_10_runs_gwc_taskcontroller_data.raw.json",
+      "raw_git_blob": "296ef2c1bdf5f3d6cb0921915c82de2e90f50a7e",
+      "raw_bytes": 710464,
+      "raw_sha256": "158a17f4af17f44fbf4c1ed5f462af3e7985a130d598f90ae20b0b7a28bd3668",
+      "raw_metadata": {
+        "epic_id": "LOGIN-CAPABILITY",
+        "run_count": 10,
+        "runtime_node_count": 243
+      },
+      "target_identifier_value_matches": 0,
+      "source_provenance_field_samples": 0,
+      "sensitive_key_values_recorded": false,
+      "fixture_twin_path": "projects/dw-observation/fixtures/login_epic_10_runs_gwc_taskcontroller_data.json",
+      "fixture_twin_git_blob": "3314445bb6fc9e5111b38eb515132d0414364800",
+      "fixture_twin_sha256": "ecb732674427886e42b332a83372e3404e0952f07839ecbb2a94c70cdd68a9dd",
+      "fixture_wrapper_prefix_bytes": 14,
+      "fixture_wrapper_suffix_bytes": 2,
+      "embedded_raw_bytes_identical": true,
+      "classification": "LOGIN_CAPABILITY_SAMPLE_DATA_NOT_DWO_INCIDENT"
+    },
+    {
+      "source": "DW-SuperApps simulation failure catalog",
+      "path": "systems/gwc-simulation-lab/fixtures/failure-cases.json",
+      "refs": [
+        "5c9720e2230da64660716e07ce8453575545ae23",
+        "a780fdf09f5260a1e2012113954b90424c075beb"
+      ],
+      "sha256": "3587077829b3f0d50852c9e862086c6adf966817544cace5c06771bde3fc12f8",
+      "target_identifier_value_matches": 0,
+      "classification": "GENERIC_SIMULATION_FIXTURE"
+    },
+    {
+      "source": "DW-SuperApps #126",
+      "url": "https://github.com/nhatnguyenquang1838-coder/DW-SuperApps/issues/126",
+      "state": "closed",
+      "body_sha256": "5673ddc6950c2c858db07dfe730fef59b36afd2c522368807ac142abcf28dc70",
+      "comments_count": 4,
+      "classification": "ARCHIVED_LEGACY_A2A_CONTROL; NO ORIGINAL TRACE PAYLOAD"
+    }
+  ],
+  "actions_cap_recovery": {
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "head_sha": "414002f92d48083e7133236346b26e3a2a047e33",
+    "all_runs_for_head_sha": 1178,
+    "standard_api_cap": 1000,
+    "date_partition": "2000-01-01T00:00:00Z..2026-09-30T10:24:15Z",
+    "partition_result_count": 180,
+    "already_inventoried_page10_boundary_run_ids": [
+      36702203911,
+      36702203996
+    ],
+    "previously_uninventoried_runs": 178,
+    "inventory_ref": "$HERMES_HOME/cache/scratch/dwo-gh-actions-page11-12-20261015.json",
+    "inventory_sha256": "44b5307b2378d24397c974860dab68e9ac9569d9f8ba87e1f9525dff532e2e87",
+    "artifact_count": 5,
+    "artifact_name_counts": {
+      "instruction-package-pm-skills": 1,
+      "instruction-package-gwc": 1,
+      "instruction-package-rental-home": 1,
+      "instruction-package-ds-mcp": 1,
+      "validation-evidence-36434012770": 1
+    },
+    "candidate_artifact_name_matches": 0,
+    "artifact_read_errors": 0,
+    "validation_artifact": {
+      "run_id": 36434012770,
+      "artifact_id": 10975375051,
+      "name": "validation-evidence-36434012770",
+      "member_count": 8,
+      "member_sha256": {
+        "runtime-checkpoint-family-tests.log": "baf49b59538192f3e136ca0404cac516ecb8dd2fe5ba1416604056f3080fa49c",
+        "runtime-registry-tests.log": "6daa658904a19ce5474f32d1297ce5eb8cfcb3fa8eea5ad4d52d0aa4f6de36cf",
+        "line-ending-validation.log": "da080ef2840e9a5e19ff83a492d35e11b96580ddc452fc420d55ec44929305bf",
+        "compile-python-tools.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "governance-unit-tests.log": "c8e22bb8763089a3bf226685dbf57128dad9985232f1d016327c5329fed513cd",
+        "runtime-registry-validation.log": "3fc05d0bd5337fa051997e86e2e1d74689b27da4b29de2846c8b437d7a9604cb",
+        "validate-instructions.log": "cf89d5aa7517965b9b71a75212dd5fee16e4fbc9d02d6673ccfe571d75dfd00f",
+        "runtime-checkpoint-family-validation.log": "6851441aba171c9cddd1a0696f08d10989cd7be43399f16703b3c9ef7b9d9465"
+      },
+      "target_identifier_matches": 0
+    }
+  },
+  "independent_plan_and_unit_tests": {
+    "plan_dag_harness": {
+      "candidate_code_sha": "22ef367d3fcf703e0fedf43a565de9928b4611d7",
+      "branch_head": "d9ca6957ced604cd0fd3ef9ce79167cd78288004",
+      "runtime_plan_sha256": "ac8e8b855d5564ec9e503f965cd73deb60b546caf70a7304c43140a315422500",
+      "node_count": 13,
+      "atomic_leaf_count": 8,
+      "dependency_edge_count": 10,
+      "all_refs_resolved": true,
+      "acyclic": true,
+      "harness_stdout_sha256": "ff0ec7b902983cc5173c5c49d2faa4b2828015f5e7507fd2103959cc6cbf158c"
+    },
+    "unit_tests": {
+      "command": "python -m pytest -q -p no:cacheprovider tests/test_scrum781_q0_execution_contract.py tests/test_q0_universal_qualification.py",
+      "exit_code": 0,
+      "result": "40 passed in 1.33s",
+      "environment": "isolated Python 3.14.7 / pytest 9.1.1 / jsonschema 4.26.0",
+      "jsonschema_environment_repair": "jsonschema and four dependencies installed only into the scratch Q0 Python environment; no manifest or host environment changed",
+      "stdout_sha256": "a486065f64c9ffe31323e4afca65103489cd2ecf4792d08cf29c5fe32e553ee6",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "limits": {
+    "original_dwo_trace_found": false,
+    "authentic_fixture_found": false,
+    "authentic_dwo_replay": false,
+    "load_proof": false,
+    "q0_l3_qualified": false,
+    "native_gate_receipt": null,
+    "canonical_q0_verification_receipt_created": false,
+    "production_effects": [],
+    "no_global_absence_claim": true,
+    "current_gate": "UR.G2"
+  },
+  "next_same_run_action": "Proceed with one bounded P5 code-level coverage audit: map each mandatory qualification-matrix entry to existing exact-head unit evidence versus live-only evidence; run only new independent sandbox checks that do not depend on the missing DWO trace. Keep authentic replay, LOAD_PROOF, L3 and certification unclaimed."
+}

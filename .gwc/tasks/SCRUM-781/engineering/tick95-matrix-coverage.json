@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "evidence_class": "ENGINEERING_NATIVE_COVERAGE_ADD_NOT_NATIVE_GATE_RECEIPT",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "session_id": "20261014_021304_0dc728",
+  "native_tick": 95,
+  "source_head": "d75b736",
+  "collected_at": "2026-10-18T23:10:00Z",
+  "native_preflight": "ENGINEERING_PREFLIGHT_PASS",
+  "finding": "Q0_MANDATORY_MATRIX_NATIVE_COVERAGE_GAP",
+  "diagnosis": {
+    "gap": "7 of 13 mandatory Q0 qualification matrix entries had ZERO real native test coverage — they appeared only as synthetic keys in the _matrix() helper of tests/test_q0_universal_qualification.py, never exercised by a real test. Entries: default_route, node_architect_seam, typed_continuation, restart_recovery, self_fix_replay, stale_state_fail_closed, recursive_plan_dag_complete.",
+    "evidence": "grep across tests/ showed each of these 7 entries referenced only in test_q0_universal_qualification.py (as _matrix/mandatory_entries/results keys), with no real assertion exercising the underlying q0_qualification functions.",
+    "not_a_code_defect": true,
+    "not_a_failure": true
+  },
+  "repair": {
+    "file": "tests/test_scrum781_q0_mandatory_matrix_coverage.py",
+    "change": "Added 12 real native tests driving the actual tools.node_architect.q0_qualification functions (validate_q0_route_context, resolve_q0_qualification_node, advance_qualification_gate, _validate_matrix) to prove each of the 7 previously-uncovered mandatory entries by real behavior, including fail-closed negative cases (legacy epoch, action mismatch, missing evidence, profile drift, workflow-mode drift, incomplete matrix, active defects).",
+    "green_verified": true,
+    "focused_suite": "tests/test_scrum781_q0_mandatory_matrix_coverage.py: 12 passed"
+  },
+  "wide_suite": {
+    "command": "pytest tests/ --ignore=tests/test_g2-execution-library.py",
+    "passed": 3739,
+    "failed": 16,
+    "skipped": 7,
+    "subtests_passed": 576,
+    "new_tests_added": 12,
+    "new_failure_ids": 0,
+    "excluded_file": "tests/test_g2-execution-library.py — tracked Markdown file with .py suffix breaks unfiltered pytest collection; unchanged at parent HEAD, excluded by name only, not a repository pytest PASS"
+  },
+  "remaining_failures": {
+    "count": 16,
+    "classification": "LEGACY_GATE_FIXTURE_REJECTED_BY_V2",
+    "modules": [
+      "tests.test_agent_runtime_entrypoint_m1_m7 (1)",
+      "tests.test_scrum_566_agent_host_wiring (4)",
+      "tests.test_scrum_566_agent_runtime_loop (11)"
+    ],
+    "all_reproduced_in_prior_q0_baseline": true,
+    "all_closed": false,
+    "note": "All 16 are legacy v1 host/gate fixtures that the Universal V2 quarantine intentionally rejects (ValueError: UNIVERSAL_GATE_INVALID from live_runtime_bridge GATES allowlist). No new failure IDs introduced across ticks 89-95."
+  },
+  "foreign_files_preserved": 6,
+  "hashes_intact": true,
+  "single_writer": true,
+  "no_new_branch": true,
+  "no_core_or_plugin_edit": true,
+  "no_destructive_action": true,
+  "no_merge_or_deploy": true,
+  "m1_hold_unchanged": true,
+  "never_claimed": [
+    "LOAD_PROOF",
+    "original replay",
+    "L3",
+    "native gate receipt"
+  ]
+}

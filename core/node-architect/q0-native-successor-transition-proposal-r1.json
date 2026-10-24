@@ -1,0 +1,79 @@
+{
+  "artifact_type": "Q0_NATIVE_SUCCESSOR_TRANSITION_PROPOSAL",
+  "authority_granted": false,
+  "executed_effects": [],
+  "from_context": {
+    "active_engineering_plan_digest": "sha256:08028c21107c7abbd8e0ab3525f5d5a32b66e5f314d949f45a385541de6c3f06",
+    "active_engineering_plan_ref": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+    "active_frontier_digest": "sha256:08b99c63183b03b23811b417d7a643434e393e06415d31bb2ab022b91a781b5d",
+    "active_frontier_ref": "core/node-architect/q0-controlled-failure-frontier-r3.json",
+    "checkpoint_ref": "/Users/mac/.hermes/cache/scratch/q0-m1-m7-host/20261014_021304_0dc728/3926191c93f475aa0c35c3efddce056e3a155f8a/checkpoint.sqlite",
+    "context_digest": "sha256:9369deda8c64e9a5ad414aea95c6faced44beab29efe092cc7d487d8aee2e5a5",
+    "native_universal_state_in_bound_checkpoint": "NOT_PRESENT",
+    "surface": "M1_M7_ENGINEERING_TASK_CONTEXT"
+  },
+  "predecessor_proposal": {
+    "file_sha256": "9aa8e55a8291d602314bcceddf2f60b303864a2030dfa8e682438aad4f12a256",
+    "proposal_digest": "sha256:f0d776617aa514b8ac57b98f0373a09ff39d4b555c0f141551f12d8ec92ba22c",
+    "ref": "core/node-architect/q0-live-successor-g1-20261022-r2.json",
+    "superseded_by_controller_command": 159,
+    "superseded_claim": "The prior candidate named UR.G6 as a possible successor activation gate; #159 clarifies UR.G6 is final acceptance and native plan activation requires its own exact contract/decision."
+  },
+  "proposal_only": true,
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "schema_id": "gwc.q0.native-successor-transition-proposal/v1",
+  "schema_version": 1,
+  "status": "BLOCKED_NO_CANONICAL_NATIVE_G1_TRANSITION_RECEIPT",
+  "to_frontier": {
+    "digest": "sha256:12baa72366ccb2697366d109f86356284aad4f8fd47400bed7c84cb9a4c5eff6",
+    "ref": "core/node-architect/q0-native-successor-frontier-proposal-r1.json"
+  },
+  "to_plan": {
+    "digest": "sha256:dbbd7a4abb1607c9f4346696d68b1fa18a6844dceb340ca35aa58e21e3f6232e",
+    "ref": "core/node-architect/q0-native-successor-runtime-plan-candidate-r1.json"
+  },
+  "transition_contract": {
+    "activation_status": "NOT_ACTIVATED",
+    "authority_granted": false,
+    "canonical_transition_surfaces": [
+      {
+        "applies_to": "M1-M7 TaskContext plan transition only",
+        "executed": false,
+        "preconditions": [
+          "resolve_active_plan(new_ref)",
+          "activation_receipt_ref exists",
+          "exact prior context readback"
+        ],
+        "ref": "tools/node_architect/engineering_m1_m7_workflow.py::reconcile_engineering_plan_transition"
+      },
+      {
+        "applies_to": "validates caller-supplied native RuntimePlan+RunState+NodeAllocation and emits actions; no persistent cross-context activation",
+        "executed": false,
+        "ref": "tools/node_architect/universal_run_controller.py::UniversalController"
+      },
+      {
+        "applies_to": "same-sequence recovery and a scenario-specific seq14/UR.G5→seq15/UR.G2 recovery replan; not generic successor activation",
+        "executed": false,
+        "ref": "tools/node_architect/universal_run_persistence.py"
+      },
+      {
+        "applies_to": "UR.G1 currently checks only nonempty PLAN_RECEIPT; no PLAN_RECEIPT schema/builder found",
+        "executed": false,
+        "ref": "tools/node_architect/q0_qualification.py::complete_q0_gate"
+      }
+    ],
+    "executed_effects": [],
+    "from_context_digest": "sha256:9369deda8c64e9a5ad414aea95c6faced44beab29efe092cc7d487d8aee2e5a5",
+    "missing_contract": [
+      "source-defined native G1 PLAN_RECEIPT structure/provenance validator",
+      "source-defined bridge from this exact M1-M7 context digest to a native RunState and plan activation record",
+      "separate exact selector/checkpoint activation authority"
+    ],
+    "next_owner": "GPT Controller to specify/authorize the exact native activation and typed transition contract; not UR.G6",
+    "status": "BLOCKED_NO_CANONICAL_NATIVE_G1_TRANSITION_RECEIPT",
+    "to_frontier_ref": "core/node-architect/q0-native-successor-frontier-proposal-r1.json",
+    "to_runtime_plan_digest": "sha256:dbbd7a4abb1607c9f4346696d68b1fa18a6844dceb340ca35aa58e21e3f6232e",
+    "typed_transition_receipt_ref": null
+  },
+  "transition_proposal_digest": "sha256:860672f6e8fb9800d0ca27d44db6891fcef1bde6f07295725eadf91ad483ec7c"
+}

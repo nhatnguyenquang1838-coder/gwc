@@ -81,7 +81,7 @@ def _base_record(
     return {
         "record_id": record_id,
         "schema_id": schema_id,
-        "schema_version": 1,
+        "schema_version": 2,
         "run_id": run_id,
         "created_at": created_at,
         "created_by": copy.deepcopy(dict(created_by)),
@@ -126,7 +126,7 @@ def create_run_manifest_revision(
 
     record = _base_record(
         record_id=record_id,
-        schema_id="gwc.universal-run.run-manifest-revision",
+        schema_id="gwc.universal-run.run-manifest-revision.v2",
         run_id=run_id,
         created_at=created_at,
         created_by=created_by,
@@ -170,6 +170,12 @@ def validate_node_allocation(
     if "content_digest" in allocation:
         _require(verify_record_digest(allocation), "NODE_ALLOCATION_DIGEST_INVALID")
 
+    _require(
+        allocation.get("schema_id") == "gwc.universal-run.node-allocation.v2"
+        and allocation.get("schema_version") == 2
+        and allocation.get("lifecycle_profile") == UNIVERSAL_PROFILE,
+        "NODE_ALLOCATION_SCHEMA_MISMATCH",
+    )
     _canonical_reference(allocation.get("record_id"), "RECORD_ENVELOPE_INVALID", "record_id")
     _canonical_reference(allocation.get("run_id"), "RECORD_ENVELOPE_INVALID", "run_id")
 
@@ -238,7 +244,7 @@ def create_node_allocation(
     reasons = _normalize_boundary_reasons(independent_boundary_reasons)
     record = _base_record(
         record_id=record_id,
-        schema_id="gwc.universal-run.node-allocation",
+        schema_id="gwc.universal-run.node-allocation.v2",
         run_id=run_id,
         created_at=created_at,
         created_by=created_by,
@@ -342,7 +348,7 @@ def materialize_child_run(
 
     record = _base_record(
         record_id=record_id,
-        schema_id="gwc.universal-run.child-run-materialization-receipt",
+        schema_id="gwc.universal-run.child-run-materialization-receipt.v2",
         run_id=parent_run_id,
         created_at=created_at,
         created_by=created_by,
