@@ -223,6 +223,7 @@ class ExchangeOutbox:
             require(receipt.get('response_to_marker') == request['marker'] and
                     isinstance(receipt.get('response_text'),str) and bool(receipt['response_text'].strip())
                     and isinstance(receipt.get('assistant_turn_ref'),str) and bool(receipt['assistant_turn_ref']), 'CONTROLLER_RESPONSE_READBACK_REQUIRED')
+            reconcile_controller_response(request, {'status':receipt['status'], 'receipt':receipt})
         with self._db() as db:
             db.execute('BEGIN IMMEDIATE')
             current = db.execute('SELECT status,receipt FROM exchange WHERE key=?',(request['request_digest'],)).fetchone()
@@ -299,6 +300,7 @@ def execute_host_exchange(context, request, outbox, capabilities):
     # Exchange-mode deadlock guard: the same request left unresolved for
     # `threshold` consecutive attempts must not be re-sent. One escalation per
     # stall_key; the host reports it instead of waking the Controller again.
+    reserved = outbox.reserve(request)
     exchange_stall = outbox.stall(request) if outbox.read(request)['status'] in {
         'EXCHANGE_REQUESTED','MESSAGE_SENT_VERIFIED','CONTROLLER_ACTION_REQUIRED'} else None
     if exchange_stall and exchange_stall.get('stalled'):
@@ -307,7 +309,7 @@ def execute_host_exchange(context, request, outbox, capabilities):
                 'stall':exchange_stall,'prior':outbox.read(request),
                 'typed_ce_admitted':False,'authority_granted':False}
     outbox.note_attempt(request)
-    if not outbox.reserve(request):
+    if not reserved:
         return {'status':'DUPLICATE_SEND_DETECTED','prior':outbox.read(request),'typed_ce_admitted':False}
     try:
         receipt = provider(request)

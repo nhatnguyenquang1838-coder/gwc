@@ -96,6 +96,10 @@ def local_engineering_capabilities(context,*,guard,artifact_directory,allowed_co
             else:
                 input_binding=hashes
             require(digest(input_binding)==item['input_digest'],'ENGINEERING_INPUT_DIGEST_DRIFT')
+            require(item.get('fingerprint')==digest({k:v for k,v in item.items() if k!='fingerprint'}),
+                    'ENGINEERING_WORK_FINGERPRINT_INVALID')
+            require((artifacts/(item['fingerprint'].split(':')[-1]+'.json')).resolve().is_relative_to(artifacts),
+                    'ENGINEERING_ARTIFACT_PATH_ESCAPE')
             require(item['action'] in c['runtime_plan']['scope']['allowed_actions'] and item['action']=='run_sandboxed_validation','ENGINEERING_EFFECT_AUTHORITY_REQUIRED')
             require(validate(c),'ENGINEERING_EFFECT_REVALIDATION_FAILED')
             return {'argv':list(argv),'source_head':c['repository']['head_sha'],'input_hashes':hashes,
@@ -120,6 +124,7 @@ def local_engineering_capabilities(context,*,guard,artifact_directory,allowed_co
                  'input_policy_ref':policy_ref,'input_policy_sha256':policy_sha256 if policy_ref else None,
                  'input_digest':item['input_digest']}
         path=artifacts/(item['fingerprint'].split(':')[-1]+'.json');encoded=json.dumps(payload,sort_keys=True)
+        require(path.resolve().is_relative_to(artifacts),'ENGINEERING_ARTIFACT_PATH_ESCAPE')
         path.write_text(encoded)
         try:observed=json.loads(result.stdout)
         except ValueError:observed={}

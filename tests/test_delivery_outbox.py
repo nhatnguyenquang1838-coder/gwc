@@ -124,6 +124,52 @@ class DeliveryOutboxTest(unittest.TestCase):
             outbox.transition(self.path, worker_id="w1", to_state="ACK_CONFIRMED", **key)
         self.assertEqual(str(ctx.exception), "OUTBOX_LEASE_LOST")
 
+    def test_lease_handoff_after_check_cannot_be_overwritten_by_stale_worker(self):
+        from unittest.mock import patch
+        rec = _record()
+        key = _key(rec)
+        clock = [1000.0]
+        with patch.object(outbox, "_now", side_effect=lambda: clock[0]):
+            outbox.enqueue(self.path, **rec)
+            outbox.acquire_lease(self.path, worker_id="w1", lease_ttl_s=1, **key)
+            verify = outbox._verify_lease
+            def handoff(*args, **kwargs):
+                prior = verify(*args, **kwargs)
+                clock[0] = 1002.0
+                outbox.acquire_lease(self.path, worker_id="w2", **key)
+                return prior
+            with patch.object(outbox, "_verify_lease", side_effect=handoff):
+                with self.assertRaisesRegex(outbox.OutboxConflict, "OUTBOX_LEASE_LOST"):
+                    outbox.transition(self.path, worker_id="w1", to_state="ACK_CONFIRMED", **key)
+            row = outbox.discover_restart(self.path)[0]
+            self.assertEqual(row["state"], "IN_FLIGHT")
+            self.assertEqual(row["lease_holder"], "w2")
+
+    def test_exact_expiration_reclaim_matches_persisted_owner(self):
+        from unittest.mock import patch
+        key = _key()
+        clock = [1000.0]
+        with patch.object(outbox, "_now", side_effect=lambda: clock[0]):
+            outbox.enqueue(self.path, **_record())
+            outbox.acquire_lease(self.path, worker_id="w1", lease_ttl_s=1, **key)
+            clock[0] = 1001.0
+            lease = outbox.acquire_lease(self.path, worker_id="w2", **key)
+            self.assertEqual(lease["lease_holder"], "w2")
+            self.assertEqual(outbox.discover_restart(self.path)[0]["lease_holder"], "w2")
+
+    def test_acquire_lease_never_reports_success_for_zero_row_cas(self):
+        import sqlite3
+        rec = _record()
+        outbox.enqueue(self.path, **rec)
+        with sqlite3.connect(self.path) as db:
+            db.execute("CREATE TRIGGER refuse_lease BEFORE UPDATE OF lease_holder "
+                       "ON delivery_outbox BEGIN SELECT RAISE(IGNORE); END")
+        with self.assertRaisesRegex(outbox.OutboxConflict, "OUTBOX_LEASE_CONTENTION"):
+            outbox.acquire_lease(self.path, worker_id="denied", **_key(rec))
+        row = outbox.discover_restart(self.path)[0]
+        self.assertEqual(row["state"], "PENDING")
+        self.assertIsNone(row["lease_holder"])
+
     def test_illegal_transition_fails_closed(self):
         rec = _record()
         outbox.enqueue(self.path, **rec)

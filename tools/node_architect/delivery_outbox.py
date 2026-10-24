@@ -307,6 +307,7 @@ def acquire_lease(
     """
     try:
         with _connect(path) as conn:
+            conn.execute("BEGIN IMMEDIATE")
             key = (projection_target, event_source, event_id, canonical_state_digest, delivery_generation)
             row = conn.execute(
                 "SELECT * FROM delivery_outbox WHERE projection_target=? AND "
@@ -320,14 +321,16 @@ def acquire_lease(
             if row["lease_holder"] is not None and row["lease_expires_at"] > _now():
                 raise OutboxConflict(OUTBOX_LEASE_CONTENTION)
             now = _now()
-            conn.execute(
+            updated = conn.execute(
                 "UPDATE delivery_outbox SET lease_holder=?, lease_expires_at=?, state=?, "
                 "updated_at=? WHERE projection_target=? AND event_source IS ? AND event_id=? "
                 "AND canonical_state_digest=? AND delivery_generation=? AND "
-                "(lease_holder IS NULL OR lease_expires_at < ?)",
+                "(lease_holder IS NULL OR lease_expires_at <= ?)",
                 (worker_id, now + lease_ttl_s, IN_FLIGHT, now,
                  *key, _now()),
             )
+            if updated.rowcount != 1:
+                raise OutboxConflict(OUTBOX_LEASE_CONTENTION)
             expected = _readback_digest(conn, path)
         _readback_after_write(path, expected)
         return {
@@ -391,13 +394,18 @@ def transition(
         else:
             next_attempt = None
         with _connect(path) as conn:
-            conn.execute(
+            conn.execute("BEGIN IMMEDIATE")
+            updated = conn.execute(
                 "UPDATE delivery_outbox SET state=?, reason_class=COALESCE(?, reason_class), "
                 "attempt_no=?, next_attempt_at=?, lease_holder=NULL, lease_expires_at=NULL, "
                 "updated_at=? WHERE projection_target=? AND event_source IS ? AND event_id=? "
-                "AND canonical_state_digest=? AND delivery_generation=?",
-                (to_state, reason_class, attempt_no, next_attempt, now, *key),
+                "AND canonical_state_digest=? AND delivery_generation=? "
+                "AND state=? AND lease_holder=? AND lease_expires_at=? AND lease_expires_at>?",
+                (to_state, reason_class, attempt_no, next_attempt, now, *key,
+                 row["state"], worker_id, row["lease_expires_at"], _now()),
             )
+            if updated.rowcount != 1:
+                raise OutboxConflict(OUTBOX_LEASE_LOST)
             expected = _readback_digest(conn, path)
         _readback_after_write(path, expected)
     except (sqlite3.Error, OutboxStoreUnavailable) as exc:

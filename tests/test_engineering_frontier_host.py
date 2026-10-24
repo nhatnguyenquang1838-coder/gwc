@@ -159,6 +159,51 @@ def test_host_executes_exact_terminal_bridge_suite_and_verifies_artifact(tmp_pat
     assert caps['engineering.verify_result'](c,item,changed) is False
 
 
+@pytest.mark.parametrize('fingerprint', [None, 'sha256:../victim', 'sha256:'+'0'*64])
+def test_host_rejects_unbound_artifact_fingerprint_before_subprocess(tmp_path, fingerprint):
+    import hashlib
+    from tools.node_architect.engineering_host_adapter import local_engineering_capabilities
+    from tools.node_architect.task_context_binding import digest
+    c, _, _ = agent_fixture(tmp_path)
+    ref = 'tools/repair.py'
+    argv = ['-c', 'print("{}")']
+    item = {'id':'fingerprint-refusal', 'action':'run_sandboxed_validation', 'argv':argv,
+            'read_paths':[ref], 'input_digest':digest({ref:hashlib.sha256((tmp_path/ref).read_bytes()).hexdigest()})}
+    if fingerprint is not None:
+        item['fingerprint'] = fingerprint
+    victim = tmp_path/'victim.json'
+    victim.write_text('preserve this sentinel')
+    artifacts = tmp_path/'validation-results'
+    caps = local_engineering_capabilities(c, guard=lambda:True,
+                                         artifact_directory=artifacts, allowed_commands=[argv])
+    with pytest.raises(ValueError, match='ENGINEERING_WORK_FINGERPRINT_INVALID'):
+        caps['engineering.execute'](c, item)
+    assert victim.read_text() == 'preserve this sentinel'
+    assert not artifacts.exists()
+
+
+def test_host_rejects_preexisting_artifact_symlink_outside_store(tmp_path):
+    import hashlib
+    from tools.node_architect.engineering_host_adapter import local_engineering_capabilities
+    from tools.node_architect.task_context_binding import digest
+    c, _, _ = agent_fixture(tmp_path)
+    ref = 'tools/repair.py'
+    argv = ['-c', 'print("{}")']
+    item = {'id':'artifact-refusal', 'action':'run_sandboxed_validation', 'argv':argv,
+            'read_paths':[ref], 'input_digest':digest({ref:hashlib.sha256((tmp_path/ref).read_bytes()).hexdigest()})}
+    item['fingerprint'] = digest(item)
+    victim = tmp_path/'outside.json'
+    victim.write_text('preserve')
+    artifacts = tmp_path/'validation-results'
+    artifacts.mkdir()
+    (artifacts/(item['fingerprint'].split(':')[-1]+'.json')).symlink_to(victim)
+    caps = local_engineering_capabilities(c, guard=lambda:True,
+                                         artifact_directory=artifacts, allowed_commands=[argv])
+    with pytest.raises(ValueError, match='ENGINEERING_ARTIFACT_PATH_ESCAPE'):
+        caps['engineering.execute'](c, item)
+    assert victim.read_text() == 'preserve'
+
+
 def test_local_preflight_classifies_input_digest_drift_before_execution(tmp_path,monkeypatch):
     import hashlib
     from tools.node_architect.engineering_host_adapter import local_engineering_capabilities
