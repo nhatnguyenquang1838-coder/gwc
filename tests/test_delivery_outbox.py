@@ -201,24 +201,95 @@ class DeliveryOutboxTest(unittest.TestCase):
         self.assertEqual(len(pending), 1)
         self.assertEqual(pending[0]["state"], "PENDING")
 
-    def test_ack_verified_requires_5way_binding_and_freshness(self):
+    def _bound_ack(self):
+        """Unit-only shape/request bindings; never authenticated receiver proof."""
         rec = _record()
         outbox.enqueue(self.path, **rec)
-        key = _key(rec)
-        outbox.acquire_lease(self.path, worker_id="w1", **key)
-        good_ack = {
-            "destination_id": "audit-sink-staging-01",
-            "event_source": rec["event_source"],
-            "event_id": rec["event_id"],
-            "delivery_generation": 1,
-            "request_digest": "sha256:" + "d" * 64,
-            "payload_digest": rec["event_payload_digest"],
-            "created": time.time(),
-            "signature_proof": "sig:verified",
-        }
-        verified, code = outbox.verify_ack(self.path, ack=good_ack, worker_id="w1")
-        self.assertTrue(verified)
-        self.assertEqual(code, "ACK_VERIFIED")
+        outbox.acquire_lease(self.path, worker_id="w1", **_key(rec))
+        request_digest = "sha256:" + "d" * 64
+        outbox.record_attempt(self.path, semantic_event_id=outbox._semantic_event_id(
+            rec["projection_target"], rec["event_source"], rec["event_id"], rec["canonical_state_digest"]),
+            delivery_generation=1, destination_id=rec["destination_id"], attempt_no=1,
+            request_digest=request_digest, response_class="UNIT_FIXTURE_ONLY")
+        return {"destination_id":rec["destination_id"], "event_source":rec["event_source"],
+                "event_id":rec["event_id"], "delivery_generation":1,
+                "request_digest":request_digest, "payload_digest":rec["event_payload_digest"],
+                "created":time.time(), "signature_proof":"UNIT_SELF_ATTESTED_NOT_AUTHENTIC"}
+
+    def test_bound_but_self_attested_ack_requires_independent_verifier(self):
+        ack = self._bound_ack()
+        verified, code = outbox.verify_ack(self.path, ack=ack, worker_id="w1")
+        self.assertFalse(verified)
+        self.assertEqual(code, "ACK_VERIFIER_UNAVAILABLE")
+
+    def test_ack_binding_mismatches_are_not_hidden_by_truthy_proof(self):
+        ack = self._bound_ack()
+        for field, value, expected in [
+            ("event_source", "gwc.other.v1.0", "ACK_BINDING_MISMATCH"),
+            ("payload_digest", "sha256:"+"f"*64, "ACK_BINDING_MISMATCH"),
+            ("request_digest", "sha256:"+"e"*64, "ACK_REQUEST_UNBOUND"),
+        ]:
+            with self.subTest(field=field):
+                verified, code = outbox.verify_ack(self.path, ack={**ack,field:value}, worker_id="w1")
+                self.assertFalse(verified)
+                self.assertEqual(code, expected)
+
+    def test_ack_nonfinite_or_future_freshness_is_invalid(self):
+        ack = self._bound_ack()
+        for created in [float("nan"), float("inf"), float("-inf"), time.time()+3600]:
+            with self.subTest(created=created):
+                verified, code = outbox.verify_ack(self.path, ack={**ack,"created":created}, worker_id="w1")
+                self.assertFalse(verified)
+                self.assertEqual(code, "ACK_FRESHNESS_INVALID")
+
+    def test_ack_requires_actual_persisted_request_attempt(self):
+        import sqlite3
+        ack = self._bound_ack()
+        with sqlite3.connect(self.path) as db:
+            db.execute("DELETE FROM delivery_outbox_attempts")
+        verified, code = outbox.verify_ack(self.path, ack=ack, worker_id="w1")
+        self.assertFalse(verified)
+        self.assertEqual(code, "ACK_REQUEST_UNBOUND")
+
+    def test_delivery_observers_do_not_materialize_missing_store(self):
+        import sqlite3
+        from contextlib import suppress
+        rec = _record()
+        ack = {"destination_id":rec["destination_id"], "event_source":rec["event_source"],
+               "event_id":rec["event_id"], "delivery_generation":1,
+               "request_digest":"unit-only", "payload_digest":rec["event_payload_digest"],
+               "created":time.time()}
+        for reader in ["ack", "lease", "restart", "readback"]:
+            with self.subTest(reader=reader):
+                target = self.path.parent/(reader+"-missing.sqlite")
+                with suppress(sqlite3.Error, outbox.OutboxStoreUnavailable):
+                    if reader == "ack":outbox.verify_ack(target, ack=ack, worker_id="w1")
+                    elif reader == "lease":outbox._verify_lease(target, key=tuple(_key().values()), worker_id="w1")
+                    elif reader == "restart":outbox.discover_restart(target)
+                    else:outbox._readback_after_write(target, "unit-only")
+                self.assertFalse(target.exists(), reader+" created a missing store")
+
+    def test_delivery_observation_does_not_change_uninitialized_store_policy(self):
+        import sqlite3
+        target = self.path.parent/"sentinel.sqlite"
+        with sqlite3.connect(target) as db:
+            db.execute("CREATE TABLE sentinel(value TEXT)")
+        db.close()
+        before = target.read_bytes()
+        with self.assertRaises(outbox.OutboxStoreUnavailable):
+            outbox.discover_restart(target)
+        self.assertEqual(target.read_bytes(), before)
+        with sqlite3.connect(target) as db:
+            self.assertEqual(db.execute("PRAGMA journal_mode").fetchone()[0], "delete")
+        db.close()
+
+    def test_transition_cannot_bypass_ack_authentication(self):
+        self._bound_ack()
+        with self.assertRaisesRegex(outbox.OutboxConflict, "ACK_VERIFIER_UNAVAILABLE"):
+            outbox.transition(self.path, **_key(), worker_id="w1", to_state="ACK_CONFIRMED")
+        row = outbox.discover_restart(self.path)[0]
+        self.assertEqual(row["state"], "IN_FLIGHT")
+        self.assertEqual(row["lease_holder"], "w1")
 
     def test_bare_2xx_not_confirmed(self):
         rec = _record()
