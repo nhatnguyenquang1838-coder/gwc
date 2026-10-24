@@ -6,6 +6,7 @@ GUI, credential access, Loop lifecycle operation or legacy gate receipt is used.
 from __future__ import annotations
 import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
@@ -76,6 +77,8 @@ def local_engineering_capabilities(context,*,guard,artifact_directory,allowed_co
     def preflight(c,item):
         """Validate source, policy and command bindings without starting the task subprocess."""
         try:
+            require(os.open in os.supports_dir_fd and all(hasattr(os,name) for name in ('O_DIRECTORY','O_NOFOLLOW')),
+                    'ENGINEERING_ARTIFACT_FENCE_UNAVAILABLE')
             require(validate(c),'ENGINEERING_SOURCE_OR_OWNER_CHANGED')
             argv=tuple(item.get('argv',[]));require(argv in {tuple(a) for a in allowed_commands},'ENGINEERING_COMMAND_NOT_ALLOWLISTED')
             hashes={}
@@ -118,6 +121,9 @@ def local_engineering_capabilities(context,*,guard,artifact_directory,allowed_co
         if current!=prepared:raise EngineeringPreEffectValidationError('ENGINEERING_PREFLIGHT_BINDING_CHANGED')
         argv=tuple(prepared['argv']);hashes=prepared['input_hashes']
         policy_ref=prepared['input_policy_ref'];policy_sha256=prepared['input_policy_sha256']
+        existing=artifacts/(item['fingerprint'].split(':')[-1]+'.json')
+        if existing.exists() or existing.is_symlink():
+            raise EngineeringPreEffectValidationError('ENGINEERING_ARTIFACT_ALREADY_EXISTS')
         result=subprocess.run([sys.executable,*argv],cwd=root,capture_output=True,text=True,timeout=90)
         if preflight(c,item)!=prepared:
             raise EngineeringPreEffectValidationError('ENGINEERING_POSTEXEC_BINDING_CHANGED')
@@ -128,7 +134,17 @@ def local_engineering_capabilities(context,*,guard,artifact_directory,allowed_co
                  'input_digest':item['input_digest'],'task_context_digest':prepared['task_context_digest']}
         path=artifacts/(item['fingerprint'].split(':')[-1]+'.json');encoded=json.dumps(payload,sort_keys=True)
         require(path.resolve().is_relative_to(artifacts),'ENGINEERING_ARTIFACT_PATH_ESCAPE')
-        path.write_text(encoded)
+        # Fence the publication syscall, not just an earlier pathname lookup.
+        # Exclusive creation also refuses hardlinks and existing regular files.
+        try:
+            directory_fd=os.open(artifacts,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
+            try:
+                fd=os.open(path.name,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600,dir_fd=directory_fd)
+                with os.fdopen(fd,'w',encoding='utf-8') as stream:stream.write(encoded)
+            finally:os.close(directory_fd)
+        except OSError as exc:
+            # The subprocess already ran: do NOT label this a pre-task refusal.
+            raise ValueError('ENGINEERING_ARTIFACT_PUBLICATION_REFUSED') from exc
         try:observed=json.loads(result.stdout)
         except ValueError:observed={}
         outcome=observed.get('result','HOST_PROCESS_FAILED')

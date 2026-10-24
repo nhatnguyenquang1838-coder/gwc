@@ -1,0 +1,110 @@
+{
+  "evidence_class": "LOCAL_UNIT_HOST_PUBLICATION_FENCING_NOT_NATIVE_QUALIFICATION",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "session_id": "20261014_021304_0dc728",
+  "native_tick": 455,
+  "parent_head": "4e8ddb35addbed7b38b4ed1c726787b01804baa8",
+  "advisory_ref": "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6386695946",
+  "authority_source": "AGENTS.md:47-95 UNIVERSAL_V2_DEVELOPMENT; frozen R3 same-branch scope; advisory not authority",
+  "communication_reader_result": "HUMAN_COMMUNICATION_ACTOR_MISMATCH; GPT Controller / Hermes Executor labels; no canonical consumption or typed cursor claim",
+  "source_sha256": {
+    "tools/node_architect/engineering_host_adapter.py": "97df5b0cfc5bfb0f4cd4ba98128db5901e7cbb78e0035409bb333ec805bfb122",
+    "tests/test_engineering_frontier_host.py": "9a457030182b3f8e3670d753b97f7a1765e96dfe31768d64128d05865ce4870d"
+  },
+  "sentinel_observations": {
+    "publication-red": [
+      {
+        "case": "publication-red-tmp/test_artifact_replacement_afte0/outside-store/aef14b0c799cc2d735e9faa9abefe158d94f948f745cf5693dd7d8aadc20754f.json",
+        "sentinel_preserved": false,
+        "sha256": "976996755a0d6952bfec1c4de626d01c8c9027b0b34ca27385de6187c4d97e2d"
+      },
+      {
+        "case": "publication-red-tmp/test_artifact_replacement_afte1/outside-store/aef14b0c799cc2d735e9faa9abefe158d94f948f745cf5693dd7d8aadc20754f.json",
+        "sentinel_preserved": false,
+        "sha256": "672b32854291a0fcf03156a9cce8c326d46dcae3bdca61aa4f357f307fcfc370"
+      },
+      {
+        "case": "publication-red-tmp/test_artifact_replacement_afte2/outside-store/aef14b0c799cc2d735e9faa9abefe158d94f948f745cf5693dd7d8aadc20754f.json",
+        "sentinel_preserved": false,
+        "sha256": "58f0cb6013c4764f082a07caa5081bff846ed16200c69b8ec052e0818f5c5077"
+      }
+    ],
+    "publication-green": [
+      {
+        "case": "publication-green-tmp/test_artifact_replacement_afte0/outside-store/aef14b0c799cc2d735e9faa9abefe158d94f948f745cf5693dd7d8aadc20754f.json",
+        "sentinel_preserved": true,
+        "sha256": "fdd5b18d0d6e7d3c33870cff243d12410eaf09faaf2fdee173a03fc61414ea81"
+      },
+      {
+        "case": "publication-green-tmp/test_artifact_replacement_afte1/outside-store/aef14b0c799cc2d735e9faa9abefe158d94f948f745cf5693dd7d8aadc20754f.json",
+        "sentinel_preserved": true,
+        "sha256": "fdd5b18d0d6e7d3c33870cff243d12410eaf09faaf2fdee173a03fc61414ea81"
+      },
+      {
+        "case": "publication-green-tmp/test_artifact_replacement_afte2/outside-store/aef14b0c799cc2d735e9faa9abefe158d94f948f745cf5693dd7d8aadc20754f.json",
+        "sentinel_preserved": true,
+        "sha256": "fdd5b18d0d6e7d3c33870cff243d12410eaf09faaf2fdee173a03fc61414ea81"
+      }
+    ],
+    "host-final": [
+      {
+        "case": "host-final-tmp/test_artifact_replacement_afte0/outside-store/aef14b0c799cc2d735e9faa9abefe158d94f948f745cf5693dd7d8aadc20754f.json",
+        "sentinel_preserved": true,
+        "sha256": "fdd5b18d0d6e7d3c33870cff243d12410eaf09faaf2fdee173a03fc61414ea81"
+      },
+      {
+        "case": "host-final-tmp/test_artifact_replacement_afte1/outside-store/aef14b0c799cc2d735e9faa9abefe158d94f948f745cf5693dd7d8aadc20754f.json",
+        "sentinel_preserved": true,
+        "sha256": "fdd5b18d0d6e7d3c33870cff243d12410eaf09faaf2fdee173a03fc61414ea81"
+      },
+      {
+        "case": "host-final-tmp/test_artifact_replacement_afte2/outside-store/aef14b0c799cc2d735e9faa9abefe158d94f948f745cf5693dd7d8aadc20754f.json",
+        "sentinel_preserved": true,
+        "sha256": "fdd5b18d0d6e7d3c33870cff243d12410eaf09faaf2fdee173a03fc61414ea81"
+      }
+    ]
+  },
+  "RED": {
+    "publication": "3 failing preservation assertions on unchanged production4e8ddb35: real subprocess followed by filesystem leaf symlink/hardlink or store symlink replacement; each outside-store sentinel overwritten by artifact JSON",
+    "cache": "1 failing no-second-subprocess assertion after publication fix: existing artifact caused redundant task run before exclusive-create refusal",
+    "platform": "guard regression only: absent dir_fd support refused before task and before artifact-store creation"
+  },
+  "fix": [
+    "Pin artifact directory using O_DIRECTORY|O_NOFOLLOW; create relative leaf via dir_fd using O_CREAT|O_EXCL|O_NOFOLLOW, without truncation",
+    "Refuse unsupported platform before task; preserve original preflight refusals",
+    "Refuse preexisting target before task; bytes and existing result verification preserved",
+    "Post-task publication rejection is ValueError ENGINEERING_ARTIFACT_PUBLICATION_REFUSED, NOT pre_effect_validation_failed"
+  ],
+  "tests": {
+    "focused": "27 passed in17.66s exit0",
+    "expanded": "327 passed +11 subtests across15 modules in30.55s exit0",
+    "raw_logs": "~/.hermes/cache/scratch/q0-recovery-r1/c255-preeffect-r1/"
+  },
+  "availability_change": [
+    "Artifacts create-once/private0600; no overwrite, automatic cleanup or live migration",
+    "Verifier still accepts existing valid result; execute refuses reexecution when target exists",
+    "Unsupported OS syscall controls fail closed before task"
+  ],
+  "limits": [
+    "Fences artifact-publication write, NOT earlier task subprocess or receiver authenticity",
+    "No general OS sandbox, arbitrary-ancestor directory-race protection, rollback, compromised-process resistance, fsync or crash-atomic complete-file visibility claimed",
+    "Task subprocess executes on initially admitted context; input/owner changes during execution are detected later, not undone",
+    "Human-reader actor mismatch left unmodified; no machine receipt/cursor/continuation advancement"
+  ],
+  "retained_holds": [
+    "ACK_VERIFIER_UNAVAILABLE",
+    "authentic DWO replay NOT_ESTABLISHED; exhausted Jira source not repeated",
+    "native CF / LOAD_PROOF / L3 / UR.G6 NOT_ESTABLISHED",
+    "live checkpoint/selector/cursor/scheduler/activation/merge/deploy untouched"
+  ],
+  "authority_granted": false,
+  "native_qualification_claimed": false,
+  "children_spawned": 0,
+  "context_compressed": false,
+  "skills_reloaded": [
+    "hermes-loop-operations",
+    "dwa-gpt-exchange",
+    "governance-bounded-implementation",
+    "test-driven-development"
+  ]
+}

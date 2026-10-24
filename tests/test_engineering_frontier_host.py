@@ -243,6 +243,71 @@ def test_post_command_input_drift_cannot_publish_completion(tmp_path, monkeypatc
     assert not directory.exists()  # No completed artifact published after drift.
 
 
+@pytest.mark.parametrize('replacement', ['symlink', 'hardlink', 'store_symlink'])
+def test_artifact_replacement_after_containment_check_cannot_overwrite_sentinel(tmp_path,monkeypatch,replacement):
+    import os
+    from pathlib import Path
+    c,item,caps,_,directory,_=_terminal_unit_host(tmp_path)
+    artifact=directory/(item['fingerprint'].split(':')[-1]+'.json')
+    outside=tmp_path/'outside-store';outside.mkdir()
+    sentinel=outside/artifact.name;sentinel.write_bytes(b'PRESERVE')
+    resolve=Path.resolve;replaced=[]
+    def race(path,*args,**kwargs):
+        resolved=resolve(path,*args,**kwargs)
+        # Deterministic filesystem replacement after the last containment lookup,
+        # not a forged executor result. The real admitted unit subprocess ran.
+        if path==artifact and directory.exists() and not replaced:
+            replaced.append(replacement)
+            if replacement=='symlink':artifact.symlink_to(sentinel)
+            elif replacement=='hardlink':os.link(sentinel,artifact)
+            else:
+                directory.rename(tmp_path/'original-store')
+                directory.symlink_to(outside,target_is_directory=True)
+        return resolved
+    monkeypatch.setattr(Path,'resolve',race)
+    error=None
+    try:caps['engineering.execute'](c,item)
+    except (ValueError,OSError) as exc:error=exc
+    assert replaced==[replacement]
+    assert sentinel.read_bytes()==b'PRESERVE'  # Must hold BEFORE reporting refusal.
+    assert error is not None
+    # This is publication fencing, not a claim the task subprocess never ran.
+    assert getattr(error,'pre_effect_validation_failed',False) is False
+
+
+def test_existing_artifact_is_preserved_without_reexecuting_task(tmp_path,monkeypatch):
+    import sys
+    from pathlib import Path
+    import tools.node_architect.engineering_host_adapter as host
+    c,item,caps,_,_,_=_terminal_unit_host(tmp_path)
+    result=caps['engineering.execute'](c,item)
+    artifact=Path(result['artifact_ref']);before=artifact.read_bytes()
+    run=host.subprocess.run;calls=[]
+    def observed(argv,*args,**kwargs):
+        if argv[0]==sys.executable:calls.append(argv)
+        return run(argv,*args,**kwargs)
+    monkeypatch.setattr(host.subprocess,'run',observed)
+    with pytest.raises(ValueError):caps['engineering.execute'](c,item)
+    assert calls==[]
+    assert artifact.read_bytes()==before
+    assert caps['engineering.verify_result'](c,item,result) is True
+
+
+def test_missing_atomic_publication_support_refuses_before_task(tmp_path,monkeypatch):
+    import os,sys
+    import tools.node_architect.engineering_host_adapter as host
+    c,item,caps,_,directory,_=_terminal_unit_host(tmp_path)
+    monkeypatch.setattr(os,'supports_dir_fd',set())
+    run=host.subprocess.run;calls=[]
+    def observed(argv,*args,**kwargs):
+        if argv[0]==sys.executable:calls.append(argv)
+        return run(argv,*args,**kwargs)
+    monkeypatch.setattr(host.subprocess,'run',observed)
+    with pytest.raises(ValueError,match='ENGINEERING_ARTIFACT_FENCE_UNAVAILABLE'):
+        caps['engineering.execute'](c,item)
+    assert calls==[] and not directory.exists()
+
+
 def test_host_executes_exact_terminal_bridge_suite_and_verifies_artifact(tmp_path):
     import hashlib,subprocess
     from tools.node_architect.engineering_host_adapter import local_engineering_capabilities
