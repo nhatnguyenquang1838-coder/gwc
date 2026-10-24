@@ -797,28 +797,32 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
 
 def reconcile_engineering_source_head(old_context,new_context,*,repository_root,reason,dry_run:bool=False,
                                       target_copy: str | None = None,
-                                      read_latest_command=None,last_acked_seq=None,
+                                      read_latest_command: Callable[[], dict] | None = None,
+                                      last_acked_seq=None,
                                       approval_id=None,scope_hash=None,
                                       approved_scope_prefix=None,expires_at=None,now=None):
     """Explicit HEAD-only continuation; retains old invocations and effect claims.
 
-    Omitting every effect-fence keyword preserves legacy behavior for existing
-    callers and tests. Supplying any fence value activates the complete fence.
-    Dry runs require a caller-created isolated database copy and never open the
-    live checkpoint with a writable connection.
+    Non-dry reconciliation requires an explicit refusal-only fence before any
+    checkpoint access; omitted values must not select an unguarded legacy path.
+    Passing this fence does not establish trusted approval provenance or grant
+    effect authority. Dry runs require a caller-created isolated database copy
+    and never open the live checkpoint with a writable connection.
     """
     import copy,subprocess
-    if not dry_run and any(value is not None for value in
-            (read_latest_command,last_acked_seq,approval_id,scope_hash,
-             approved_scope_prefix,expires_at,now)):
-        assert_effect_fence(read_latest_command=read_latest_command,
-            last_acked_seq=last_acked_seq,approval_id=approval_id,
-            scope_hash=scope_hash,approved_scope_prefix=approved_scope_prefix,
-            expires_at=expires_at,now=now)
     if dry_run and target_copy is None:
         raise ValueError('DRY_RUN_REQUIRES_ISOLATED_COPY')
     old=validate_task_context(old_context);new=validate_task_context(new_context);equivalent=copy.deepcopy(new)
     equivalent['repository']['head_sha']=old['repository']['head_sha'];require(equivalent==old and reason,'ENGINEERING_RECONCILE_NON_HEAD_DRIFT')
+    if not dry_run:
+        if not (callable(read_latest_command) and last_acked_seq is not None and
+                approval_id is not None and scope_hash is not None and
+                approved_scope_prefix is not None and now is not None):
+            raise ValueError('FENCE_CONTEXT_REQUIRED')
+        assert_effect_fence(read_latest_command=read_latest_command,
+            last_acked_seq=last_acked_seq,approval_id=approval_id,
+            scope_hash=scope_hash,approved_scope_prefix=approved_scope_prefix,
+            expires_at=expires_at,now=now)
     root=Path(repository_root).resolve()
     def git(*args):return subprocess.check_output(['git','-C',str(root),*args],text=True).strip()
     require(root==Path(new['repository']['worktree']).resolve() and git('rev-parse','HEAD')==new['repository']['head_sha'] and git('branch','--show-current')==new['repository']['branch'],'ENGINEERING_RECONCILE_GIT_BINDING_REQUIRED')

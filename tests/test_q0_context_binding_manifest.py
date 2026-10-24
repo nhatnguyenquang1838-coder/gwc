@@ -329,6 +329,51 @@ def test_non_dry_reconcile_runs_effect_fence_before_checkpoint_write(tmp_path):
     assert _file_sha(checkpoint) == before
 
 
+@pytest.mark.parametrize("fence", [
+    {},
+    {"read_latest_command": None, "last_acked_seq": None, "approval_id": None,
+     "scope_hash": None, "approved_scope_prefix": None, "expires_at": None,
+     "now": None},
+])
+def test_live_head_reconcile_cannot_omit_effect_fence(tmp_path, fence):
+    from tools.node_architect.engineering_m1_m7_workflow import reconcile_engineering_source_head
+
+    old, new = _reconcile_fixture(tmp_path)
+    checkpoint = Path(old["workflow"]["checkpoint_ref"])
+    before_sha, before_tables = _file_sha(checkpoint), _tables(checkpoint)
+    with pytest.raises(ValueError, match="FENCE_CONTEXT_REQUIRED"):
+        reconcile_engineering_source_head(
+            old, new, repository_root=tmp_path, reason="unbound live effect", **fence)
+    assert _file_sha(checkpoint) == before_sha
+    assert _tables(checkpoint) == before_tables
+
+
+@pytest.mark.parametrize("missing", [
+    "read_latest_command", "last_acked_seq", "approval_id", "scope_hash",
+    "approved_scope_prefix", "now",
+])
+def test_partial_live_fence_is_rejected_before_any_checkpoint_access(tmp_path, monkeypatch, missing):
+    import tools.node_architect.engineering_m1_m7_workflow as workflow
+    from test_engineering_m1_m7_workflow import _fixture_effect_fence
+
+    old, new = _reconcile_fixture(tmp_path)
+    checkpoint = Path(old["workflow"]["checkpoint_ref"])
+    before_sha, before_tables = _file_sha(checkpoint), _tables(checkpoint)
+    fence = _fixture_effect_fence()
+    fence.pop(missing)
+
+    def deny_connection(*args, **kwargs):
+        pytest.fail("incomplete fence must be denied before opening any SQLite connection")
+
+    with monkeypatch.context() as patcher:
+        patcher.setattr(workflow.sqlite3, "connect", deny_connection)
+        with pytest.raises(ValueError, match="FENCE_CONTEXT_REQUIRED"):
+            workflow.reconcile_engineering_source_head(
+                old, new, repository_root=tmp_path, reason="partial fence", **fence)
+    assert _file_sha(checkpoint) == before_sha
+    assert _tables(checkpoint) == before_tables
+
+
 def test_head_reconcile_preserves_non_head_drift_guard(tmp_path):
     from tools.node_architect.engineering_m1_m7_workflow import reconcile_engineering_source_head
 

@@ -53,6 +53,14 @@ def test_duplicate_invocation_and_work_cannot_reexecute(tmp_path):
     assert counts=={'read':2,'execute':1}
 
 
+def _fixture_effect_fence():
+    """Unit-test refusal-check inputs, not authenticated live authority."""
+    return {'read_latest_command': lambda: {'seq': 43}, 'last_acked_seq': 43,
+            'approval_id': 'UNIT_FIXTURE_ONLY', 'scope_hash': 'sha256:' + 'a' * 64,
+            'approved_scope_prefix': 'sha256:' + 'a' * 16,
+            'expires_at': '2099-01-01T00:00:00Z', 'now': '2026-10-23T00:00:00Z'}
+
+
 def _blocked_frontier(c,work_id='trace',status='BLOCKED_EXTERNAL_EVIDENCE'):
     return {'source_head':c['repository']['head_sha'],
             'runtime_plan_digest':c['run']['runtime_plan_digest'],'authority_granted':False,
@@ -105,7 +113,8 @@ def test_head_only_advance_keeps_blocker_key(tmp_path):
     identity=first['terminal']['blocker_identity']
     git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','--allow-empty','-m','advance')
     newer=copy.deepcopy(c);newer['repository']['head_sha']=git('rev-parse','HEAD')
-    reconcile_engineering_source_head(c,newer,repository_root=tmp_path,reason='additive head advance')
+    reconcile_engineering_source_head(c,newer,repository_root=tmp_path,reason='additive head advance',
+                                      **_fixture_effect_fence())
     second=run_task_workflow(newer,host_capabilities=caps,invocation_key='head-two')
     assert second['terminal']['blocker_identity']==identity
     assert second['graph_requests']==[]
@@ -317,7 +326,8 @@ def test_head_change_requires_explicit_same_checkpoint_reconciliation(tmp_path):
     new=deepcopy(old);new['repository']['head_sha']=git('rev-parse','HEAD')
     with pytest.raises(ValueError,match='ENGINEERING_CHECKPOINT_CONTEXT_DRIFT'):
         run_task_workflow(new,host_capabilities=caps,invocation_key='two')
-    reconcile_engineering_source_head(old,new,repository_root=tmp_path,reason='fixture additive source')
+    reconcile_engineering_source_head(old,new,repository_root=tmp_path,reason='fixture additive source',
+                                      **_fixture_effect_fence())
     r=run_task_workflow(new,host_capabilities=caps,invocation_key='two')
     assert r['verdict']['reason_code']=='NO_MATERIAL_CHANGE'
     assert counts=={'read':2,'execute':1}
@@ -829,7 +839,8 @@ def test_terminal_blocker_identity_dedupes_across_firings_and_head_only_advance(
     assert same_head['graph_requests']==[]
     git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','--allow-empty','-m','additive source change')
     newer=copy.deepcopy(c);newer['repository']['head_sha']=git('rev-parse','HEAD')
-    reconcile_engineering_source_head(c,newer,repository_root=tmp_path,reason='fixture additive commit preserving same blocker')
+    reconcile_engineering_source_head(c,newer,repository_root=tmp_path,reason='fixture additive commit preserving same blocker',
+                                      **_fixture_effect_fence())
     second=run_task_workflow(newer,host_capabilities=caps,invocation_key='terminal-head-three')
     assert second['terminal']['blocker_identity']==identity
     assert second['terminal_exchange_request'] is None
