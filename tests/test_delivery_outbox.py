@@ -222,6 +222,35 @@ class DeliveryOutboxTest(unittest.TestCase):
         self.assertFalse(verified)
         self.assertEqual(code, "ACK_VERIFIER_UNAVAILABLE")
 
+    def test_unavailable_ack_confirmation_preserves_recovery_path(self):
+        ack = self._bound_ack()
+        key = _key()
+        before = outbox.discover_restart(self.path)[0]
+        self.assertEqual(outbox.verify_ack(self.path, ack=ack, worker_id="w1"),
+                         (False, "ACK_VERIFIER_UNAVAILABLE"))
+        with self.assertRaisesRegex(outbox.OutboxConflict, "ACK_VERIFIER_UNAVAILABLE"):
+            outbox.transition(self.path, worker_id="w1", to_state="ACK_CONFIRMED", **key)
+        self.assertEqual(outbox.discover_restart(self.path)[0], before)
+        # This is recovery availability, NOT successful receiver authentication.
+        outbox.transition(self.path, worker_id="w1", to_state="ACK_UNKNOWN", **key)
+        self.assertEqual(outbox.discover_restart(self.path)[0]["state"], "ACK_UNKNOWN")
+        outbox.acquire_lease(self.path, worker_id="recovery", **key)
+        retry = outbox.transition(self.path, worker_id="recovery", to_state="RETRY_SCHEDULED", **key)
+        self.assertEqual(retry["state"], "RETRY_SCHEDULED")
+        self.assertEqual(retry["attempt_no"], 1)
+        self.assertIsNotNone(retry["next_attempt_at"])
+        row = outbox.discover_restart(self.path)[0]
+        self.assertEqual(row["state"], "RETRY_SCHEDULED")
+        self.assertIsNone(row["lease_holder"])
+
+    def test_expired_bound_ack_is_refused_without_confirming_delivery(self):
+        ack = self._bound_ack()
+        before = outbox.discover_restart(self.path)[0]
+        ack["created"] = time.time() - outbox.DEFAULT_ACK_FRESHNESS_S - 1
+        self.assertEqual(outbox.verify_ack(self.path, ack=ack, worker_id="w1"),
+                         (False, "ACK_STALE"))
+        self.assertEqual(outbox.discover_restart(self.path)[0], before)
+
     def test_ack_binding_mismatches_are_not_hidden_by_truthy_proof(self):
         ack = self._bound_ack()
         for field, value, expected in [

@@ -110,25 +110,67 @@ def test_source_bound_host_frontier_loads_real_policy_and_trace_status(tmp_path)
 
 def test_local_verifier_accepts_only_bound_terminal_bridge_suite_artifact(tmp_path):
     import json,hashlib
+    from pathlib import Path
     from tools.node_architect.engineering_host_adapter import local_engineering_capabilities
     from tools.node_architect.task_context_binding import digest
-    c,request,git=agent_fixture(tmp_path)
-    caps=local_engineering_capabilities(c,guard=lambda:True,
-        artifact_directory=tmp_path/'validation-results',
-        allowed_commands=[['-m','pytest','tests/test_engineering_m1_m7_workflow.py','-q']])
-    argv=['-m','pytest','tests/test_engineering_m1_m7_workflow.py','-q']
+    c,_,git=agent_fixture(tmp_path)
+    ref='tests/test_unit_only.py'
+    source=tmp_path/ref;source.parent.mkdir(parents=True)
+    source.write_text('def test_unit_fixture_only():\n    assert True\n')
+    git('add',ref);git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','unit fixture input')
+    c['repository']['head_sha']=git('rev-parse','HEAD')
+    argv=['-m','pytest',ref,'-q']
     item={'id':'bridge-validation','action':'run_sandboxed_validation','argv':argv,
-          'verification_profile':'Q0_TERMINAL_RESULT_SUITE','required_test_files':['tests/test_engineering_m1_m7_workflow.py'],
-          'minimum_tests_passed':1,'expected_result':'Q0_TERMINAL_RESULT_SUITE_PASS'}
-    stdout='.................... [100%]\n20 passed in 0.42s\n'
-    artifact=tmp_path/'validation-results'/'bridge.json';artifact.parent.mkdir(parents=True)
-    payload={'argv':argv,'source_head':c['repository']['head_sha'],'exit_code':0,'stdout':stdout,'stderr':'','input_hashes':{}}
-    artifact.write_text(json.dumps(payload,sort_keys=True))
-    result={'artifact_ref':str(artifact),'artifact_digest':digest(payload),'stdout_digest':digest(stdout),'exit_code':0,'source_head':c['repository']['head_sha'],'result':'Q0_TERMINAL_RESULT_SUITE_PASS','executed_effects':[]}
+          'verification_profile':'Q0_TERMINAL_RESULT_SUITE','required_test_files':[ref],
+          'minimum_tests_passed':1,'expected_result':'Q0_TERMINAL_RESULT_SUITE_PASS',
+          'read_paths':[ref],'input_digest':digest({ref:hashlib.sha256(source.read_bytes()).hexdigest()})}
+    item['fingerprint']=digest(item)
+    caps=local_engineering_capabilities(c,guard=lambda:True,
+        artifact_directory=tmp_path/'validation-results',allowed_commands=[argv])
+    # Positive evidence is emitted by the actual unit-host subprocess, not invented stdout.
+    result=caps['engineering.execute'](c,item)
+    assert result['exit_code']==0
     assert caps['engineering.verify_result'](c,item,result) is True
+    artifact=Path(result['artifact_ref']);payload=json.loads(artifact.read_text())
     bad=dict(payload);bad['argv']=['-c','print("not tests")'];artifact.write_text(json.dumps(bad,sort_keys=True))
     bad_result={**result,'artifact_digest':digest(bad)}
     assert caps['engineering.verify_result'](c,item,bad_result) is False
+
+
+@pytest.mark.parametrize('gap', ['outside_store', 'command_not_allowlisted', 'input_hashes', 'policy_digest'])
+def test_host_verifier_cannot_skip_preflight_or_artifact_binding(tmp_path, gap):
+    import hashlib, json
+    from tools.node_architect.engineering_host_adapter import local_engineering_capabilities
+    from tools.node_architect.task_context_binding import digest
+    c, _, _ = agent_fixture(tmp_path)
+    allowed = ['-m','pytest','tests/unit_only.py','-q']
+    argv = ['-m','pytest','tests/not_allowlisted.py','-q'] if gap == 'command_not_allowlisted' else allowed
+    ref = 'tools/repair.py'
+    hashes = {ref:hashlib.sha256((tmp_path/ref).read_bytes()).hexdigest()}
+    item = {'id':'bound-verification','action':'run_sandboxed_validation','argv':argv,
+            'read_paths':[ref], 'input_digest':digest(hashes),
+            'verification_profile':'Q0_TERMINAL_RESULT_SUITE','required_test_files':[argv[2]],
+            'minimum_tests_passed':1,'expected_result':'UNIT_ONLY_SUITE_PASS'}
+    item['fingerprint'] = digest(item)
+    artifacts = tmp_path/'validation-results'
+    artifacts.mkdir()
+    artifact = artifacts/(item['fingerprint'].split(':')[-1]+'.json')
+    if gap == 'outside_store':artifact = tmp_path/'untrusted-outside.json'
+    stdout = '1 passed in 0.01s\n'  # Adversarial input, NOT observed execution.
+    payload = {'argv':argv,'source_head':c['repository']['head_sha'],'exit_code':0,
+               'stdout':stdout,'stderr':'','input_hashes':hashes,'input_digest':item['input_digest'],
+               'input_policy_ref':None,'input_policy_sha256':None}
+    if gap == 'input_hashes':payload['input_hashes'] = {ref:'0'*64}
+    if gap == 'policy_digest':payload['input_policy_sha256'] = 'unbound-policy'
+    artifact.write_text(json.dumps(payload))
+    before = artifact.read_bytes()
+    result = {'artifact_ref':str(artifact),'artifact_digest':digest(payload),'stdout_digest':digest(stdout),
+              'exit_code':0,'source_head':c['repository']['head_sha'],
+              'result':item['expected_result'],'executed_effects':[]}
+    caps = local_engineering_capabilities(c, guard=lambda:True,
+                                         artifact_directory=artifacts, allowed_commands=[allowed])
+    assert caps['engineering.verify_result'](c,item,result) is False
+    assert artifact.read_bytes() == before
 
 
 def test_host_executes_exact_terminal_bridge_suite_and_verifies_artifact(tmp_path):

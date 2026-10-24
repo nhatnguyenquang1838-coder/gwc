@@ -140,7 +140,16 @@ def local_engineering_capabilities(context,*,guard,artifact_directory,allowed_co
                 'source_head':c['repository']['head_sha'],'stdout_digest':digest(result.stdout),
                 'artifact_ref':str(path),'artifact_digest':digest(payload),'observed':observed,'executed_effects':[]}
     def verify(c,item,result):
-        raw=json.loads(Path(result['artifact_ref']).read_text())
+        try:
+            prepared=preflight(c,item)
+            expected=(artifacts/(item['fingerprint'].split(':')[-1]+'.json')).resolve()
+            path=Path(result['artifact_ref']).resolve()
+            if path!=expected or not path.is_relative_to(artifacts):return False
+            raw=json.loads(path.read_text())
+            if not isinstance(raw,dict) or any(k not in raw or raw[k]!=v for k,v in prepared.items()):return False
+            if result.get('source_head')!=prepared['source_head'] or result.get('executed_effects')!=[]:return False
+        except (ValueError,KeyError,TypeError,OSError):
+            return False
         if digest(raw)!=result['artifact_digest'] or digest(raw['stdout'])!=result['stdout_digest']:return False
         if item.get('verification_profile')=='Q0_TERMINAL_RESULT_SUITE':
             if raw.get('argv')!=item.get('argv') or raw.get('source_head')!=c['repository']['head_sha'] or result.get('source_head')!=c['repository']['head_sha'] or raw.get('exit_code')!=0:return False
