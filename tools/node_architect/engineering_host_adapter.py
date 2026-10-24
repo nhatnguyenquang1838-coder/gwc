@@ -125,8 +125,12 @@ def local_engineering_capabilities(context,*,guard,artifact_directory,allowed_co
         if existing.exists() or existing.is_symlink():
             raise EngineeringPreEffectValidationError('ENGINEERING_ARTIFACT_ALREADY_EXISTS')
         result=subprocess.run([sys.executable,*argv],cwd=root,capture_output=True,text=True,timeout=90)
-        if preflight(c,item)!=prepared:
-            raise EngineeringPreEffectValidationError('ENGINEERING_POSTEXEC_BINDING_CHANGED')
+        try:postflight=preflight(c,item)
+        except EngineeringPreEffectValidationError as exc:
+            # Preserve the reason, without falsely claiming the task never ran.
+            raise ValueError(exc.reason_code) from exc
+        if postflight!=prepared:
+            raise ValueError('ENGINEERING_POSTEXEC_BINDING_CHANGED')
         artifacts.mkdir(parents=True,exist_ok=True)
         payload={'argv':list(argv),'source_head':c['repository']['head_sha'],'exit_code':result.returncode,
                  'stdout':result.stdout,'stderr':result.stderr,'input_hashes':hashes,

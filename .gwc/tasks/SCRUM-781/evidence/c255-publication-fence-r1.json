@@ -8,8 +8,8 @@
   "authority_source": "AGENTS.md:47-95 UNIVERSAL_V2_DEVELOPMENT; frozen R3 same-branch scope; advisory not authority",
   "communication_reader_result": "HUMAN_COMMUNICATION_ACTOR_MISMATCH; GPT Controller / Hermes Executor labels; no canonical consumption or typed cursor claim",
   "source_sha256": {
-    "tools/node_architect/engineering_host_adapter.py": "97df5b0cfc5bfb0f4cd4ba98128db5901e7cbb78e0035409bb333ec805bfb122",
-    "tests/test_engineering_frontier_host.py": "9a457030182b3f8e3670d753b97f7a1765e96dfe31768d64128d05865ce4870d"
+    "tools/node_architect/engineering_host_adapter.py": "a642ef5968158594cf60ce5b0364f9a3646b7fdd44693dfb884ee1dcd13acfbb",
+    "tests/test_engineering_frontier_host.py": "9f274e4df4cc33ab104519b71c1ff7cc90ec283abf07ac7d06c182b33c41f37c"
   },
   "sentinel_observations": {
     "publication-red": [
@@ -67,18 +67,21 @@
   "RED": {
     "publication": "3 failing preservation assertions on unchanged production4e8ddb35: real subprocess followed by filesystem leaf symlink/hardlink or store symlink replacement; each outside-store sentinel overwritten by artifact JSON",
     "cache": "1 failing no-second-subprocess assertion after publication fix: existing artifact caused redundant task run before exclusive-create refusal",
-    "platform": "guard regression only: absent dir_fd support refused before task and before artifact-store creation"
+    "platform": "guard regression only: absent dir_fd support refused before task and before artifact-store creation",
+    "classification": "2 genuine false pre_effect_validation_failed=True assertions after real task subprocess ran: input and context drift; tested against eea5be4c"
   },
   "fix": [
     "Pin artifact directory using O_DIRECTORY|O_NOFOLLOW; create relative leaf via dir_fd using O_CREAT|O_EXCL|O_NOFOLLOW, without truncation",
     "Refuse unsupported platform before task; preserve original preflight refusals",
     "Refuse preexisting target before task; bytes and existing result verification preserved",
-    "Post-task publication rejection is ValueError ENGINEERING_ARTIFACT_PUBLICATION_REFUSED, NOT pre_effect_validation_failed"
+    "Post-task publication rejection is ValueError ENGINEERING_ARTIFACT_PUBLICATION_REFUSED, NOT pre_effect_validation_failed",
+    "Postflight preflight errors retain original reason string but become ordinary ValueError; context mismatch likewise not marked pre-effect. Actual downstream engineering_m1_m7_workflow.py:428-449 treats these as UNKNOWN/reconciliation-required, not retryable PRE_EFFECT_VALIDATION_FAILED"
   ],
   "tests": {
-    "focused": "27 passed in17.66s exit0",
-    "expanded": "327 passed +11 subtests across15 modules in30.55s exit0",
-    "raw_logs": "~/.hermes/cache/scratch/q0-recovery-r1/c255-preeffect-r1/"
+    "focused": "28 passed in18.91s exit0",
+    "expanded": "328 passed +11 subtests across15 modules in31.10s exit0",
+    "raw_logs": "~/.hermes/cache/scratch/q0-recovery-r1/c255-preeffect-r1/",
+    "publication_package": "327 passed +11 subtests at committed eea5be4c in30.67s"
   },
   "availability_change": [
     "Artifacts create-once/private0600; no overwrite, automatic cleanup or live migration",
@@ -106,5 +109,6 @@
     "dwa-gpt-exchange",
     "governance-bounded-implementation",
     "test-driven-development"
-  ]
+  ],
+  "classification_parent": "eea5be4c476ac918e76f5c0d80cd02ff802a7def"
 }

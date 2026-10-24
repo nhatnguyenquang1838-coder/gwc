@@ -226,7 +226,8 @@ def test_post_preflight_drift_refused_before_task_subprocess(tmp_path, monkeypat
     assert sentinel.read_bytes()==b'PRESERVE'
 
 
-def test_post_command_input_drift_cannot_publish_completion(tmp_path, monkeypatch):
+@pytest.mark.parametrize('drift', ['input','context'])
+def test_post_command_input_drift_cannot_publish_completion(tmp_path, monkeypatch,drift):
     import sys
     import tools.node_architect.engineering_host_adapter as host
     c,item,caps,source,directory,_=_terminal_unit_host(tmp_path)
@@ -234,12 +235,15 @@ def test_post_command_input_drift_cannot_publish_completion(tmp_path, monkeypatc
     def changed(argv,*args,**kwargs):
         result=run(argv,*args,**kwargs)
         if argv[0]==sys.executable:
-            calls.append(argv);source.write_text('changed while task ran\n')
+            calls.append(argv)
+            if drift=='input':source.write_text('changed while task ran\n')
+            else:c['run']['id']+='-changed-during-task'
         return result
     monkeypatch.setattr(host.subprocess,'run',changed)
-    with pytest.raises(ValueError,match='ENGINEERING_INPUT_SOURCE_DRIFT'):
+    with pytest.raises(ValueError,match='ENGINEERING_INPUT_SOURCE_DRIFT|ENGINEERING_POSTEXEC_BINDING_CHANGED') as caught:
         caps['engineering.execute'](c,item)
     assert len(calls)==1  # The initially admitted unit subprocess really ran.
+    assert getattr(caught.value,'pre_effect_validation_failed',False) is False
     assert not directory.exists()  # No completed artifact published after drift.
 
 
