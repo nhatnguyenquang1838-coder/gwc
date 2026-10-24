@@ -789,7 +789,12 @@ class RealTargetActivationAdapter:
             raise ValueError('EFFECT_AUTHORITY_TRUST_ANCHOR_UNAVAILABLE')
         if not issuer_ref.startswith(_REAL_TARGET_GRANTS_DIR + '/'):
             raise ValueError('EFFECT_AUTHORITY_TRUST_ANCHOR_UNAVAILABLE')
-        path = self.source_root / issuer_ref
+        grant_root = (self.source_root / _REAL_TARGET_GRANTS_DIR).resolve()
+        path = (self.source_root / issuer_ref).resolve()
+        if ('..' in Path(issuer_ref).parts
+                or not grant_root.is_relative_to(self.source_root)
+                or not path.is_relative_to(grant_root)):
+            raise ValueError('EFFECT_AUTHORITY_TRUST_ANCHOR_UNAVAILABLE')
         if not path.is_file():
             raise ValueError('EFFECT_AUTHORITY_TRUST_ANCHOR_UNAVAILABLE')
         try:

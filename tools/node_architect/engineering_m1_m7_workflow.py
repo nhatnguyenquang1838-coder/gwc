@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import TypedDict,Any,Callable,Literal
 from .stable_json import read_json
-from .task_context_binding import validate_task_context,digest,require,ACTIVITIES
+from .task_context_binding import validate_task_context,digest,require,ACTIVITIES,read_checkpoint
 from .controller_exchange_adapter import make_exchange_request,ExchangeOutbox,reconcile_controller_response
 
 MODE='Q0_ENGINEERING_COORDINATION'
@@ -92,7 +92,9 @@ def _historical_context_recovery(checkpoint_ref, run, *, current_head=None):
                    'Recover the exact historical task context from immutable source evidence.',
                    'Resume only after exact digest equality and repository ancestry are proven.',
                ]}
-    with sqlite3.connect(str(checkpoint_ref), timeout=30) as db:
+    if not Path(checkpoint_ref).is_file():
+        return package
+    with read_checkpoint(checkpoint_ref) as db:
         exists = db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='engineering_workflow'").fetchone()
         if exists:
             row = db.execute('SELECT context_digest FROM engineering_workflow WHERE run=?', (run,)).fetchone()
@@ -122,7 +124,10 @@ def resolve_prior_context(checkpoint_ref, run, *, candidate_old, candidate_new):
     from .task_context_binding import validate_task_context
     old = validate_task_context(candidate_old)
     new = validate_task_context(candidate_new)
-    with sqlite3.connect(str(checkpoint_ref), timeout=30) as db:
+    if not Path(checkpoint_ref).is_file():
+        raise HISTORICAL_CONTEXT_NOT_PROVABLE(_historical_context_recovery(
+            checkpoint_ref, run, current_head=new['repository']['head_sha']))
+    with read_checkpoint(checkpoint_ref) as db:
         exists = db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='engineering_workflow'").fetchone()
         row = (db.execute('SELECT context_digest FROM engineering_workflow WHERE run=?', (run,)).fetchone()
                if exists else None)
@@ -881,7 +886,10 @@ def reconcile_legacy_terminal_dispatches(checkpoint_ref,run):
     import re
     pattern=re.compile(r'blocker_identity\s*\(?\s*(sha256:[0-9a-f]{64})\s*\)?',re.I)
     groups={};examined=0;unmatched=0
-    with sqlite3.connect(str(checkpoint_ref)) as db:
+    if not Path(checkpoint_ref).is_file():
+        return {'run_id':run,'rows_examined':0,'unmatched_rows':0,'groups':{},
+                'authority_granted':False,'typed_ce_admitted':False,'mutated':False}
+    with read_checkpoint(checkpoint_ref) as db:
         try:
             rows=db.execute('SELECT blocker_identity,request,request_source_head,response_observation '
                             'FROM engineering_terminal_dispatches').fetchall()

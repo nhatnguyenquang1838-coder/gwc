@@ -764,6 +764,51 @@ def _real_r2_activation_fixture(tmp_path):
     return source, proposal, plan, allocation, predecessor, authority, branch, head
 
 
+@pytest.mark.parametrize("escape", ["parent_components", "symlink"])
+def test_real_target_issuer_cannot_escape_canonical_grant_directory(tmp_path, escape):
+    from tools.node_architect.q0_m1_m7_integration import RealTargetActivationAdapter
+
+    source = tmp_path / "source"
+    grants = source / "authority/grants"
+    grants.mkdir(parents=True)
+    outside = source / "not-a-grant.json"
+    outside.write_text(json.dumps({"authority_kind": "HUMAN_OPERATOR_EFFECT_AUTHORITY"}))
+    if escape == "parent_components":
+        issuer_ref = "authority/grants/../../not-a-grant.json"
+    else:
+        (grants / "escaped.json").symlink_to(outside)
+        issuer_ref = "authority/grants/escaped.json"
+    before = outside.read_bytes()
+    target = tmp_path / "unactivated"
+    adapter = RealTargetActivationAdapter(source_root=source, live_root=target)
+    with pytest.raises(ValueError, match="^EFFECT_AUTHORITY_TRUST_ANCHOR_UNAVAILABLE$"):
+        adapter._canonical_issuer(issuer_ref)
+    assert outside.read_bytes() == before
+    assert not target.exists()
+
+
+@pytest.mark.parametrize("escape", ["parent_components", "symlink"])
+def test_real_target_transition_rejects_escaped_issuer_before_effects(tmp_path, escape):
+    from tools.node_architect.q0_m1_m7_integration import RealTargetActivationAdapter, _REAL_TARGET_PLAN_REF
+
+    source, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
+    outside = source / "not-a-grant.json"
+    outside.write_text(json.dumps(authority))
+    if escape == "parent_components":
+        issuer_ref = "authority/grants/../../not-a-grant.json"
+    else:
+        (source / "authority/grants/escaped.json").symlink_to(outside)
+        issuer_ref = "authority/grants/escaped.json"
+    target = tmp_path / "unactivated-target"
+    adapter = RealTargetActivationAdapter(source_root=source, live_root=target)
+    with pytest.raises(ValueError, match="^EFFECT_AUTHORITY_TRUST_ANCHOR_UNAVAILABLE$"):
+        adapter.transition(authority={**authority, "issuer_ref": issuer_ref},
+                           predecessor=predecessor, successor_plan=plan,
+                           successor_plan_ref=_REAL_TARGET_PLAN_REF,
+                           node_allocation=allocation, branch=branch, head=head, mode="COMMIT")
+    assert not target.exists()
+
+
 def test_real_target_authority_rejects_policy_document_as_issuer(tmp_path):
     from tools.node_architect.q0_m1_m7_integration import (
         _R3_PREDECESSOR_PLAN_REF, RealTargetActivationAdapter,

@@ -36,11 +36,15 @@ class SQLiteCheckpointConflict(RuntimeError):
     """Raised when a checkpoint write fails its CAS/binding guard."""
 
 
-def _connect(path: Path) -> sqlite3.Connection:
-    conn = sqlite3.connect(str(path))
+def _connect(path: Path, *, read_only: bool = False) -> sqlite3.Connection:
+    if read_only:
+        conn = sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)
+        conn.execute("PRAGMA query_only=ON")
+    else:
+        conn = sqlite3.connect(str(path))
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA synchronous=FULL")
     conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")
-    conn.execute("PRAGMA synchronous=FULL")
     return conn
 
 
@@ -79,6 +83,8 @@ def write_checkpoint(
     - lease_valid=False fails closed (fencing).
     - On success, reload + readback the committed row and verify record_digest.
     """
+    if not lease_valid:
+        raise SQLiteCheckpointConflict("lease/fencing invalid")
     init_store(path)
     conn = _connect(path)
     try:
@@ -115,10 +121,13 @@ def write_checkpoint(
 def read_checkpoint(
     path: Path, *, task_id: str, run_id: str, node_id: str
 ) -> dict[str, Any] | None:
-    """Read the latest committed checkpoint row for a key (replay-safe)."""
-    init_store(path)
-    conn = _connect(path)
+    """Read the latest row without creating a store, schema or WAL policy."""
+    if not path.is_file():
+        return None
+    conn = _connect(path, read_only=True)
     try:
+        if conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='checkpoint_events'").fetchone() is None:
+            return None
         row = conn.execute(
             "SELECT * FROM checkpoint_events "
             "WHERE task_id=? AND run_id=? AND node_id=? "
@@ -144,9 +153,12 @@ def read_checkpoint(
 
 
 def store_meta_get(path: Path, key: str) -> str | None:
-    init_store(path)
-    conn = _connect(path)
+    if not path.is_file():
+        return None
+    conn = _connect(path, read_only=True)
     try:
+        if conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='store_meta'").fetchone() is None:
+            return None
         row = conn.execute("SELECT value FROM store_meta WHERE key=?", (key,)).fetchone()
         return row["value"] if row else None
     finally:

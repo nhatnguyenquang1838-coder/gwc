@@ -1,6 +1,7 @@
 """Generic task binding. Identity and source readback are not effect authority."""
 from __future__ import annotations
 import copy
+from contextlib import contextmanager
 import hashlib
 import json
 import re
@@ -121,9 +122,23 @@ def seal_context_manifest(checkpoint_ref, manifest, *, authorized: bool = False)
     return manifest_digest
 
 
+@contextmanager
+def read_checkpoint(checkpoint_ref):
+    """Open an existing checkpoint without create/write capability; close on exit."""
+    uri = Path(checkpoint_ref).resolve().as_uri() + '?mode=ro'
+    db = sqlite3.connect(uri, uri=True, timeout=30)
+    try:
+        db.execute('PRAGMA query_only=ON')
+        yield db
+    finally:
+        db.close()
+
+
 def load_context_manifests(checkpoint_ref, run) -> list[dict]:
-    """Return sealed rows as dictionaries, in their durable sealing order."""
-    with sqlite3.connect(str(checkpoint_ref), timeout=30) as db:
+    """Return sealed rows as dictionaries, without creating a missing checkpoint."""
+    if not Path(checkpoint_ref).is_file():
+        return []
+    with read_checkpoint(checkpoint_ref) as db:
         exists = db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",
                             ('engineering_context_manifests',)).fetchone()
         if not exists:

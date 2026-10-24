@@ -52,6 +52,89 @@ def _tables(path):
         return db.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name").fetchall()
 
 
+@pytest.mark.parametrize("reader", ["manifests", "recovery", "prior_context", "legacy_audit"])
+def test_checkpoint_observers_do_not_create_missing_database(tmp_path, reader):
+    from tools.node_architect.engineering_m1_m7_workflow import (
+        _historical_context_recovery, reconcile_legacy_terminal_dispatches,
+        resolve_prior_context,
+    )
+    from tools.node_architect.task_context_binding import load_context_manifests
+
+    checkpoint = tmp_path / "missing-checkpoint.sqlite"
+    value = _context(tmp_path)
+    if reader == "manifests":
+        assert load_context_manifests(checkpoint, value["run"]["id"]) == []
+    elif reader == "recovery":
+        assert _historical_context_recovery(checkpoint, value["run"]["id"])["stored_context_digest"] is None
+    elif reader == "prior_context":
+        with pytest.raises(ValueError, match="HISTORICAL_CONTEXT_NOT_PROVABLE"):
+            resolve_prior_context(checkpoint, value["run"]["id"],
+                                  candidate_old=value, candidate_new=value)
+    else:
+        result = reconcile_legacy_terminal_dispatches(checkpoint, value["run"]["id"])
+        assert result["rows_examined"] == 0 and result["mutated"] is False
+    assert not checkpoint.exists(), "read-only observer created a checkpoint database"
+    assert sorted(tmp_path.iterdir()) == []
+
+
+def test_read_checkpoint_has_no_write_capability_and_closes_connection(tmp_path):
+    from tools.node_architect.task_context_binding import read_checkpoint
+
+    checkpoint = tmp_path / "checkpoint?#.sqlite"
+    with sqlite3.connect(checkpoint) as writer:
+        writer.execute("CREATE TABLE sentinel(value TEXT)")
+        writer.execute("INSERT INTO sentinel VALUES ('preserved')")
+    before_sha, before_tables = _file_sha(checkpoint), _tables(checkpoint)
+    with read_checkpoint(checkpoint) as reader:
+        assert reader.execute("PRAGMA query_only").fetchone()[0] == 1
+        assert reader.execute("SELECT value FROM sentinel").fetchone() == ("preserved",)
+        with pytest.raises(sqlite3.OperationalError, match="readonly"):
+            reader.execute("DELETE FROM sentinel")
+        with pytest.raises(sqlite3.OperationalError, match="readonly"):
+            reader.execute("CREATE TABLE unwanted(value TEXT)")
+    with pytest.raises(sqlite3.ProgrammingError, match="closed"):
+        reader.execute("SELECT 1")
+    assert _file_sha(checkpoint) == before_sha
+    assert _tables(checkpoint) == before_tables
+
+
+@pytest.mark.parametrize("reader_name", ["manifests", "recovery", "prior_context", "legacy_audit"])
+def test_checkpoint_observers_use_read_only_connection(tmp_path, monkeypatch, reader_name):
+    from tools.node_architect.engineering_m1_m7_workflow import (
+        _historical_context_recovery, reconcile_legacy_terminal_dispatches,
+        resolve_prior_context,
+    )
+    from tools.node_architect.task_context_binding import load_context_manifests
+
+    checkpoint = tmp_path / "existing.sqlite"
+    with sqlite3.connect(checkpoint) as writer:
+        writer.execute("CREATE TABLE sentinel(value TEXT)")
+    before_sha, before_tables = _file_sha(checkpoint), _tables(checkpoint)
+    real_connect, calls = sqlite3.connect, []
+
+    def observed_connect(database, *args, **kwargs):
+        calls.append((database, kwargs))
+        assert kwargs.get("uri") is True and database.endswith("?mode=ro")
+        return real_connect(database, *args, **kwargs)
+
+    value = _context(tmp_path)
+    monkeypatch.setattr(sqlite3, "connect", observed_connect)
+    if reader_name == "manifests":
+        assert load_context_manifests(checkpoint, value["run"]["id"]) == []
+    elif reader_name == "recovery":
+        assert _historical_context_recovery(checkpoint, value["run"]["id"])["stored_context_digest"] is None
+    elif reader_name == "prior_context":
+        with pytest.raises(ValueError, match="HISTORICAL_CONTEXT_NOT_PROVABLE"):
+            resolve_prior_context(checkpoint, value["run"]["id"],
+                                  candidate_old=value, candidate_new=value)
+    else:
+        assert reconcile_legacy_terminal_dispatches(checkpoint, value["run"]["id"])["mutated"] is False
+    assert calls
+    monkeypatch.setattr(sqlite3, "connect", real_connect)
+    assert _file_sha(checkpoint) == before_sha
+    assert _tables(checkpoint) == before_tables
+
+
 def test_context_manifest_round_trip_is_digest_stable(tmp_path):
     from tools.node_architect.task_context_binding import (
         build_context_manifest, digest, load_context_manifests, seal_context_manifest,
