@@ -434,7 +434,7 @@ class UniversalController:
             if successor["active_gate"] == "UR.G3"
             else "CONTINUE_UNIVERSAL_LANE_REMEDIATION"
         )
-        next_owner = "EXECUTOR" if successor["active_gate"] == "UR.G3" else "CONTROLLER"
+        next_owner = "EXECUTOR" if successor["active_gate"] in {"UR.G2", "UR.G3"} else "CONTROLLER"
         successor["typed_next"] = typed_next
         successor["next_owner"] = next_owner
         successor_consumed = list(successor.get("consumed_receipts", []))
@@ -697,7 +697,7 @@ class UniversalController:
             if successor["active_gate"] == "UR.G3"
             else "CONTINUE_UNIVERSAL_LANE_REMEDIATION"
         )
-        next_owner = "EXECUTOR" if successor["active_gate"] == "UR.G3" else "CONTROLLER"
+        next_owner = "EXECUTOR" if successor["active_gate"] in {"UR.G2", "UR.G3"} else "CONTROLLER"
         successor["typed_next"] = typed_next
         successor["next_owner"] = next_owner
         transition_ref = transition_receipt_ref or (
