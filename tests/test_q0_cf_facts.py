@@ -232,3 +232,99 @@ def test_readback_drift_containment_and_bool_int_alias_are_refused(tmp_path, mut
         code = "CF_REQUIRED_FACTS_MISSING_OR_INVALID"
     with pytest.raises(Q0FactEvidenceError, match=code):
         consume_cf_leaf_fact_receipt(receipt, predecessors=[], previous_consumptions=[], **context)
+
+
+def _ack65_fixture():
+    from tools.node_architect.q0_cf_facts import OPTION_B_DECISION_TEXT
+    body = """<!-- dw.taskcontroller.communication/v2 -->
+### A2A v2 · ACK #65
+run: scrum781-q0-fresh-20261010-r1
+seq: 65
+from: GPT
+to: Hermes
+kind: ACK
+source_ref: github://nhatnguyenquang1838-coder/gwc/issues/595
+reply_to: https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6281823173
+
+**GOAL**
+NEW, EXPLICIT USER DECISION RECEIVED IN THE BOUND CHATGPT THREAD. This is human approval. ACK64 RECOMMENDS Option B and is NOT a Human approval.
+
+**NEXT**
+""" + OPTION_B_DECISION_TEXT + "\n\n**EVIDENCE**\nG1 materialized in canonical branch: `47fce8bf35515dc36ad830d5fe1c4b48535d6ff2`; plan `core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json` blob `444f64dcff12e52a95c69b4698d1cc369be295f0`; route `core/node-architect/q0-engineering-coordination-route-r1.json` blob `e1b75c8b20c8326c74873b634dac62a12820bfbf`.\n"
+    return {
+        "id": 6281930331,
+        "html_url": "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6281930331",
+        "issue_url": "https://api.github.com/repos/nhatnguyenquang1838-coder/gwc/issues/595",
+        "user": {"login": "nhatnguyenquang1838-coder"},
+        "body": body,
+    }
+
+
+def _option_b_materialization():
+    return {
+        "commit": "47fce8bf35515dc36ad830d5fe1c4b48535d6ff2",
+        "plan_ref": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+        "plan_git_blob": "444f64dcff12e52a95c69b4698d1cc369be295f0",
+        "route_ref": "core/node-architect/q0-engineering-coordination-route-r1.json",
+        "route_git_blob": "e1b75c8b20c8326c74873b634dac62a12820bfbf",
+        "r3_plan": {
+            "run_id": "scrum781-q0-fresh-20261010-r1",
+            "g1_revision": {
+                "status": "HUMAN_APPROVED_PENDING_NATIVE_ACTIVATION",
+                "human_decision": {
+                    "exact_text": "APPROVE OPTION B — Replan Q0 sang Controlled Failure Campaign, giữ original DWO NOT_REPRODUCED.",
+                    "context_ref": "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6281823173",
+                    "scope": "ACCEPTANCE_TARGET_CHANGE_AND_G1_SUCCESSOR_PLAN_ONLY",
+                    "not_effect_authority": True,
+                },
+            },
+        },
+        "route": {"approved_successor_g1": {
+            "successor_plan_ref": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+            "activation_status": "PENDING_HERMES_CF_PRECHECK_AND_NATIVE_CHECKPOINT_RECONCILIATION",
+        }},
+    }
+
+
+def test_ack65_is_controller_attestation_and_not_raw_human_or_effect_authority():
+    from tools.node_architect.q0_cf_facts import validate_option_b_controller_attestation
+    result = validate_option_b_controller_attestation(_ack65_fixture(), _option_b_materialization())
+    assert result["decision_attested"] is True
+    assert result["trust_class"] == "CONTROLLER_OBSERVED_HUMAN_DECISION_ATTESTATION"
+    assert result["raw_human_receipt_present"] is False
+    assert result["human_authenticated"] is False
+    assert result["native_plan_activated"] is False
+    assert result["authority_granted"] is False
+    assert result["proposal_ref"] != result["decision_attestation_ref"]
+
+
+@pytest.mark.parametrize("mutation,code", [
+    ("proposal_comment", "HUMAN_DECISION_PROPOSAL_NOT_APPROVAL"),
+    ("wrong_run", "HUMAN_DECISION_RUN_MISMATCH"),
+    ("wrong_author", "HUMAN_DECISION_CONTROLLER_AUTHOR_MISMATCH"),
+    ("wrong_sequence", "HUMAN_DECISION_SEQUENCE_MISMATCH"),
+    ("wrong_text", "HUMAN_DECISION_TEXT_MISMATCH"),
+    ("wrong_plan_blob", "HUMAN_DECISION_G1_MATERIALIZATION_MISMATCH"),
+    ("wrong_r3_pointer", "HUMAN_DECISION_R3_BINDING_MISMATCH"),
+])
+def test_option_b_attestation_rejects_proposal_drift_and_unbound_materialization(mutation, code):
+    from tools.node_architect.q0_cf_facts import validate_option_b_controller_attestation, Q0FactEvidenceError
+    comment, materialization = _ack65_fixture(), _option_b_materialization()
+    if mutation == "proposal_comment":
+        comment["id"] = 6281823173
+        comment["html_url"] = "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6281823173"
+        comment["body"] = comment["body"].replace("ACK #65", "ACK #64").replace("seq: 65", "seq: 64")
+    elif mutation == "wrong_run":
+        comment["body"] = comment["body"].replace("scrum781-q0-fresh-20261010-r1", "other-run")
+    elif mutation == "wrong_author":
+        comment["user"]["login"] = "untrusted-user"
+    elif mutation == "wrong_sequence":
+        comment["body"] = comment["body"].replace("ACK #65", "ACK #66").replace("seq: 65", "seq: 66")
+    elif mutation == "wrong_text":
+        comment["body"] = comment["body"].replace("APPROVE OPTION B", "RECOMMEND OPTION B")
+    elif mutation == "wrong_plan_blob":
+        materialization["plan_git_blob"] = "0" * 40
+    elif mutation == "wrong_r3_pointer":
+        materialization["r3_plan"]["g1_revision"]["human_decision"]["context_ref"] = comment["html_url"]
+    with pytest.raises(Q0FactEvidenceError, match=code):
+        validate_option_b_controller_attestation(comment, materialization)

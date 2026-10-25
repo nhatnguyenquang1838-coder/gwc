@@ -32,6 +32,125 @@ def _require(condition: bool, code: str) -> None:
         raise Q0FactEvidenceError(code)
 
 
+OPTION_B_DECISION_TEXT = (
+    "APPROVE OPTION B — Replan Q0 sang Controlled Failure Campaign, giữ original DWO NOT_REPRODUCED."
+)
+_OPTION_B_PROPOSAL_REF = (
+    "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6281823173"
+)
+_OPTION_B_ATTESTATION_REF = (
+    "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6281930331"
+)
+_OPTION_B_G1_COMMIT = "47fce8bf35515dc36ad830d5fe1c4b48535d6ff2"
+_OPTION_B_PLAN_REF = "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json"
+_OPTION_B_PLAN_BLOB = "444f64dcff12e52a95c69b4698d1cc369be295f0"
+_OPTION_B_ROUTE_REF = "core/node-architect/q0-engineering-coordination-route-r1.json"
+_OPTION_B_ROUTE_BLOB = "e1b75c8b20c8326c74873b634dac62a12820bfbf"
+
+
+def validate_option_b_controller_attestation(
+    comment: Mapping[str, Any], materialization: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Classify exact ACK65 + G1 bytes as a Controller attestation, not raw Human proof.
+
+    The caller must obtain ``comment`` from a fresh GitHub API readback and independently
+    resolve the declared Git blobs from the materialization commit. This pure validator
+    checks their identity and cross-bindings; it does not authenticate the caller, the
+    original browser turn, a Human principal, or native plan activation.
+    """
+    _require(isinstance(comment, Mapping) and isinstance(materialization, Mapping),
+             "HUMAN_DECISION_ATTESTATION_INVALID")
+    if comment.get("id") == 6281823173:
+        raise Q0FactEvidenceError("HUMAN_DECISION_PROPOSAL_NOT_APPROVAL")
+    _require(comment.get("id") == 6281930331
+             and comment.get("html_url") == _OPTION_B_ATTESTATION_REF
+             and comment.get("issue_url") == "https://api.github.com/repos/nhatnguyenquang1838-coder/gwc/issues/595",
+             "HUMAN_DECISION_ATTESTATION_SOURCE_MISMATCH")
+    user = comment.get("user")
+    _require(isinstance(user, Mapping) and user.get("login") == "nhatnguyenquang1838-coder",
+             "HUMAN_DECISION_CONTROLLER_AUTHOR_MISMATCH")
+    body = comment.get("body")
+    if not isinstance(body, str):
+        raise Q0FactEvidenceError("HUMAN_DECISION_ATTESTATION_INVALID")
+    lines = body.splitlines()
+    _require(len(lines) >= 16 and lines[0] == "<!-- dw.taskcontroller.communication/v2 -->"
+             and lines[1].startswith("### A2A v2 · "),
+             "HUMAN_DECISION_COMMUNICATION_INVALID")
+    headers: dict[str, str] = {}
+    for line in lines[2:9]:
+        if ": " not in line:
+            raise Q0FactEvidenceError("HUMAN_DECISION_COMMUNICATION_INVALID")
+        key, value = line.split(": ", 1)
+        if key in headers:
+            raise Q0FactEvidenceError("HUMAN_DECISION_COMMUNICATION_INVALID")
+        headers[key] = value
+    _require(set(headers) == {"run", "seq", "from", "to", "kind", "source_ref", "reply_to"},
+             "HUMAN_DECISION_COMMUNICATION_INVALID")
+    _require(lines[1].startswith(f"### A2A v2 · {headers['kind']} #{headers['seq']}"),
+             "HUMAN_DECISION_SEQUENCE_MISMATCH")
+    _require(headers["run"] == "scrum781-q0-fresh-20261010-r1", "HUMAN_DECISION_RUN_MISMATCH")
+    _require(headers["seq"] == "65" and headers["kind"] == "ACK"
+             and headers["from"] == "GPT" and headers["to"] == "Hermes"
+             and headers["source_ref"] == "github://nhatnguyenquang1838-coder/gwc/issues/595",
+             "HUMAN_DECISION_SEQUENCE_MISMATCH")
+    _require(headers["reply_to"] == _OPTION_B_PROPOSAL_REF,
+             "HUMAN_DECISION_PROPOSAL_LINK_MISMATCH")
+    _require("NEW, EXPLICIT USER DECISION RECEIVED IN THE BOUND CHATGPT THREAD" in body
+             and OPTION_B_DECISION_TEXT in body,
+             "HUMAN_DECISION_TEXT_MISMATCH")
+
+    expected_materialization = {
+        "commit": _OPTION_B_G1_COMMIT,
+        "plan_ref": _OPTION_B_PLAN_REF,
+        "plan_git_blob": _OPTION_B_PLAN_BLOB,
+        "route_ref": _OPTION_B_ROUTE_REF,
+        "route_git_blob": _OPTION_B_ROUTE_BLOB,
+    }
+    _require(all(materialization.get(key) == value for key, value in expected_materialization.items())
+             and all(value in body for value in expected_materialization.values()),
+             "HUMAN_DECISION_G1_MATERIALIZATION_MISMATCH")
+    plan = materialization.get("r3_plan")
+    route = materialization.get("route")
+    _require(isinstance(plan, Mapping) and plan.get("run_id") == headers["run"]
+             and isinstance(plan.get("g1_revision"), Mapping), "HUMAN_DECISION_R3_BINDING_MISMATCH")
+    revision = plan["g1_revision"]
+    decision = revision.get("human_decision")
+    successor = route.get("approved_successor_g1") if isinstance(route, Mapping) else None
+    _require(revision.get("status") == "HUMAN_APPROVED_PENDING_NATIVE_ACTIVATION"
+             and isinstance(decision, Mapping)
+             and decision.get("exact_text") == OPTION_B_DECISION_TEXT
+             and decision.get("context_ref") == _OPTION_B_PROPOSAL_REF
+             and decision.get("scope") == "ACCEPTANCE_TARGET_CHANGE_AND_G1_SUCCESSOR_PLAN_ONLY"
+             and decision.get("not_effect_authority") is True
+             and isinstance(successor, Mapping)
+             and successor.get("successor_plan_ref") == _OPTION_B_PLAN_REF
+             and successor.get("activation_status") != "ACTIVATED",
+             "HUMAN_DECISION_R3_BINDING_MISMATCH")
+    return {
+        "schema_id": "gwc.q0.option-b-controller-attestation-readback.v1",
+        "decision_attestation_ref": _OPTION_B_ATTESTATION_REF,
+        "proposal_ref": _OPTION_B_PROPOSAL_REF,
+        "decision_text": OPTION_B_DECISION_TEXT,
+        "run_id": headers["run"],
+        "communication_seq": int(headers["seq"]),
+        "github_comment_id": comment["id"],
+        "github_author": user["login"],
+        "g1_materialization_commit": _OPTION_B_G1_COMMIT,
+        "plan_ref": _OPTION_B_PLAN_REF,
+        "plan_git_blob": _OPTION_B_PLAN_BLOB,
+        "route_ref": _OPTION_B_ROUTE_REF,
+        "route_git_blob": _OPTION_B_ROUTE_BLOB,
+        "trust_class": "CONTROLLER_OBSERVED_HUMAN_DECISION_ATTESTATION",
+        "decision_attested": True,
+        "raw_human_receipt_present": False,
+        "human_authenticated": False,
+        "native_plan_activated": False,
+        "authority_granted": False,
+        "qualification_accepted": False,
+        "executed_effects": [],
+    }
+
+
 def _read_source(ref: str, context: Mapping[str, Any]) -> tuple[Any, dict[str, Any]]:
     registry = context["sources"]
     _require(ref in registry, "FACT_SOURCE_UNREGISTERED")
