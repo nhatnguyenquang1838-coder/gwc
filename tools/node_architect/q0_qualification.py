@@ -549,11 +549,14 @@ def advance_qualification_gate(
     *, current_gate: str, current_state: str, evidence: Mapping[str, Any], sequence: int = 1,
     run_id: str | None = None, runtime_plan_digest: str | None = None,
     candidate_sha: str | None = None,
+    node_allocation: Mapping[str, Any] | None = None,
+    runtime_plan: Mapping[str, Any] | None = None, source_head: str | None = None,
 ) -> dict[str, Any]:
     """Use the shared Universal kernel lifecycle to complete then advance one gate."""
     complete_q0_gate(
         gate=current_gate, evidence=evidence, run_id=run_id,
         runtime_plan_digest=runtime_plan_digest, candidate_sha=candidate_sha,
+        node_allocation=node_allocation, runtime_plan=runtime_plan, source_head=source_head,
     )
     gate = current_gate
     outcome = (evidence or {}).get("integration_outcome") if current_gate == "UR.G4" else None

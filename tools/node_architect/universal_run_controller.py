@@ -403,6 +403,9 @@ class UniversalController:
             run_id=assignment["run_id"],
             runtime_plan_digest=assignment["runtime_plan_digest"],
             candidate_sha=candidate_sha,
+            node_allocation=self.node_allocation,
+            runtime_plan=self.runtime_plan,
+            source_head=candidate_sha,
         )
         transition = advance_qualification_gate(
             current_gate=gate,
@@ -412,6 +415,9 @@ class UniversalController:
             run_id=assignment["run_id"],
             runtime_plan_digest=assignment["runtime_plan_digest"],
             candidate_sha=candidate_sha,
+            node_allocation=self.node_allocation,
+            runtime_plan=self.runtime_plan,
+            source_head=candidate_sha,
         )
         pre_state = copy.deepcopy(self.run_state)
         successor = copy.deepcopy(self.run_state)
@@ -637,6 +643,9 @@ class UniversalController:
             run_id=self.run_state["run_id"],
             runtime_plan_digest=self.runtime_plan["digest"],
             candidate_sha=candidate_sha,
+            node_allocation=self.node_allocation,
+            runtime_plan=self.runtime_plan,
+            source_head=candidate_sha,
         )
         local_receipt_body = {
             "schema_id": "gwc.universal-run.controller-local-completion-receipt.v2",
@@ -670,6 +679,9 @@ class UniversalController:
             run_id=self.run_state["run_id"],
             runtime_plan_digest=self.runtime_plan["digest"],
             candidate_sha=candidate_sha,
+            node_allocation=self.node_allocation,
+            runtime_plan=self.runtime_plan,
+            source_head=candidate_sha,
         )
         pre_state = copy.deepcopy(self.run_state)
         successor = copy.deepcopy(self.run_state)

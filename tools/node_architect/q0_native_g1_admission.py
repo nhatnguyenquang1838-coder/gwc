@@ -33,8 +33,15 @@ def _seal(body: Mapping[str, Any]) -> str:
 def _allocation_digest(allocation: Mapping[str, Any]) -> str | None:
     content_digest = allocation.get("content_digest")
     if isinstance(content_digest, Mapping):
-        return content_digest.get("value")
-    return allocation.get("digest")
+        value = content_digest.get("value")
+    else:
+        value = allocation.get("digest")
+    # Canonical record producers store the hex value separately from the
+    # algorithm; receipt references use the qualified sha256: form. Preserve
+    # the source record and qualify only an exact SHA-256 value at this seam.
+    if isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value):
+        return "sha256:" + value
+    return value
 
 
 def _validate_predecessor(predecessor: Any, successor_run_id: str, successor_digest: str) -> dict[str, Any]:

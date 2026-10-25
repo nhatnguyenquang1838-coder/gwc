@@ -13,7 +13,7 @@ import hashlib
 import importlib
 import json
 from pathlib import Path
-from unittest.mock import patch
+
 
 import pytest
 
@@ -164,22 +164,14 @@ def test_mandatory_restart_recovery_resumes_from_durable_gate_state():
         "runtime_plan": runtime_plan, "source_head": candidate,
     }
     assert bound_complete(gate="UR.G1", evidence=evidence, **kwargs)["gate_state"] == "PASSED"
-    # advance_qualification_gate owns lifecycle advancement; bind its internal
-    # completion check to the same validated G1 plan receipt.
-    def complete_with_bindings(*, gate, evidence, **_ignored):
-        if gate == "UR.G1":
-            return bound_complete(gate=gate, evidence=evidence, **kwargs)
-        return bound_complete(gate=gate, evidence=evidence, **_ignored)
-
-    with patch.object(m, "complete_q0_gate", side_effect=complete_with_bindings):
-        first = m.advance_qualification_gate(
-            current_gate="UR.G1", current_state="ACTIVE", evidence=evidence,
-        )
-        # A 'restart' re-advances from the same durable gate/state and must be
-        # deterministic (same next gate/state).
-        second = m.advance_qualification_gate(
-            current_gate="UR.G1", current_state="ACTIVE", evidence=evidence,
-        )
+    first = m.advance_qualification_gate(
+        current_gate="UR.G1", current_state="ACTIVE", evidence=evidence, **kwargs,
+    )
+    # A restart re-advances the same validated bindings without replacing the
+    # production completion validator with a mock.
+    second = m.advance_qualification_gate(
+        current_gate="UR.G1", current_state="ACTIVE", evidence=evidence, **kwargs,
+    )
     assert first["next_gate"] == second["next_gate"] == "UR.G2"
     assert first["next_state"] == second["next_state"] == "ACTIVE"
 
