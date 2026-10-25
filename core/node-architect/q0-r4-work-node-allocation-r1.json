@@ -1,0 +1,42 @@
+{
+  "record_id": "scrum781-q0-fresh-20261010-r1:r4:writer-allocation-proposal",
+  "schema_id": "gwc.universal-run.node-allocation.v2",
+  "schema_version": 2,
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "created_at": "2026-10-24T19:46:17.562892+00:00",
+  "created_by": {
+    "profile": "default",
+    "mode": "PREPARATION_ONLY",
+    "communication_seq": 262
+  },
+  "lifecycle_profile": {
+    "id": "gwc.universal-run.v2",
+    "version": 2
+  },
+  "provenance": {
+    "predecessor_refs": [
+      "08028c21107c7abbd8e0ab3525f5d5a32b66e5f314d949f45a385541de6c3f06",
+      "sha256:bdcf4e9c44ea1b5cdeaa464c77446b9e1b66aeec98f2aaa48018564a2eedc0e6"
+    ],
+    "source_refs": [
+      "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+      "core/node-architect/q0-native-successor-runtime-plan-r2.json",
+      "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6388594591"
+    ]
+  },
+  "node_allocation_id": "scrum781-q0-fresh-20261010-r1:r4:isolation-writer",
+  "kind": "WORK",
+  "requirement": "REQUIRED",
+  "condition_ref": null,
+  "control_justification": null,
+  "independent_boundary_reasons": [
+    "INDEPENDENT_EVIDENCE",
+    "INDEPENDENT_HANDOFF"
+  ],
+  "child_instance_policy": "SINGLE_ACTIVE",
+  "content_digest": {
+    "algorithm": "sha256",
+    "canonicalization": "JCS",
+    "value": "0a960270669d8f5a6e8a79923cd3c92e162880e08bec35eb527fbd503269ef7e"
+  }
+}

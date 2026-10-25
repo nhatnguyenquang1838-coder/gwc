@@ -911,6 +911,7 @@ def test_real_target_first_activation_allows_missing_receipt_and_flags_cold_star
     view = adapter._real_target_view(_REAL_TARGET_PLAN_REF, plan, predecessor)
     assert ACTIVATION_RECEIPT_REF not in view["artifacts"]
     assert view["first_activation"] is True
+    _bind_disposable_real_target_authority(adapter, authority, _REAL_TARGET_PLAN_REF)
     result = adapter.preflight(authority=authority, predecessor=predecessor, successor_plan=plan,
                                successor_plan_ref=_REAL_TARGET_PLAN_REF, node_allocation=allocation,
                                branch=branch, head=head)
@@ -972,6 +973,7 @@ def test_real_target_adapter_recovers_partial_commit_and_rolls_back(tmp_path, mo
     repo_root, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
     root = tmp_path / "partial-real-target"
     adapter = integration.RealTargetActivationAdapter(source_root=repo_root, live_root=root)
+    _bind_disposable_real_target_authority(adapter, authority, integration._REAL_TARGET_PLAN_REF)
     kwargs = dict(authority=authority, predecessor=predecessor, successor_plan=plan,
                   successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
                   node_allocation=allocation, branch=branch, head=head)
@@ -995,6 +997,8 @@ def test_real_target_rollback_restores_isolated_selector_checkpoint_cursor(tmp_p
     repo_root, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
     root = tmp_path / "rollback-isolated"
     adapter = RealTargetActivationAdapter(source_root=repo_root, live_root=root)
+    _bind_disposable_real_target_authority(adapter, authority,
+                                         "core/node-architect/q0-native-successor-runtime-plan-r2.json")
     kwargs = dict(authority=authority, predecessor=predecessor, successor_plan=plan,
                   successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
                   node_allocation=allocation, branch=branch, head=head)
@@ -1003,3 +1007,189 @@ def test_real_target_rollback_restores_isolated_selector_checkpoint_cursor(tmp_p
     assert rollback_real_target_activation(root)["status"] == "ROLLED_BACK"
     assert not any((root / name).exists() for name in ("selector.json", "checkpoint.json", "cursor.json"))
 
+
+# Bounded R2 -> exact R4 bootstrap. These are disposable synthetic grant fixtures,
+# NOT operator grants or evidence of live approval, activation or host loading.
+R4_ARTIFACT_ROOT = Path(__file__).resolve().parents[1]
+R4_WRAPPER_REF = "core/node-architect/q0-native-successor-runtime-plan-r3-proposal-r2.json"
+R4_PLAN_REF = "core/node-architect/q0-r4-native-runtime-plan-r1.json"
+R4_ALLOCATION_REF = "core/node-architect/q0-r4-work-node-allocation-r1.json"
+R4_DIGEST = "sha256:16445abb85d78f61ac6dc2207c47c98240a45c8107e49f546b369e2d90bfa38f"
+R4_PREVIOUS = "sha256:bdcf4e9c44ea1b5cdeaa464c77446b9e1b66aeec98f2aaa48018564a2eedc0e6"
+
+
+def _r4_bootstrap_fixture(tmp_path):
+    import shutil
+    from tools.node_architect.q0_m1_m7_integration import RealTargetActivationAdapter
+    source, _, _, _, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
+    for ref in (R4_WRAPPER_REF, R4_PLAN_REF, R4_ALLOCATION_REF):
+        (source / ref).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(R4_ARTIFACT_ROOT / ref, source / ref)
+    wrapper = json.loads((source / R4_WRAPPER_REF).read_text())
+    plan = wrapper["native_runtime_plan"]
+    allocation = json.loads((source / R4_ALLOCATION_REF).read_text())
+    target = tmp_path / "r4-unactivated-target"
+    authority["bindings"].update(successor_plan_digest=plan["digest"],
+                                node_allocation_digest=allocation["content_digest"]["value"],
+                                successor_plan_ref=R4_WRAPPER_REF, live_target=str(target.resolve()))
+    authority["issued"] = True
+    (source / authority["issuer_ref"]).write_text(json.dumps(authority))
+    adapter = RealTargetActivationAdapter(source_root=source, live_root=target)
+    kwargs = dict(authority=authority, predecessor=predecessor, successor_plan=plan,
+                  successor_plan_ref=R4_WRAPPER_REF, node_allocation=allocation, branch=branch, head=head)
+    return adapter, kwargs
+
+
+def _snapshot_tree(root):
+    return {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
+            for p in root.rglob("*") if p.is_file()}
+
+
+def test_bootstrap_exact_r4_view_accepts_same_c273_plan_without_writes(tmp_path):
+    adapter, kwargs = _r4_bootstrap_fixture(tmp_path)
+    before = _snapshot_tree(tmp_path)
+    view = adapter._real_target_view(R4_WRAPPER_REF, kwargs["successor_plan"], kwargs["predecessor"])
+    assert kwargs["successor_plan"]["digest"] == R4_DIGEST
+    assert kwargs["successor_plan"]["previous_digest"] == R4_PREVIOUS
+    assert R4_WRAPPER_REF in view["artifacts"]
+    assert "core/node-architect/q0-native-successor-runtime-plan-r2.json" not in view["artifacts"]
+    assert not adapter.live_root.exists()
+    assert _snapshot_tree(tmp_path) == before
+
+
+def test_bootstrap_source_view_hashes_selected_r4_wrapper(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import _digest
+    adapter, kwargs = _r4_bootstrap_fixture(tmp_path)
+    path = adapter.source_root / R4_WRAPPER_REF
+    first = adapter._real_target_view(R4_WRAPPER_REF, kwargs["successor_plan"], kwargs["predecessor"])
+    path.write_bytes(path.read_bytes() + b"\n")
+    second = adapter._real_target_view(R4_WRAPPER_REF, kwargs["successor_plan"], kwargs["predecessor"])
+    assert first["view_digest"] != second["view_digest"]
+    assert second["artifacts"][R4_WRAPPER_REF] == "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
+    assert second["view_digest"] == _digest(second["artifacts"])
+
+
+@pytest.mark.parametrize("ref", ["core/node-architect/unknown.json", "../escape.json", "/tmp/plan.json",
+                                  "core/node-architect/../q0-native-successor-runtime-plan-r2.json"])
+def test_bootstrap_unknown_successor_refs_remain_denied_without_writes(tmp_path, ref):
+    adapter, kwargs = _r4_bootstrap_fixture(tmp_path)
+    before = _snapshot_tree(tmp_path)
+    with pytest.raises(ValueError, match="^SUCCESSOR_PLAN_REF_INVALID$"):
+        adapter._real_target_view(ref, kwargs["successor_plan"], kwargs["predecessor"])
+    assert _snapshot_tree(tmp_path) == before
+    assert not adapter.live_root.exists()
+
+
+@pytest.mark.parametrize("change", ["caller_plan", "digest", "previous_digest", "payload", "separate_plan", "allocation_bytes"])
+def test_bootstrap_r4_exact_artifact_mismatches_remain_denied(tmp_path, change):
+    adapter, kwargs = _r4_bootstrap_fixture(tmp_path)
+    plan = copy.deepcopy(kwargs["successor_plan"])
+    wrapper = json.loads((adapter.source_root / R4_WRAPPER_REF).read_text())
+    if change == "caller_plan":
+        plan["revision"] += 1
+    elif change == "separate_plan":
+        (adapter.source_root / R4_PLAN_REF).write_text("{}")
+    elif change == "allocation_bytes":
+        path = adapter.source_root / R4_ALLOCATION_REF
+        path.write_bytes(path.read_bytes() + b"\n")
+    else:
+        if change == "digest":
+            plan["digest"] = "sha256:" + "0" * 64
+        elif change == "previous_digest":
+            plan["previous_digest"] = "sha256:" + "1" * 64
+        else:
+            plan["scope"]["max_children"] = 2
+        wrapper["native_runtime_plan"] = plan
+        (adapter.source_root / R4_WRAPPER_REF).write_text(json.dumps(wrapper))
+        (adapter.source_root / R4_PLAN_REF).write_text(json.dumps(plan))
+    before = _snapshot_tree(tmp_path)
+    with pytest.raises(ValueError, match="^REAL_TARGET_SUCCESSOR_MISMATCH$"):
+        adapter._real_target_view(R4_WRAPPER_REF, plan, kwargs["predecessor"])
+    assert _snapshot_tree(tmp_path) == before
+    assert not adapter.live_root.exists()
+
+
+def _store_disposable_grant(adapter, authority):
+    (adapter.source_root / authority["issuer_ref"]).write_text(json.dumps(authority))
+
+
+def _bind_disposable_real_target_authority(adapter, authority, successor_ref):
+    authority["bindings"].update(successor_plan_ref=successor_ref, live_target=str(adapter.live_root))
+    _store_disposable_grant(adapter, authority)
+
+
+@pytest.mark.parametrize("field,value", [
+    ("successor_plan_ref", "core/node-architect/q0-native-successor-runtime-plan-r2.json"),
+    ("successor_plan_ref", "core/node-architect/wrong.json"),
+    ("live_target", "OTHER_TARGET"),
+    ("live_target", "NONCANONICAL_ALIAS"),
+    ("successor_plan_ref", None),
+    ("live_target", None),
+])
+def test_bootstrap_authority_requires_exact_successor_ref_and_canonical_target(tmp_path, field, value):
+    adapter, kwargs = _r4_bootstrap_fixture(tmp_path)
+    authority = kwargs["authority"]
+    if value == "OTHER_TARGET":
+        value = str(tmp_path / "other-target")
+    elif value == "NONCANONICAL_ALIAS":
+        value = str(adapter.live_root.parent / "uncreated" / ".." / adapter.live_root.name)
+    authority["bindings"][field] = value
+    _store_disposable_grant(adapter, authority)
+    before = _snapshot_tree(tmp_path)
+    with pytest.raises(ValueError, match="^EFFECT_AUTHORITY_BINDING_MISMATCH$"):
+        adapter.preflight(**kwargs)
+    assert not adapter.live_root.exists()
+    assert _snapshot_tree(tmp_path) == before
+
+
+def test_bootstrap_r2_committed_projection_cannot_back_rebound_r4_authority(tmp_path):
+    adapter, kwargs = _r4_bootstrap_fixture(tmp_path)
+    grant = copy.deepcopy(kwargs["authority"])
+    grant["bindings"]["successor_plan_ref"] = "core/node-architect/q0-native-successor-runtime-plan-r2.json"
+    _store_disposable_grant(adapter, grant)
+    before = _snapshot_tree(tmp_path)
+    with pytest.raises(ValueError, match="^EFFECT_AUTHORITY_BINDING_MISMATCH$"):
+        adapter.preflight(**kwargs)
+    assert _snapshot_tree(tmp_path) == before
+    assert not adapter.live_root.exists()
+
+
+@pytest.mark.parametrize("issued", [False, None])
+def test_bootstrap_unissued_template_is_not_operator_authority(tmp_path, issued):
+    adapter, kwargs = _r4_bootstrap_fixture(tmp_path)
+    grant = {**kwargs["authority"], "issued": issued}
+    _store_disposable_grant(adapter, grant)
+    with pytest.raises(ValueError, match="^EFFECT_AUTHORITY_GRANT_NOT_ISSUED$"):
+        adapter.preflight(**kwargs)
+    assert not adapter.live_root.exists()
+
+
+def test_bootstrap_every_accepted_plan_is_explicitly_self_referential(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import _SELF_REFERENTIAL_ISSUER_REFS
+    assert {R4_WRAPPER_REF, R4_PLAN_REF, R4_ALLOCATION_REF,
+            "core/node-architect/q0-native-successor-runtime-plan-r2.json"} <= _SELF_REFERENTIAL_ISSUER_REFS
+    adapter, kwargs = _r4_bootstrap_fixture(tmp_path)
+    for ref in (R4_WRAPPER_REF, R4_PLAN_REF, R4_ALLOCATION_REF):
+        with pytest.raises(ValueError, match="^EFFECT_AUTHORITY_TRUST_ANCHOR_UNAVAILABLE$"):
+            adapter.preflight(**{**kwargs, "authority": {**kwargs["authority"], "issuer_ref": ref}})
+    assert not adapter.live_root.exists()
+
+
+def test_bootstrap_r4_preflight_still_requires_independent_grant_without_writes(tmp_path):
+    adapter, kwargs = _r4_bootstrap_fixture(tmp_path)
+    (adapter.source_root / kwargs["authority"]["issuer_ref"]).unlink()
+    before = _snapshot_tree(tmp_path)
+    with pytest.raises(ValueError, match="^EFFECT_AUTHORITY_TRUST_ANCHOR_UNAVAILABLE$"):
+        adapter.preflight(**kwargs)
+    assert _snapshot_tree(tmp_path) == before
+    assert not adapter.live_root.exists()
+
+
+def test_bootstrap_bound_r4_preflight_has_no_effects(tmp_path):
+    adapter, kwargs = _r4_bootstrap_fixture(tmp_path)
+    before = _snapshot_tree(tmp_path)
+    result = adapter.preflight(**kwargs)
+    assert result["accepted"] is True and result["executed"] is False
+    assert R4_WRAPPER_REF in result["real_target_view"]["artifacts"]
+    assert not adapter.live_root.exists()
+    assert _snapshot_tree(tmp_path) == before

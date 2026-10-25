@@ -436,7 +436,6 @@ def execute_live_activation(*, authority, predecessor, successor_plan, successor
     for path in paths.values():
         if path.is_symlink() or not path.resolve().is_relative_to(root):
             raise ValueError('LIVE_ACTIVATION_LIVE_TARGET_FORBIDDEN')
-    root.mkdir(parents=True, exist_ok=True)
     key = _digest({'authority_digest': auth_digest, 'predecessor_digest': predecessor_digest,
                    'plan_digest': plan_digest, 'plan_ref': successor_plan_ref,
                    'allocation': dict(node_allocation), 'branch': branch, 'head': head})
@@ -445,6 +444,7 @@ def execute_live_activation(*, authority, predecessor, successor_plan, successor
                 'already_applied': False, 'activation_receipt_ref': str(paths['record']),
                 'resolve_readback': None, 'authority_granted': False, 'typed_ce_admitted': False,
                 'live_target': str(root)}
+    root.mkdir(parents=True, exist_ok=True)
     owner = _lease_acquire(root)
     try:
         rows = _executor_rows(root)
@@ -711,6 +711,13 @@ def verify_live_activation_isolated(isolated_root: Path | str) -> dict[str, Any]
 _REAL_TARGET_AUTHORITY_KIND = 'HUMAN_OPERATOR_EFFECT_AUTHORITY'
 _REAL_TARGET_AUTHORITY_SCOPE = 'q0.live_activation.execute'
 _REAL_TARGET_PLAN_REF = 'core/node-architect/q0-native-successor-runtime-plan-r2.json'
+_R4_TARGET_PLAN_REF = 'core/node-architect/q0-native-successor-runtime-plan-r3-proposal-r2.json'
+_R4_NATIVE_PLAN_REF = 'core/node-architect/q0-r4-native-runtime-plan-r1.json'
+_R4_ALLOCATION_REF = 'core/node-architect/q0-r4-work-node-allocation-r1.json'
+_R4_PLAN_DIGEST = 'sha256:16445abb85d78f61ac6dc2207c47c98240a45c8107e49f546b369e2d90bfa38f'
+_R4_PREVIOUS_DIGEST = 'sha256:bdcf4e9c44ea1b5cdeaa464c77446b9e1b66aeec98f2aaa48018564a2eedc0e6'
+_R4_ALLOCATION_FILE_DIGEST = 'sha256:65a54ac57973e40c960917b4d84c509bc16cbd16b76be0b5fc11ba194b9b73c8'
+_REAL_TARGET_PLAN_REFS = frozenset({_REAL_TARGET_PLAN_REF, _R4_TARGET_PLAN_REF})
 # COMMAND #186: a live-activation trusted issuer is an INDEPENDENT Human/operator
 # effect grant recorded as a dedicated grant artifact — NEVER a RuntimePlan or a
 # standing development-policy document. Those are self-referential artifacts the
@@ -720,10 +727,9 @@ _REAL_TARGET_PLAN_REF = 'core/node-architect/q0-native-successor-runtime-plan-r2
 # and live activation fails closed with EFFECT_AUTHORITY_TRUST_ANCHOR_UNAVAILABLE.
 _REAL_TARGET_GRANTS_DIR = 'authority/grants'
 _SELF_REFERENTIAL_ISSUER_REFS = frozenset({
-    _REAL_TARGET_PLAN_REF, _R3_PREDECESSOR_PLAN_REF, ROUTE_REF, ACTIVATION_RECEIPT_REF,
-})
+    _R4_NATIVE_PLAN_REF, _R4_ALLOCATION_REF, _R3_PREDECESSOR_PLAN_REF, ROUTE_REF, ACTIVATION_RECEIPT_REF,
+}) | _REAL_TARGET_PLAN_REFS
 _REAL_TARGET_VIEW_REFS = (
-    _REAL_TARGET_PLAN_REF,
     _R3_PREDECESSOR_PLAN_REF,
     ROUTE_REF,
     ACTIVATION_RECEIPT_REF,
@@ -748,16 +754,31 @@ class RealTargetActivationAdapter:
 
     def _real_target_view(self, successor_plan_ref: str, successor_plan: Mapping[str, Any],
                           predecessor: Mapping[str, Any]) -> dict[str, Any]:
-        if successor_plan_ref != _REAL_TARGET_PLAN_REF:
+        if successor_plan_ref not in _REAL_TARGET_PLAN_REFS:
             raise ValueError('SUCCESSOR_PLAN_REF_INVALID')
-        proposal_path = self.source_root / _REAL_TARGET_PLAN_REF
+        proposal_path = self.source_root / successor_plan_ref
         if not proposal_path.is_file():
             raise ValueError('REAL_TARGET_SOURCE_ARTIFACT_MISSING')
         proposal = json.loads(proposal_path.read_text('utf-8'))
         if proposal.get('native_runtime_plan') != dict(successor_plan):
             raise ValueError('REAL_TARGET_SUCCESSOR_MISMATCH')
+        extra_refs = ()
+        if successor_plan_ref == _R4_TARGET_PLAN_REF:
+            if (successor_plan.get('digest') != _R4_PLAN_DIGEST
+                    or successor_plan.get('previous_digest') != _R4_PREVIOUS_DIGEST
+                    or _digest({k: v for k, v in successor_plan.items() if k != 'digest'}) != _R4_PLAN_DIGEST):
+                raise ValueError('REAL_TARGET_SUCCESSOR_MISMATCH')
+            plan_path = self.source_root / _R4_NATIVE_PLAN_REF
+            allocation_path = self.source_root / _R4_ALLOCATION_REF
+            if not plan_path.is_file() or not allocation_path.is_file():
+                raise ValueError('REAL_TARGET_SOURCE_ARTIFACT_MISSING')
+            if (json.loads(plan_path.read_text('utf-8')) != dict(successor_plan)
+                    or _sha256_file(allocation_path) != _R4_ALLOCATION_FILE_DIGEST
+                    or proposal.get('node_allocation') != json.loads(allocation_path.read_text('utf-8'))):
+                raise ValueError('REAL_TARGET_SUCCESSOR_MISMATCH')
+            extra_refs = (_R4_NATIVE_PLAN_REF, _R4_ALLOCATION_REF)
         artifacts = {}
-        for rel in _REAL_TARGET_VIEW_REFS:
+        for rel in (successor_plan_ref, *_REAL_TARGET_VIEW_REFS, *extra_refs):
             path = self.source_root / rel
             if path.is_file():
                 artifacts[rel] = _sha256_file(path)
@@ -814,6 +835,16 @@ class RealTargetActivationAdapter:
             raise ValueError('EFFECT_AUTHORITY_TRUST_ANCHOR_UNAVAILABLE')
         issuer = self._canonical_issuer(issuer_ref)
         grant = issuer['grant']
+        if grant.get('issued') is False:
+            raise ValueError('EFFECT_AUTHORITY_GRANT_NOT_ISSUED')
+        bindings = authority.get('bindings')
+        grant_bindings = grant.get('bindings')
+        bound_keys = ('predecessor_context_digest', 'successor_plan_digest',
+                      'node_allocation_digest', 'branch', 'head',
+                      'successor_plan_ref', 'live_target')
+        if (not isinstance(bindings, Mapping) or not isinstance(grant_bindings, Mapping)
+                or any(bindings.get(k) != grant_bindings.get(k) for k in bound_keys)):
+            raise ValueError('EFFECT_AUTHORITY_BINDING_MISMATCH')
         if authority.get('authority_kind') != _REAL_TARGET_AUTHORITY_KIND:
             raise ValueError('EFFECT_AUTHORITY_KIND_INVALID')
         scope = authority.get('scope')
@@ -837,10 +868,24 @@ class RealTargetActivationAdapter:
         if (not isinstance(scopes, (list, tuple))
                 or len(scopes) != 1 or scopes[0] != _REAL_TARGET_AUTHORITY_SCOPE):
             raise ValueError('REAL_TARGET_AUTHORITY_SCOPE_INVALID')
+        if not isinstance(successor_plan_ref, str) or successor_plan_ref not in _REAL_TARGET_PLAN_REFS:
+            raise ValueError('SUCCESSOR_PLAN_REF_INVALID')
         trusted_issuer = self._verify_trusted_authority_source(authority)
         authority_digest, plan_digest, predecessor_digest = _executor_validate(
             authority, predecessor, successor_plan, successor_plan_ref,
             node_allocation, branch, head)
+        bindings = authority['bindings']
+        if (bindings.get('successor_plan_ref') != successor_plan_ref
+                or bindings.get('live_target') != str(self.live_root)):
+            raise ValueError('EFFECT_AUTHORITY_BINDING_MISMATCH')
+        if successor_plan_ref == _R4_TARGET_PLAN_REF:
+            if trusted_issuer['grant'].get('issued') is not True:
+                raise ValueError('EFFECT_AUTHORITY_GRANT_NOT_ISSUED')
+            allocation_path = self.source_root / _R4_ALLOCATION_REF
+            if not allocation_path.is_file():
+                raise ValueError('REAL_TARGET_SOURCE_ARTIFACT_MISSING')
+            if json.loads(allocation_path.read_text('utf-8')) != dict(node_allocation):
+                raise ValueError('EFFECT_AUTHORITY_BINDING_MISMATCH')
         return {'verified': True, 'authority_kind': _REAL_TARGET_AUTHORITY_KIND,
                 'scope': _REAL_TARGET_AUTHORITY_SCOPE, 'authority_digest': authority_digest,
                 'successor_plan_digest': plan_digest,
