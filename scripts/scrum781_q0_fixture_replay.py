@@ -16,6 +16,9 @@ from typing import Any, Callable, TypedDict
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_FIXTURE = ROOT / ".gwc/tasks/SCRUM-781/fixtures/q0-c91-e52-reconstructed-v1.json"
+DWO_LOGIN_FIXTURE_DIR = ROOT / ".gwc/tasks/SCRUM-781/fixtures/dwo-login-auth-r1"
+SUITE_C91_E52 = "c91-e52"
+SUITE_DWO_LOGIN = "dwo-login"
 RUN_ID = "scrum781-q0-fresh-20261010-r1"
 BRANCH = "fix/SCRUM-781-q0-fresh-20261010-r1"
 ADAPTER = "tools.node_architect.universal_run_epoch:replay_c91_incident"
@@ -40,6 +43,68 @@ def digest(data: bytes) -> str:
 def load_fixture(path: Path) -> tuple[dict[str, Any], str]:
     raw = path.read_bytes()
     return json.loads(raw), digest(raw)
+
+
+def load_dwo_login_suite(root: Path = ROOT) -> tuple[dict[str, Any], str]:
+    """Load the reconstructed DWO Login/Auth requirements suite as a replayable fixture.
+
+    Reuses the same fail-closed shape as the C91/E52 fixture: source-bound manifest,
+    immutable scenario catalog with content digest, deterministic replay, and an
+    observed-authority guard. Provenance stays RECONSTRUCTED_REQUIREMENTS_BOUND.
+    """
+    import importlib
+    login_mod = importlib.import_module("scripts.scrum781_q0_login_fixture")
+    suite = login_mod.load_suite(root=root)
+    login_mod.validate_suite(suite, root=root)
+    canonical = login_mod._canonical_json(suite["scenarios"])
+    return suite, "sha256:" + hashlib.sha256(canonical).hexdigest()
+
+
+def run_dwo_login_fixture(suite: dict[str, Any], *, root: Path = ROOT,
+                          engine: str = "native",
+                          executor: Callable[..., dict] | None = None) -> dict[str, Any]:
+    """Run the DWO Login suite through the same validate -> replay -> verify pipeline.
+
+    The native path exercises the real GWC Universal v2 epoch route probe; the LangGraph
+    path is process-local mechanics only and never becomes the GWC authority plane.
+    LoginFixtureError is re-raised as FixtureError so the shared harness sees one
+    stable exception type with the original code preserved.
+    """
+    import importlib
+    login_mod = importlib.import_module("scripts.scrum781_q0_login_fixture")
+    native_route = lambda **kwargs: {"outcome": "UNIVERSAL_ROUTE_ALLOWED", "legacy_route": False, "gate": "UR.G2"}
+    try:
+        result = login_mod.run_login_suite(suite, root=root, engine=engine, route=native_route)
+    except login_mod.LoginFixtureError as exc:
+        raise FixtureError(str(exc)) from exc
+    return {
+        "suite": SUITE_DWO_LOGIN,
+        "run_id": result["run_id"], "fixture_id": suite["manifest"]["suite_id"],
+        "engine": engine, "checkpoint_class": result["checkpoint_class"],
+        "result": result["result"], "observed": {"pass_count": result["pass_count"]},
+        "incident_provenance": suite["manifest"]["incident"]["provenance_class"],
+        "authentic_dwo_login_replay": result["authentic_dwo_login_replay"],
+        "q0_l3_qualified": result["q0_l3_qualified"],
+        "native_gate_receipt": result["native_gate_receipt"],
+        "executed_effects": result["executed_effects"],
+    }
+
+
+def load_suite_fixture(name: str, root: Path = ROOT) -> tuple[dict[str, Any], str]:
+    if name == SUITE_C91_E52:
+        return load_fixture(DEFAULT_FIXTURE)
+    if name == SUITE_DWO_LOGIN:
+        return load_dwo_login_suite(root=root)
+    raise FixtureError("Q0_FIXTURE_SUITE_UNKNOWN:" + name)
+
+
+def run_suite(name: str, *, root: Path = ROOT, engine: str = "native",
+              executor: Callable[..., dict] | None = None) -> dict[str, Any]:
+    if name == SUITE_C91_E52:
+        fixture, _ = load_fixture(DEFAULT_FIXTURE)
+        return run_fixture(fixture, root=root, engine=engine, executor=executor)
+    suite, _ = load_dwo_login_suite(root=root)
+    return run_dwo_login_fixture(suite, root=root, engine=engine, executor=executor)
 
 
 def validate_fixture(fixture: dict[str, Any], *, root: Path = ROOT) -> None:
@@ -169,6 +234,7 @@ def run_fixture(fixture: dict[str, Any], *, root: Path = ROOT,
     else:
         raise FixtureError("Q0_FIXTURE_ENGINE_UNKNOWN")
     return {
+        "suite": SUITE_C91_E52,
         "run_id": RUN_ID, "fixture_id": fixture["fixture_id"],
         "engine": engine, "checkpoint_class": checkpoint,
         "result": "RECONSTRUCTED_SUBCASE_PASS",
@@ -185,11 +251,18 @@ def main() -> int:
     parser.add_argument("--fixture", type=Path, default=DEFAULT_FIXTURE)
     parser.add_argument("--engine", choices=["native", "langgraph"], default="native")
     parser.add_argument("--out", type=Path, help="Optional explicit local evidence JSON destination")
+    parser.add_argument("--suite", choices=[SUITE_C91_E52, SUITE_DWO_LOGIN], default=SUITE_C91_E52,
+                        help="Fixture class to run; both classes are validated separately, never merged into one claim.")
     args = parser.parse_args()
     try:
-        fixture, fixture_digest = load_fixture(args.fixture)
-        result = run_fixture(fixture, engine=args.engine)
+        if args.suite == SUITE_DWO_LOGIN:
+            suite, fixture_digest = load_dwo_login_suite()
+            result = run_dwo_login_fixture(suite, engine=args.engine)
+        else:
+            fixture, fixture_digest = load_fixture(args.fixture)
+            result = run_fixture(fixture, engine=args.engine)
         result["fixture_digest"] = fixture_digest
+        result["suite"] = args.suite
     except (OSError, ValueError, KeyError, TypeError, ImportError) as exc:
         result = {"result": "BLOCKED", "reason_code": str(exc), "q0_l3_qualified": False}
         print(json.dumps(result, sort_keys=True))
