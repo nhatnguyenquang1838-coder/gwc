@@ -52,9 +52,19 @@ def test_unknown_suite_name_fails_closed():
         load_suite_fixture("does-not-exist")
 
 
-def test_dwo_login_native_run_through_shared_pipeline():
+def test_dwo_login_native_run_through_shared_pipeline(monkeypatch):
+    from tools.node_architect import universal_run_epoch
     suite, _ = load_dwo_login_suite()
+    real_route = universal_run_epoch.route_universal_request
+    calls = []
+
+    def observed_real_route(**kwargs):
+        calls.append(kwargs)
+        return real_route(**kwargs)
+
+    monkeypatch.setattr(universal_run_epoch, "route_universal_request", observed_real_route)
     result = run_dwo_login_fixture(suite, engine="native")
+    assert calls == [{"runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT", "requested_gate": "UR.G2", "requested_action": "q0_execute_probe"}]
     assert result["result"] == "RECONSTRUCTED_LOGIN_CONTRACT_PASS"
     assert result["fixture_id"] == "DWO-LOGIN-AUTH-R1-RECONSTRUCTED-V1"
     assert result["authentic_dwo_login_replay"] is False

@@ -72,9 +72,8 @@ def run_dwo_login_fixture(suite: dict[str, Any], *, root: Path = ROOT,
     """
     import importlib
     login_mod = importlib.import_module("scripts.scrum781_q0_login_fixture")
-    native_route = lambda **kwargs: {"outcome": "UNIVERSAL_ROUTE_ALLOWED", "legacy_route": False, "gate": "UR.G2"}
     try:
-        result = login_mod.run_login_suite(suite, root=root, engine=engine, route=native_route)
+        result = login_mod.run_login_suite(suite, root=root, engine=engine, model=executor)
     except login_mod.LoginFixtureError as exc:
         raise FixtureError(str(exc)) from exc
     return {
