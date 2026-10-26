@@ -1,0 +1,12 @@
+{
+  "assertions": [
+    "test_default_v2_import_graph_excludes_legacy_runtime_and_governance",
+    "test_root_q0_boot_points_to_consumed_machine_runtime_profile",
+    "test_gwc_v1_runtime_is_manifest_quarantined_and_not_authoritative",
+    "test_legacy_runtime_entrypoint_fails_closed_without_v1_execution"
+  ],
+  "candidate_sha": "5e40763b63b27873ac2cff30ac10f0eeef5a5469",
+  "default_cli_successor_exact_match": true,
+  "result": "UNIVERSAL_V2_CORE_ISOLATED_GWC_V1_QUARANTINED",
+  "source_assertions_sha256": "dec06020932927c7a63c4f104d747a1a7ccb722bb29d75162fa68778c7abe6a0"
+}

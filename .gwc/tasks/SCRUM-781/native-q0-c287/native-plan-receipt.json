@@ -1,0 +1,42 @@
+{
+  "artifact_type": "native-g1-plan-receipt",
+  "authority_granted": false,
+  "candidate_sha": "5e40763b63b27873ac2cff30ac10f0eeef5a5469",
+  "consumed": false,
+  "decision_ref": "core/node-architect/q0-native-successor-runtime-plan-r2.json",
+  "effect_authority_granted": false,
+  "node_allocation_digest": "sha256:15f2ab7654f58717240df867b1c4a488d867f688f5fe683fe0d217f0627c6252",
+  "node_allocation_id": "scrum781-q0-fresh-20261010-r1:q0.qualification-campaign:native-genesis",
+  "plan_coverage": {
+    "default_route": "PLANNED",
+    "deterministic_replay": "PLANNED",
+    "effect_authority": "PLANNED",
+    "exact_readback": "PLANNED",
+    "fresh_boot": "PLANNED",
+    "node_allocation": "PLANNED",
+    "node_architect_seam": "PLANNED",
+    "recursive_plan_dag_complete": "PLANNED",
+    "restart_recovery": "PLANNED",
+    "runtime_plan": "PLANNED",
+    "self_fix_replay": "PLANNED",
+    "stale_state_fail_closed": "PLANNED",
+    "typed_continuation": "PLANNED"
+  },
+  "provenance_ref": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+  "qualification_results": {},
+  "receipt_digest": "sha256:53f0fe02e632d0662912efc1406f3a068c13621f1450782425cbd40fd9451a32",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "runtime_plan_digest": "sha256:936a1b411ba64f99f350f459534e939a5bd8a63bbadfdeb7afc5250f93a74dba",
+  "schema_id": "gwc.q0.native-g1-plan-receipt.v2",
+  "schema_version": 2,
+  "source_head": "5e40763b63b27873ac2cff30ac10f0eeef5a5469",
+  "work_id": "W6",
+  "work_order": [
+    "W1",
+    "W2",
+    "W3",
+    "W4",
+    "W5",
+    "W6"
+  ]
+}

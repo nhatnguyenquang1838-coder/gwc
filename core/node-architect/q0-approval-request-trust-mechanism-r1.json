@@ -1,0 +1,22 @@
+{
+  "artifact_type": "APPROVAL_REQUEST",
+  "run": "scrum781-q0-fresh-20261010-r1",
+  "command_ref": "COMMAND #188 (APPROVE A CLOSED; APPROVE B blocked)",
+  "decision_owner": "Human/Controller (Nhat)",
+  "title": "Establish an independent, verifiable, anti-forgery Human/operator authorization mechanism (prerequisite for APPROVE B)",
+  "why": "COMMAND #188: code can read a JSON grant from authority/grants/, but cannot prove the file was granted by an authorized Human/operator. A grant file != valid authority. This is a NEW governance decision, not executor implementation.",
+  "scope": [
+    "define or supply an independent Human/operator effect-grant provenance (e.g. signature / externally-committed digest / separate trusted channel) that the adapter verifies before accepting a live-activation grant"
+  ],
+  "does_not_authorize": [
+    "any live selector/checkpoint/cursor/scheduler write",
+    "APPROVE B execution",
+    "merge/deploy/production",
+    "any change to R3/r2/frontier or real .gwc"
+  ],
+  "base_sha": "607e358851b6679b2fc1953faac540c67bea5c44",
+  "current_gate": "UR.G2 / RUN_NOT_COMPLETE",
+  "release_trigger": "Nhat decides the authorization-mechanism approach (or supplies a real independent grant)",
+  "generated_at": "2026-10-22T00:00:00Z",
+  "scope_hash": "sha256:90bf9a6dcbee516f9f278cb624c3cb18185954dd49e5caee7853000914b12c3a"
+}

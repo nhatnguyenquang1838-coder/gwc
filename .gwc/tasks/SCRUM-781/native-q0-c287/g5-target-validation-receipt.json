@@ -1,0 +1,27 @@
+{
+  "artifact_type": "q0-target-validation-receipt",
+  "authority_granted": false,
+  "cached_diff_empty": true,
+  "ci_all_passing": true,
+  "ci_skipped_count": 9,
+  "ci_success_count": 9,
+  "created_at": "2026-10-25T15:25:16.134719+00:00",
+  "draft_pr": {
+    "headRefOid": "5e40763b63b27873ac2cff30ac10f0eeef5a5469",
+    "isDraft": true,
+    "number": 609,
+    "state": "OPEN"
+  },
+  "executed_effects": [],
+  "gate": "UR.G5",
+  "schema_id": "dw.gwc.q0.target-validation-receipt/v1",
+  "schema_version": 1,
+  "target": {
+    "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+    "identity": "5e40763b63b27873ac2cff30ac10f0eeef5a5469",
+    "kind": "candidate-branch",
+    "repository": "nhatnguyenquang1838-coder/gwc"
+  },
+  "tracked_diff_empty": true,
+  "validation_action": "q0_validate_in_target"
+}

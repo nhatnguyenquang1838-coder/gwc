@@ -1,0 +1,10 @@
+{
+  "gate": "UR.G0",
+  "load_receipt_ref": "/Users/mac/prj/DW-SuperApps/worktrees/gwc/SCRUM-781-q0-fresh-20261010-r1/.gwc/tasks/SCRUM-781/native-q0-c287/fix-loaded-receipt.json",
+  "load_receipt_sha256": "c4da12ff95cf370b69ff1f4fcc392c452989d6d60650b5ec1887aab6b19e5f8a",
+  "outcome": "PASS",
+  "replay_ref": "/Users/mac/.hermes/cache/scratch/q0-recovery-r1/c284-native-resume-r1/q0-stable-json-d42c6527-f68f-49b0-aea6-d65dbf4394e0/activation-replay-result.json",
+  "replay_sha256": "78a7d7affb61b3e70b667f9505633eeb665e7e0b0ba2f5e00c80ed36d1573138",
+  "runtime_plan_digest": "sha256:936a1b411ba64f99f350f459534e939a5bd8a63bbadfdeb7afc5250f93a74dba",
+  "source_head": "5e40763b63b27873ac2cff30ac10f0eeef5a5469"
+}

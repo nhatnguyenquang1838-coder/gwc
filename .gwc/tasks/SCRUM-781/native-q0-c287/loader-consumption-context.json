@@ -1,0 +1,16 @@
+{
+  "canonical_L3_load_acceptance": false,
+  "consumer_modules": {
+    "tools/node_architect/q0_native_bootstrap.py": "sha256:7e207e3ba8e3acf95687bb7d2423fd01644ae9bc6cb9c5cd064732124ab68bec",
+    "tools/node_architect/q0_native_g1_admission.py": "sha256:112cc5b28fe6a576a24536c72891e6ce24678667dccbce8506ea0322453aad37",
+    "tools/node_architect/q0_qualification.py": "sha256:9e6df68a20e56f0700a651da4bb980a0c93bee4d3e26ba645320a1564e5bf0c5",
+    "tools/node_architect/universal_run_controller.py": "sha256:160a12ca7dedc0376a54f0bab48b7637183173ef6794b174f8e4e7acccfabd69",
+    "tools/node_architect/universal_run_execution.py": "sha256:2959356ab4a67fc98cff4ff04d7dee3c617cb5a0801bc22a928768534c65c97c",
+    "tools/node_architect/universal_run_persistence.py": "sha256:4f7b4e59856d6aaa7abb497fb058e755af88cf0c5701c66d4e9e99e8c00739d3"
+  },
+  "consumer_process_id": 26176,
+  "native_plan_digest": "sha256:936a1b411ba64f99f350f459534e939a5bd8a63bbadfdeb7afc5250f93a74dba",
+  "producer_observation_ref": "/Users/mac/.hermes/cache/scratch/q0-recovery-r1/c284-native-resume-r1/q0-stable-json-d42c6527-f68f-49b0-aea6-d65dbf4394e0/activation-replay-result.json",
+  "producer_observation_sha256": "78a7d7affb61b3e70b667f9505633eeb665e7e0b0ba2f5e00c80ed36d1573138",
+  "schema_validation": "PASS"
+}

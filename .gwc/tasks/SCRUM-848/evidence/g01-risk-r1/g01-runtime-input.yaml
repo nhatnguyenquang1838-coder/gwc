@@ -1,0 +1,397 @@
+{
+  "artifact_type": "g01-runtime-input",
+  "generated_at": "2026-10-26T11:05:44Z",
+  "policies": [
+    {
+      "id": "GWC_ROOT_AGENTS",
+      "path": "AGENTS.md",
+      "ref": "main@f560db71705d89d0ded2a5efbcaeb4c7c4dafab8",
+      "source_sha": "fe0351be65ebe3b08964dcf7ce7ddb5c9b22554e"
+    },
+    {
+      "id": "GWC_CODING_GOVERNANCE",
+      "path": "core/Coding_Project_Governance_v1.0.md",
+      "ref": "main@f560db71705d89d0ded2a5efbcaeb4c7c4dafab8",
+      "source_sha": "ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3"
+    },
+    {
+      "id": "GWC_GATE_LIFECYCLE",
+      "path": "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+      "ref": "main@f560db71705d89d0ded2a5efbcaeb4c7c4dafab8",
+      "source_sha": "c6c8cc254d7b7946f55a8825bb0f58f2451b2a49"
+    },
+    {
+      "id": "GWC_PROJECT_PROFILE",
+      "path": "projects/gwc/project-profile.yaml",
+      "ref": "main@f560db71705d89d0ded2a5efbcaeb4c7c4dafab8",
+      "source_sha": "487bb5e227b20cd9cde85ad6a17305e8610177dc"
+    },
+    {
+      "id": "GWC_DEFAULT_RISK_PROFILE",
+      "path": "governance/risk-profiles/default.yaml",
+      "ref": "main@f560db71705d89d0ded2a5efbcaeb4c7c4dafab8",
+      "source_sha": "351ce67c9bc1cfea180dc4f37d37e4063db590d6"
+    }
+  ],
+  "project": {
+    "id": "gwc",
+    "name": "GWC",
+    "profile_path": "projects/gwc/project-profile.yaml"
+  },
+  "repository": {
+    "base_ref": "main",
+    "base_sha": "f560db71705d89d0ded2a5efbcaeb4c7c4dafab8",
+    "connector": "GitHub",
+    "full_name": "nhatnguyenquang1838-coder/gwc",
+    "protected_branches": [
+      "main"
+    ],
+    "source_baseline": {
+      "authority": "REMOTE_PROTECTED_BASE",
+      "local_state": {
+        "analysis_eligible": false,
+        "dirty": true,
+        "equivalence": "MISMATCH",
+        "head_sha": "29b58922c756ce06f43d915131ea3301b730b0b0",
+        "ref": "fix/SCRUM-781-q0-fresh-20261010-r1"
+      },
+      "observed_at_utc": "2026-10-26T11:05:44Z",
+      "observed_ref": "main",
+      "observed_sha": "f560db71705d89d0ded2a5efbcaeb4c7c4dafab8",
+      "provider": "GitHub"
+    },
+    "verified": true,
+    "write_enabled": true
+  },
+  "request": {
+    "acceptance_criteria": [
+      {
+        "id": "AC-1",
+        "statement": "G0/G1 artifacts validate against schemas at the exact main@f560 source baseline.",
+        "verifiable": true
+      },
+      {
+        "id": "AC-2",
+        "statement": "Canonical risk classifier output is accepted only from real intake/source/repository/protected-base producer outputs; no risk class is forced.",
+        "verifiable": true
+      },
+      {
+        "id": "AC-3",
+        "statement": "Canonical G2 preparation either emits a task-bound AWAITING_APPROVAL request/envelope with all authority flags false, or a precise blocked reason.",
+        "verifiable": true
+      },
+      {
+        "id": "AC-4",
+        "statement": "No branch/worktree creation or source write occurs before a valid task-bound Human G2.",
+        "verifiable": true
+      }
+    ],
+    "affected": [
+      "GWC Node Architect G2 approval-preparation producer",
+      "GWC gate approval request/envelope consumers"
+    ],
+    "assumptions": [
+      "The active GitHub DEAR ruleset applies to the default branch; its observed rules are deletion and non_fast_forward only, while GWC policy independently prohibits main writes.",
+      "The local Q0 worktree at 29b58922 is excluded from trusted child analysis; source authority comes from the exact remote protected-base readback."
+    ],
+    "constraints": [
+      "Canonical base is main@f560db71705d89d0ded2a5efbcaeb4c7c4dafab8",
+      "Proposed implementation head remains equal to base during G0/G1 and G2 preparation",
+      "No branch/worktree creation or source write before a valid Human G2",
+      "Use canonical risk classifier without forcing a class",
+      "No agent child dispatch"
+    ],
+    "desired_outcome": "Produce a validated child G0/G1 package and, only if canonical risk classification and existing preparation pass, a non-authorizing G2 pending request/envelope for the bounded bootstrap repair.",
+    "in_scope": [
+      "tools/node_architect/g2_approval_preparation.py",
+      "tests/test_scrum844_g2_approval_preparation.py",
+      "task-scoped G0/G1/G2 artifacts under .gwc/tasks/SCRUM-847"
+    ],
+    "non_goals": [
+      "SCRUM-846 source edits",
+      "SCRUM-781/Q0 source or cursor work",
+      "PR #609/#613 source integration",
+      "alternate or legacy issuer",
+      "commit/push/PR update before later applicable gate",
+      "main write, merge, deploy, production, secret, migration, or destructive operation"
+    ],
+    "problem": {
+      "statement": "Canonical G2 preparation currently rejects R3 and advanced-HEAD scope; child defect must preserve source-bound R2/R3 classification and non-authorizing pending behavior.",
+      "why_now": "Human-directed COMMAND #311 requires this bootstrap defect to be isolated, risk-classified and prepared on main@f560 before any source write."
+    },
+    "requester": "Nhat Nguyen Quang",
+    "risks": [
+      {
+        "description": "Caller-supplied or stale HEAD could be mistaken for a trusted advanced-HEAD observation.",
+        "id": "RISK-1",
+        "impact": "high",
+        "mitigation": "Require a source-bound host-observed HEAD seam; reject stale or foreign branch/head bindings."
+      },
+      {
+        "description": "A risk downgrade or hardcoded R2 can incorrectly prepare an approval request.",
+        "id": "RISK-2",
+        "impact": "high",
+        "mitigation": "Use only canonical producer outputs and recompute policy-bound classification; preserve false authority flags."
+      },
+      {
+        "description": "UA graph metadata is stale relative to main@f560, so graph coverage is UNKNOWN.",
+        "id": "RISK-3",
+        "impact": "medium",
+        "mitigation": "Use exact-SHA source/import/caller scan and report graph-derived impact as unavailable, not low."
+      }
+    ],
+    "unresolved_questions": []
+  },
+  "risk": {
+    "class": "R2",
+    "human_direction_confirmed": true
+  },
+  "runtime": {
+    "agent_runtime_id": "hermes",
+    "connector_fallback_evidence": [
+      {
+        "connector": "GitHub",
+        "evidence": "Live gh repo view, ls-remote, GitHub PR reads and GitHub MCP issue search succeeded.",
+        "role": "primary",
+        "status": "AVAILABLE"
+      },
+      {
+        "connector": "DWC",
+        "evidence": "Not selected for this local_agent G0/G1 preparation.",
+        "role": "fallback",
+        "status": "SKIPPED"
+      }
+    ],
+    "connector_priority": [
+      "GitHub",
+      "DWC",
+      "DW1"
+    ],
+    "execution_mode": "local_agent",
+    "required_behavior_contracts": [
+      {
+        "path": "core/Agent_Behavior_Semantic_Contract_v1.0.md",
+        "required": true,
+        "source_sha": "956e557fedee58bc7d6eb2d53c2615524db8b16f",
+        "status": "AVAILABLE"
+      },
+      {
+        "path": "core/Agent_Response_Presentation_Contract_v1.0.md",
+        "required": true,
+        "source_sha": "244ba257d995971f5026a86e5668bc8ede8767e2",
+        "status": "AVAILABLE"
+      }
+    ],
+    "selected_connector": "GitHub",
+    "selected_profile": {
+      "id": "dwc",
+      "path": "governance/agent-runtime-profiles/dwc.yaml",
+      "source_sha": "d06ab5631a7888fd09ee44839de48840c8131eb5",
+      "status": "active",
+      "supported_execution_modes": [
+        "chat_connector_only",
+        "local_agent",
+        "repo_ci"
+      ]
+    }
+  },
+  "schema_version": "1.0",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "required": true,
+      "source_sha": "fe0351be65ebe3b08964dcf7ce7ddb5c9b22554e",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+      "required": true,
+      "source_sha": "c6c8cc254d7b7946f55a8825bb0f58f2451b2a49",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md",
+      "required": true,
+      "source_sha": "bc116f07b27ae08c2646a73a021e3cf2e06a0362",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md",
+      "required": true,
+      "source_sha": "51283934bde6df414248dded3ba960cdec5d2b25",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "core/Coding_Project_Governance_v1.0.md",
+      "required": true,
+      "source_sha": "ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "core/Agent_Operating_Runtime_Contract_v1.0.md",
+      "required": true,
+      "source_sha": "0c477a509737accb28b022ec3504b4a3151680db",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "core/Agent_Behavior_Semantic_Contract_v1.0.md",
+      "required": true,
+      "source_sha": "956e557fedee58bc7d6eb2d53c2615524db8b16f",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "core/Agent_Response_Presentation_Contract_v1.0.md",
+      "required": true,
+      "source_sha": "244ba257d995971f5026a86e5668bc8ede8767e2",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "core/E2E_DRAFT_PR_DELIVERY_RULE.md",
+      "required": true,
+      "source_sha": "626da4a219aca3d64cd75c1b94d4ec8fe3113859",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "projects/gwc/project-profile.yaml",
+      "required": true,
+      "source_sha": "487bb5e227b20cd9cde85ad6a17305e8610177dc",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "projects/gwc/project-instructions.md",
+      "required": true,
+      "source_sha": "b1ca598c0b2f4f927b5adaac8f93f08e171a8cfe",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "projects/gwc/project-extension.md",
+      "required": true,
+      "source_sha": "3d96df8e7d85a3a66c90969b1b9873e6bfdbfd50",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "governance/agent-runtime-profiles/dwc.yaml",
+      "required": true,
+      "source_sha": "d06ab5631a7888fd09ee44839de48840c8131eb5",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "governance/risk-profiles/default.yaml",
+      "required": true,
+      "source_sha": "351ce67c9bc1cfea180dc4f37d37e4063db590d6",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "core/task-lifecycle/gate-transition-map.yaml",
+      "required": true,
+      "source_sha": "16eb7c82bca303784ff4326c09196cb8dda317e4",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "tools/node_architect/g2_approval_preparation.py",
+      "required": true,
+      "source_sha": "3f0418dac84d79366c39f0cc26d76415cee7db05",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "tools/node_architect/g2_execution_envelope_render.py",
+      "required": true,
+      "source_sha": "0632da12ae2ec436587af86e6a9a89a4a4d112a9",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "tools/node_architect/approval_command_validation.py",
+      "required": true,
+      "source_sha": "d1723fe8b9a4f5f602e9efa70b19eff8bb718f7f",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "tools/node_architect/risk_classification.py",
+      "required": true,
+      "source_sha": "3e7eb851ac736540ebbad9a8d0578d0664b9b05a",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "tools/node_architect/authority_boundary_check.py",
+      "required": true,
+      "source_sha": "d0980b2f0aeb45faf2e8d160582d1219b80b876e",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "tools/node_architect/approval_token_generation.py",
+      "required": true,
+      "source_sha": "380a54a8594a5bc2b0dbe620260c13d365326767",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "tools/node_architect/evidence_artifact_map.py",
+      "required": true,
+      "source_sha": "5fe705e9853c4bf1e6d06cc9e9de88bee561665a",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "tools/node_architect/gate_state_resolution.py",
+      "required": true,
+      "source_sha": "db168113aab1f099c63126cc2a80f209ba1a400c",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "tools/node_architect/scope_hash_calculation.py",
+      "required": true,
+      "source_sha": "fef7239da476f5e2bc3791785b7a296453a53b76",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "tests/test_scrum844_g2_approval_preparation.py",
+      "required": true,
+      "source_sha": "25ec5a72bba7614dabb08734522c275553b225d9",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "tests/test_scrum809_g2_action_vocabulary.py",
+      "required": true,
+      "source_sha": "9419674ce47ffd39422bf9856a2e6247169c31bc",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "tests/test_gate_authority_g2_execution_envelope_render_m5.py",
+      "required": true,
+      "source_sha": "becdf52b3976c013692795157957435f8d03cdb8",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "tests/test_gate_authority_m5_family_flow.py",
+      "required": true,
+      "source_sha": "fa001815c4d523df3a41eb8eb0e491c8ba7e03a7",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "schemas/g2-execution-envelope.schema.json",
+      "required": true,
+      "source_sha": "b4c3e316c8a0d147db5d62924eed01215252aa50",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "schemas/gate-approval-request.schema.json",
+      "required": true,
+      "source_sha": "214a225fa90ed12e004285c6ff749e10f55647dc",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "schemas/gate-approval-validation.schema.json",
+      "required": true,
+      "source_sha": "2285bc1129f8557d8dfdbd91aa669435663b2c3a",
+      "status": "AVAILABLE"
+    },
+    {
+      "path": "core/node-architect/node-catalog/gate_authority/approval-command-validation.node.json",
+      "required": true,
+      "source_sha": "e5549c55bf97d614168a62c0c0636901f992ff67",
+      "status": "AVAILABLE"
+    }
+  ],
+  "task": {
+    "claimed": true,
+    "id": "SCRUM-848"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "schema_id": "gwc.universal-run.executor-action-receipt.v2",
+  "schema_version": 2,
+  "artifact_type": "executor-action-receipt",
+  "runtime_protocol": "gwc.universal.controller/v2",
+  "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+  "runtime_profile_digest": "sha256:c724c6b036a9c0cfae5a5738554d6ee1fc075fa81b6b09e132761cc18df33881",
+  "route_id": "UNIVERSAL_RUN_NEW_RUNTIME",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "sequence": 1,
+  "gate": "UR.G0",
+  "action": "q0_understand",
+  "actor": "EXECUTOR",
+  "node_id": "q0.qualification-campaign",
+  "node_allocation_id": "scrum781-q0-fresh-20261010-r1:q0.qualification-campaign:native-genesis",
+  "runtime_plan_digest": "sha256:936a1b411ba64f99f350f459534e939a5bd8a63bbadfdeb7afc5250f93a74dba",
+  "assignment_digest": "sha256:dc9f7280546537d5719af4822afc7ef22e6370eeb5265e49af26dd54088f4be7",
+  "event_id": "sha256:1e9bf19b8844d0bb2d688e7d7de96cac7fd34465faae4bcd99e4aaba701ebac3",
+  "host_status": "ACTION_COMPLETE",
+  "host_result_digest": "sha256:7beddd39d99c503f6644735b4baa7afb27653eb5973332f0c1e02bcaf33e5fac",
+  "evidence_refs": {
+    "executor_receipt": "scrum781-q0-fresh-20261010-r1/1e9bf19b8844d0bb2d688e7d/executor-action-receipt.json"
+  },
+  "authority_granted": false,
+  "executed_effects": [],
+  "receipt_digest": "sha256:e8d8c7ffa8c10c3f5d65598a55af12cb0eff99577a486133a11c96eb5c5e5cde"
+}

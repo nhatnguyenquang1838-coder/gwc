@@ -1,0 +1,191 @@
+{
+  "artifact_type": "Q0_LIVE_SUCCESSOR_G1_PROPOSAL",
+  "schema_id": "gwc.q0.live-successor-g1-proposal/v1",
+  "schema_version": 1,
+  "proposal_revision": 2,
+  "status": "PROPOSED_NOT_ACTIVATED",
+  "proposal_only": true,
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "task_id": "SCRUM-781",
+  "session_id": "20261014_021304_0dc728",
+  "previous_proposal": {
+    "path": "/Users/mac/.hermes/loop-checkpoints/scrum781-q0-fresh-20261010-r1/Q0-LIVE-SUCCESSOR-G1-20261022.json",
+    "proposal_digest": "sha256:e3f0cc6cae70221031c3e84338fb3a54d75be456817eeec14a7c87337893b16b",
+    "file_sha256": "sha256:11111a07cdb9e9987d3acf2baf02a652c9d2a85bf46dfd0765deddf8ebc9a0d2"
+  },
+  "controller_decision": {
+    "seq": 157,
+    "comment_id": 6331919712,
+    "url": "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6331919712",
+    "decision": "ACCEPT_REPLAY_CONTRACT_CODE; MATERIALIZE/VALIDATE SUCCESSOR G1; EXECUTE LEGAL W1 LIVE SMOKE",
+    "accepted_as": "NON_ACTIVATED_PLANNING_CANDIDATE",
+    "execution_limit": "W1 sandbox only; do not create a child under R3"
+  },
+  "source_binding": {
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+    "source_head": "3ae4646abd519b9d30476c194047e8b2a3f809fc",
+    "remote_head": "3ae4646abd519b9d30476c194047e8b2a3f809fc",
+    "source_head_is_candidate_identity_only": true
+  },
+  "runtime_contract": {
+    "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+    "workflow_mode": "q0_live_qualification",
+    "qualification_profile_digest": "sha256:2a37d580c26305b74f742f45d25f4caeafae35da043a3b1307b2aedeac34932c",
+    "runtime_default_profile_digest": "sha256:c724c6b036a9c0cfae5a5738554d6ee1fc075fa81b6b09e132761cc18df33881",
+    "integration_gate": "UR.G4",
+    "acceptance_gate": "UR.G6",
+    "target_handoff": "LOGIN_R00_PLUS",
+    "human_decision_authority": {"type": "human", "id": "NHAT"},
+    "mandatory_qualification_entries": [
+      "fresh_boot", "default_route", "runtime_plan", "node_allocation",
+      "node_architect_seam", "effect_authority", "exact_readback",
+      "typed_continuation", "restart_recovery", "self_fix_replay",
+      "stale_state_fail_closed", "deterministic_replay",
+      "recursive_plan_dag_complete"
+    ]
+  },
+  "mandatory_entry_coverage": {
+    "fresh_boot": "W1",
+    "default_route": "W1",
+    "runtime_plan": "W1",
+    "node_allocation": "W2",
+    "node_architect_seam": "W2",
+    "effect_authority": "W2",
+    "exact_readback": "W2",
+    "typed_continuation": "W1",
+    "restart_recovery": "W3",
+    "self_fix_replay": "W4",
+    "stale_state_fail_closed": "W3",
+    "deterministic_replay": "W3",
+    "recursive_plan_dag_complete": "W5"
+  },
+  "active_plan_and_scope_readback": {
+    "active_engineering_plan_ref": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+    "active_engineering_plan_digest": "sha256:08028c21107c7abbd8e0ab3525f5d5a32b66e5f314d949f45a385541de6c3f06",
+    "active_frontier_ref": "core/node-architect/q0-controlled-failure-frontier-r3.json",
+    "active_frontier_digest": "sha256:08b99c63183b03b23811b417d7a643434e393e06415d31bb2ab022b91a781b5d",
+    "active_route_ref": "core/node-architect/q0-engineering-coordination-route-r1.json",
+    "active_route_resolves_to_r3": true,
+    "r3_max_children": 0,
+    "r3_scope_status": "HUMAN_APPROVED_PENDING_NATIVE_ACTIVATION",
+    "native_selector_mutated": false,
+    "checkpoint_or_cursor_mutated": false,
+    "new_child_created": false,
+    "interpretation": "R3 remains the current engineering plan/frontier. This proposal does not activate or replace it and does not materialize a child. The R3 metadata's native activation state remains pending; no selector/checkpoint action is included here."
+  },
+  "replay_semantics": {
+    "certifier_source": "tools/node_architect/q0_qualification.py",
+    "certifier_commit": "3ae4646abd519b9d30476c194047e8b2a3f809fc",
+    "receipt_schema_version": "1.1",
+    "required_subjects": ["ORIGINAL_DWO", "APPROVED_DISTINCT_CONTROLLED"],
+    "original_dwo_status": "NOT_REPRODUCED",
+    "injected_fault_can_satisfy_self_fix_replay": false,
+    "w4_rule": "Only a naturally discovered genuine GWC runtime defect with observed prestate/error and a real post-fix replay can satisfy self_fix_replay. An intentionally injected expected fault is resilience evidence only and cannot yield Q0 self-fix certification. If no qualifying defect is naturally found, stop certification at that unmet criterion; do not inject a substitute defect."
+  },
+  "work_plan": {
+    "ordering": "strictly sequential; no parallel child execution",
+    "items": [
+      {
+        "id": "W1",
+        "depends_on": [],
+        "objective": "Run an isolated, disposable Universal V2 Controller-to-Executor component smoke on source HEAD 3ae4646a using a validated sandbox RuntimePlan/NodeAllocation and a deterministic read-only provider with no network/tool side effects.",
+        "entrypoint": "tools/node_architect/agent_runtime_cli.py",
+        "expected_evidence": [
+          "separate harness process PID and per-invocation sandbox identifier (not a Q0 LOAD_PROOF activation_id)",
+          "loaded module paths/digests and exact source HEAD",
+          "native route decision and actual Controller assignment digest",
+          "actual UniversalExecutor actor receipt read back from scratch storage",
+          "Controller consumption result and legal typed NEXT",
+          "authority_granted=false, executed_effects=[]",
+          "before/after proof that parent checkpoint, selector, cursor and repository tracked files are unchanged"
+        ],
+        "evidence_class": "COMPONENT_LIVE_PROVEN_NOT_PARENT_UR_G2",
+        "limits": ["No production or external provider", "No current Q0 child", "No parent checkpoint/cursor write", "No LOAD_PROOF or L3 claim"]
+      },
+      {
+        "id": "W2",
+        "depends_on": ["W1"],
+        "objective": "Validate actual Q0 Node Architect route selection and a separately scoped sandbox NodeAllocation-to-Executor receipt; no R3 child materialization.",
+        "source_surfaces": ["tools/node_architect/resolve_gate_node_route.py", "tools/node_architect/universal_run_topology.py", "tools/node_architect/universal_run_controller.py"],
+        "expected_evidence": ["exact route decision digest", "validated allocation schema/content digest", "actual actor receipt bound to sandbox plan and allocation", "no parent cursor/authority mutation"]
+      },
+      {
+        "id": "W3",
+        "depends_on": ["W2"],
+        "objective": "Run the separate-process LangGraph checkpoint, interrupt, resume and idempotency scenario in an isolated scratch checkpoint; preserve the 3.11 pinned closure.",
+        "validation_files": ["tests/test_scrum781_q0_langgraph_checkpoint_resume.py", "tests/q0_langgraph_checkpoint_resume_worker.py"],
+        "expected_evidence": ["worker PID", "scratch checkpoint exact readback", "interrupt/resume result", "same-input idempotency", "no parent checkpoint access or write"]
+      },
+      {
+        "id": "W4",
+        "depends_on": ["W3"],
+        "objective": "If and only if an actual qualifying runtime defect is naturally observed, record genuine RED, bounded repair, fresh exact-source load and same-defect replay; otherwise report the criterion unmet and stop certification honestly.",
+        "expected_evidence": ["observed prestate/error before repair", "additive fix identity", "real process/module loaded-source evidence", "same-defect replay and exact readback beyond failure"],
+        "injection_policy": "Never inject an expected failure solely to manufacture self_fix_replay PASS."
+      },
+      {
+        "id": "W5",
+        "depends_on": ["W4"],
+        "objective": "Produce a clean exact-SHA 13/13 qualification matrix and authentic Q0 LOAD_PROOF; certify only if the native certifier accepts all independent evidence.",
+        "entry_condition": "A naturally discovered genuine GWC runtime defect was reproduced and successfully replayed after the exact fix; otherwise W5 is not eligible.",
+        "expected_evidence": ["matrix body/digest independently re-derived", "all 13 entries PASS", "real activation/session/process identity", "loaded profile/module identities", "candidate_sha equals loaded_source_sha", "no unresolved defect", "broader regression"]
+      },
+      {
+        "id": "W6",
+        "depends_on": ["W5"],
+        "objective": "Separate Human UR.G6 acceptance and LOGIN_R00_PLUS handoff only after exact Q0 L3 evidence.",
+        "entry_condition": "W5 produced and independently validated an authentic Q0 L3 receipt; UR.G6 remains a separate human decision.",
+        "decision_authority": "NHAT",
+        "expected_evidence": ["Q0 acceptance decision receipt bound to certified SHA and matrix digest", "closure and handoff receipts"]
+      }
+    ]
+  },
+  "canonical_route_evidence": {
+    "epoch_resolution": "UNIVERSAL_V2_DEVELOPMENT",
+    "legacy_route_used": false,
+    "universal_g1_action": "q0_plan_decompose",
+    "universal_g1_route_outcome": "UNIVERSAL_ROUTE_ALLOWED",
+    "q0_g1_node_route": "Q0_QUALIFICATION_NODE_SELECTED",
+    "q0_g1_authority_granted": false,
+    "canonical_g1_validation_boundary": "Universal Q0 route/profile/RuntimePlan/NodeAllocation validation is used. Legacy GWC G1 artifacts/validator are not represented as Universal gate receipts and do not authorize activation."
+  },
+  "activation_and_effect_boundaries": {
+    "proposal_validation_does_not_activate_runtime_plan": true,
+    "native_active_plan_selector_change": false,
+    "native_checkpoint_or_cursor_change": false,
+    "human_ur_g6_is_final_acceptance_not_g1_activation": true,
+    "separate_native_activation_decision": "Not requested or authorized by this proposal. If required by a future native activation contract, identify that exact contract/gate and obtain its separate decision.",
+    "merge_deploy_production_typed_ce": "NOT_AUTHORIZED"
+  },
+  "source_bindings": [
+    {"ref":"AGENTS.md","sha256":"d1c1a099000963478e60f9fba135103a190a2c8c1b92d30bae51774789905433"},
+    {"ref":"core/engineering/Q0_LIVE_QUALIFICATION_BRANCHING_STRATEGY_v1.0.md","sha256":"1c2135a27f80427b4a459b4eb82543463b5e55c60487f04166dab6bf9d150f75"},
+    {"ref":"core/runbooks/Q0_LIVE_QUALIFICATION_RUNBOOK_v1.0.md","sha256":"1019b7f41950e2c4d9e6b902f594e674baaedfac6fc040fe01a9550b455f9d11"},
+    {"ref":"core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json","sha256":"08028c21107c7abbd8e0ab3525f5d5a32b66e5f314d949f45a385541de6c3f06"},
+    {"ref":"core/node-architect/q0-controlled-failure-frontier-r3.json","sha256":"08b99c63183b03b23811b417d7a643434e393e06415d31bb2ab022b91a781b5d"},
+    {"ref":"core/node-architect/q0-engineering-coordination-route-r1.json","sha256":"75c9ebb0d8c07ba8f659532a3a2cab0633a47f9731894307462f2746e01994ea"},
+    {"ref":"core/node-architect/scrum781-q0-fresh-execution-plan-r2.json","sha256":"ac8e8b855d5564ec9e503f965cd73deb60b546caf70a7304c43140a315422500"},
+    {"ref":"core/node-architect/q0-live-qualification-profile.json","sha256":"aaab03dc97119243e962c90c0f640031589b9024e0f468e35143ffbba972c1c3"},
+    {"ref":"core/node-architect/universal-runtime-default-profile.json","sha256":"09ba2777aed85a499ff86a7951dae959e99795233d97e4902655c3e27ff60df8"},
+    {"ref":"tools/node_architect/q0_qualification.py","sha256":"4be54cf544e778c42705541bd6ac0d1c77947a56930904335204944ed613a4b8"},
+    {"ref":"tools/node_architect/q0_m1_m7_integration.py","sha256":"37241eca35cc93b2139daf6be91dd57558f7b3d7894648a9bae343acb90325b7"},
+    {"ref":"tools/node_architect/universal_run_epoch.py","sha256":"e9fd211f9b990446242ad8104b8e83f38a2b37d5beea15ff2f0f821187584aeb"},
+    {"ref":"tools/node_architect/universal_run_controller.py","sha256":"952b5c5ea894d7c37d6b6994b70401d5881b3e7dcc7992b7b00434e75a94703d"},
+    {"ref":"tools/node_architect/universal_run_execution.py","sha256":"2959356ab4a67fc98cff4ff04d7dee3c617cb5a0801bc22a928768534c65c97c"},
+    {"ref":"tools/node_architect/universal_run_topology.py","sha256":"84447b8aba9869e9b51b46f6c7afba4aab94fcf484a2ec45c84d762f4938ab9a"},
+    {"ref":"tools/node_architect/universal_runtime_profile.py","sha256":"7164240b387d1fb15300ebc9bdb8da817cfc9c9af769fdda9c6aecf8fe3159ab"},
+    {"ref":"tools/node_architect/resolve_gate_node_route.py","sha256":"ee85b6c9a2872004ab69bc50dc70851342894d12f2c69ab6db7e8b8952f8bb15"},
+    {"ref":"tools/node_architect/agent_runtime_cli.py","sha256":"a853475341635480a15a49a9e8dc1c1dde743d17b64895079ff8836ced8f02c6"},
+    {"ref":"tools/node_architect/q0_browser_binding.py","sha256":"4f48dd07fc3e157cefa5e978952ebef81ef3f4bd821c0c3179243d870656bf64"},
+    {"ref":"tools/node_architect/q0_python_env.py","sha256":"17f283388e96af1911590bfa780f64f1cfb023329e82b8d2be61db5e639a9bc0"},
+    {"ref":"requirements/langgraph-agent-workflow.txt","sha256":"d62d9a2fa1671145600bb6105cde9c63ddc6dca0ebc4c8da756fea0a846ae511"},
+    {"ref":"schemas/node-architect/universal-run/node-allocation.schema.json","sha256":"eacabaeab114fe77fc3e2567407f6e1eedb4ebe8c41d5d36ee05b2bee7f6fd33"},
+    {"ref":"schemas/node-architect/universal-run/executor-action-receipt.schema.json","sha256":"74428c7bcb7f76564a8f783dd731a433e89410c6fd99581792c872f59c7a1eb0"},
+    {"ref":"tests/test_scrum781_q0_native_host.py","sha256":"24f4bd0023d9c72f3808f6e6f2269fb6f89a55fddcebe2b0f1bc279b2317f27b"},
+    {"ref":"tests/test_universal_v2_core_isolation.py","sha256":"dec06020932927c7a63c4f104d747a1a7ccb722bb29d75162fa68778c7abe6a0"},
+    {"ref":"tests/test_scrum781_q0_langgraph_checkpoint_resume.py","sha256":"ba4f91a9489807fe212570f983da61e5932ac8d3b97eeea31df4830fd7e9dc42"},
+    {"ref":"tests/q0_langgraph_checkpoint_resume_worker.py","sha256":"f4f0edc65715b85c968c48e7d641737edcb5ac67f306eceebc979329067e5fa5"}
+  ],
+  "proposal_digest": "sha256:f0d776617aa514b8ac57b98f0373a09ff39d4b555c0f141551f12d8ec92ba22c"
+}
