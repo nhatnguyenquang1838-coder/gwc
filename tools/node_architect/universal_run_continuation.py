@@ -62,10 +62,19 @@ def continue_from_native_state(
 def recover_from_native_checkpoint(
     *, profile: Mapping[str, Any], checkpoint: Mapping[str, Any], node_allocation: Mapping[str, Any]
 ) -> UniversalController:
-    """Reconstruct a fresh Controller solely from durable plan and RunState."""
+    """Reconstruct a fresh Controller solely from durable plan and RunState.
+
+    Accepts both shapes: the canonical durable checkpoint document written by
+    ``universal_run_persistence.make_checkpoint_document`` (top-level
+    ``runtime_plan``) and the historical/projection shape that names it
+    ``plan``. A mailbox-only projection, or a document missing either the plan
+    or the RunState, still fails closed.
+    """
     if not isinstance(checkpoint, Mapping):
         raise ValueError("NATIVE_CHECKPOINT_REQUIRED")
     plan = checkpoint.get("plan")
+    if not isinstance(plan, Mapping):
+        plan = checkpoint.get("runtime_plan")
     run_state = checkpoint.get("run_state")
     if not isinstance(plan, Mapping) or not isinstance(run_state, Mapping):
         raise ValueError("NATIVE_CHECKPOINT_BINDING_INVALID")
