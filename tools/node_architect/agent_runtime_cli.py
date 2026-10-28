@@ -138,6 +138,24 @@ def _write_result(path: Path | None, result: Mapping[str, Any]) -> None:
     path.write_text(json.dumps(dict(result), indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
+def _load_evidence_artifacts(path: Path | None) -> dict[str, Any]:
+    """Load caller-supplied gate evidence for Controller consumption.
+
+    Only a JSON object mapping namespaced gate-evidence keys (for example
+    ``UNDERSTANDING_RECEIPT``) to that artifact's payload is accepted. The
+    Controller still validates the artifact; this loader grants nothing.
+    """
+    if path is None:
+        return {}
+    try:
+        payload = _load_json(path)
+    except Exception as exc:  # noqa: BLE001 - a malformed evidence file is a BLOCKED dispatch
+        raise AgentRuntimeCliError("evidence artifacts file is not valid JSON") from exc
+    if not isinstance(payload, Mapping):
+        raise AgentRuntimeCliError("evidence artifacts must be a JSON object")
+    return {str(key): value for key, value in payload.items()}
+
+
 def _emit(result: Mapping[str, Any], output: Path | None) -> int:
     _write_result(output, result)
     print(json.dumps(dict(result), sort_keys=True, ensure_ascii=False))
@@ -148,6 +166,11 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", required=True, type=Path)
     parser.add_argument("--provider-factory")
+    parser.add_argument(
+        "--evidence-artifacts",
+        type=Path,
+        help="JSON object of gate evidence (e.g. UNDERSTANDING_RECEIPT) for Controller consumption.",
+    )
     parser.add_argument("--output", type=Path)
     parser.add_argument("--max-iterations", type=int, default=32)
     args = parser.parse_args(argv)
@@ -230,7 +253,11 @@ def main(argv: list[str] | None = None) -> int:
             evidence_root=universal_run.get("evidence_root"),
             max_iterations=args.max_iterations,
         )
-        decision = controller.consume_executor_receipt(receipt)
+        # Gate evidence must reach the Controller: without it every non-UR.G2
+        # gate fails closed with Q0_GATE_EVIDENCE_REQUIRED.
+        decision = controller.consume_executor_receipt(
+            receipt, evidence_artifacts=_load_evidence_artifacts(args.evidence_artifacts)
+        )
         result = {
             "status": "UNIVERSAL_RUN_NODE_COMPLETE" if receipt.get("host_status") == "ACTION_COMPLETE" else "UNIVERSAL_RUN_NODE_BLOCKED",
             "runtime_family": "UNIVERSAL_V2",
