@@ -1,0 +1,52 @@
+{
+  "files": [
+    {
+      "bytes": 6625,
+      "path": "g0/context-snapshot.yaml",
+      "sha256": "1659b4bdd6c76bf9d37ce8a56873d51eae466bc581ded02a1d23a217014d098d"
+    },
+    {
+      "bytes": 1553,
+      "path": "g01-decision-input.yaml",
+      "sha256": "d75817016f26710b9a40bf6d43e75a06b194946283214cd9519e375d3e456832"
+    },
+    {
+      "bytes": 13660,
+      "path": "g01-runtime-input.json",
+      "sha256": "826d932f73f7264d0d881b0cb113d7313001b149a91313c205e958562833fef3"
+    },
+    {
+      "bytes": 13660,
+      "path": "g01-runtime-input.yaml",
+      "sha256": "826d932f73f7264d0d881b0cb113d7313001b149a91313c205e958562833fef3"
+    },
+    {
+      "bytes": 1395,
+      "path": "g1/brainstorming/g1-options.yaml",
+      "sha256": "6e7ecb3f3318ea75dc1944c6ce4eade3117415b5561a439de7f4eac6bb98bf1f"
+    },
+    {
+      "bytes": 1171,
+      "path": "g1/decision/g1-decision-record.yaml",
+      "sha256": "40b1c3d74cd716b30edd7c8626724f0b300d8a9a4b1c81213f7c1c087d1cc5eb"
+    },
+    {
+      "bytes": 4282,
+      "path": "g1/intake/g1-intake-brief.yaml",
+      "sha256": "0163ae60aa25ea774d7eeb98d57b4aa05d51c7e53a25fdba24c364ea6e5d657a"
+    },
+    {
+      "bytes": 10060,
+      "path": "g1/preflight/g1-preflight-report.yaml",
+      "sha256": "b4dd4cdc830ee3ce86ba1837fe7d6e50d26aa66b58ded1417d9ea29592af7145"
+    },
+    {
+      "bytes": 17388,
+      "path": "risk-producer-evidence.json",
+      "sha256": "0e1b5e4d35237b4fa0d277070fc50acfabb0a52505ea6361fa09111be2b14619"
+    }
+  ],
+  "format": "scrum848-g01-risk-evidence-manifest/v1",
+  "source": "/Users/mac/.hermes/cache/scratch/scrum848-g01-risk-r1",
+  "task": "SCRUM-848"
+}

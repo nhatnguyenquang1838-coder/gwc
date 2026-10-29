@@ -1,0 +1,29 @@
+schema_version: '1.0'
+artifact_type: g01-decision-input
+generated_at: '2026-10-26T11:10:00Z'
+options:
+  - id: OPT-1
+    title: Canonical intake/risk preparation without source mutation
+    description: Run the canonical request-intake, source-resolution, repo-identity, protected-base and risk producers for SCRUM-848, accept the natural R2 / G2_HUMAN_DIRECTION result, and stop at non-authorizing G2 preparation.
+    benefits: [Source-bound, replayable, fail-closed]
+    tradeoffs: [Requires explicit Human G2 before any write]
+    risks: [Risk class cannot be forced or lowered]
+    constraint_fit: FIT
+  - id: OPT-2
+    title: Skip canonical risk and reuse SCRUM-847 package
+    description: Reuse the earlier SCRUM-847 G2 preparation package for SCRUM-848.
+    benefits: [Faster]
+    tradeoffs: [Scope mismatch, stale artifacts, authority borrowing]
+    risks: [Blocked by upstream HUMAN_REQUIRED, wrong task binding]
+    constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: Only the canonical producer chain bound to SCRUM-848 and main@f560 can produce a valid risk class; the SCRUM-847 package is scope-stale and must not be reused.
+decision:
+  status: ACCEPTED
+  selected_option_id: OPT-1
+  actor: Nhat Nguyen Quang
+  decided_at: '2026-10-26T11:10:00Z'
+  source: human-direct
+  explicit: true
+  rationale: Human-directed SCRUM-848 scope is canonical G0/G1 and request-intake/risk preparation only, with no source edit and stop at HUMAN_REQUIRED or unsafe G2 handoff.
+  acceptance_criteria_refs: [AC-1, AC-2, AC-3, AC-4]

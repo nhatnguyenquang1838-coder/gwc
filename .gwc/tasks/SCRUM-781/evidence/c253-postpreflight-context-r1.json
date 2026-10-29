@@ -1,0 +1,73 @@
+{
+  "format_class": "LOCAL_ONLY_ENGINEERING_NOT_NATIVE_QUALIFICATION",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "session_id": "20261014_021304_0dc728",
+  "parent_head": "bad12517f2700deb11e5747ddac7c9a810605ff4",
+  "direction": "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6385754106",
+  "source_sha256": {
+    "tools/node_architect/engineering_host_adapter.py": "7790c9496a22b9050b955dca9d66d1b0ef7a8f0512a6eba70f1d7505c155554a",
+    "tests/test_engineering_frontier_host.py": "11d8ff4a5cab2f8f8af347337a7810259384255f305d47209bb8dec8f2387b43",
+    "tests/test_q0_universal_qualification.py": "4ecc96c888d94dd8f848e84b147219f064db76eab50f9e15d3791f7c0cd624e6"
+  },
+  "genuine_RED": {
+    "exit_code": 1,
+    "failed": 3,
+    "passed_existing_guards": 2,
+    "failures": [
+      "A real unit-host result accepted under another run context",
+      "A real unit-host result accepted under another task context",
+      "Changed input during the real task subprocess still allowed completed artifact publication"
+    ],
+    "already_closed_cases": [
+      "Input changed after preflight refused before task subprocess",
+      "Artifact symlink escape after preflight refused before task subprocess; sentinel unchanged"
+    ]
+  },
+  "correction": [
+    "Bind prepared metadata and actual host artifact to digest of exact TaskContext; verifier reuses mandatory prepared-field comparison",
+    "Re-run preflight after task subprocess, before creating artifact directory or publishing a result; fail on changed input/owner/source/context bindings"
+  ],
+  "compatibility": [
+    "Older cached artifacts lacking task_context_digest are deliberately not accepted; no live store/checkpoint migration or cleanup",
+    "Same exact-context replay is not claimed independently authenticated or globally prohibited",
+    "Existing c251 negative fixtures now carry correct unit context digest so the new requirement does not mask the prior four refusal cases"
+  ],
+  "native_R3_negative_harness": {
+    "scope": "Pure unit validators only; source-bound frozen R3 SHA08028c21107c7abbd8e0ab3525f5d5a32b66e5f314d949f45a385541de6c3f06 and actual published c247 evidence",
+    "cases": [
+      "missing scenario",
+      "controlled subject without authorization (no auth-ref fabricated)",
+      "non-bool original flag",
+      "subject/original flag mismatch",
+      "provenance digest mismatch",
+      "missing activation",
+      "missing runtime session",
+      "missing module identities",
+      "loaded-source SHA mismatch",
+      "actual c247 wrapper REPLAY_PROVENANCE_FIELDS_INVALID"
+    ],
+    "no_positive_receipt_emitted": true,
+    "unit_shape_fields_are_not_real_activation_or_authority": true
+  },
+  "tests": {
+    "focused": "70 passed in14.69s",
+    "expanded": "322 passed +11 subtests across15 modules in24.88s",
+    "raw_logs": "~/.hermes/cache/scratch/q0-recovery-r1/c253-postpreflight-r1/"
+  },
+  "remaining_security_limits": [
+    "Context/artifact digests are consistency bindings, not trusted receiver or native effect authentication",
+    "Task subprocess was initially admitted and really ran; post-command refusal cannot retroactively undo task effects",
+    "No atomic filesystem TOCTOU or compromised writer resistance is claimed",
+    "Native owner/authority/target admission remains separate from UNIT guard=True"
+  ],
+  "external_dependencies": {
+    "ACK": "ACK_VERIFIER_UNAVAILABLE retained; no new census/issuer/keys/mock positive",
+    "DWO": "Metadata-only Jira reader exhausted; not repeated; original immutable artifact still not retrieved",
+    "native_CF_LOAD_PROOF_L3_UR_G6": "NOT_ESTABLISHED; sandbox facts and negative tests are not native qualification"
+  },
+  "preservation": "same branch/worktree, one writer, max_children0;12 prior untracked/live checkpoint/frozen R3 unchanged; no merge/deploy/scheduler/cursor/selector/core edits",
+  "authority_granted": false,
+  "original_replay_claimed": false,
+  "load_proof_claimed": false,
+  "native_qualification_claimed": false
+}

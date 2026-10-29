@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "/Users/mac/.hermes/cache/scratch/q0-langgraph-venv/bin/python",
+    "-B",
+    "-m",
+    "pytest",
+    "tests/test_q0_native_bootstrap.py",
+    "-vv",
+    "-s",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp",
+    "/Users/mac/.hermes/cache/scratch/q0-recovery-r1/c287-native-bootstrap-r1/pytest-diagnostic-fresh"
+  ],
+  "broader_precommit_source_equivalent_suite": "271 PASS; not relabelled as postcommit271",
+  "exit_code": 0,
+  "result_sha256": "d0fb0f2b7822940a771fb84c6fe76b3ad852395a60b9e7d8dbd109b83a5d65d8",
+  "source_head": "5e40763b63b27873ac2cff30ac10f0eeef5a5469",
+  "tests_passed": 6,
+  "unit_only_environment_override": {
+    "HERMES_HOME": "/Users/mac/.hermes/cache/scratch/q0-recovery-r1/c287-native-bootstrap-r1/unit-hermes-home"
+  }
+}

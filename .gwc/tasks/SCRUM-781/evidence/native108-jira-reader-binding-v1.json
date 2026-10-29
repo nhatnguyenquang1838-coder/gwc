@@ -1,0 +1,280 @@
+{
+  "format_id": "local-only.q0-trace-reader-binding/v1",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "session_id": "20261014_021304_0dc728",
+  "native_tick": 108,
+  "source_head_at_read": "7d1b8960e5d03930101040df9a2aeb7aa167bd0b",
+  "collected_at": "2026-10-19T06:06:19.668715+00:00",
+  "result": "PRODUCER_LOCATOR_UNVERIFIED",
+  "reader_binding": {
+    "server": "existing configured jira MCP",
+    "tool": "jira_get_issue",
+    "include": "comments,remote_links",
+    "fields_requested": "summary,attachment,comment",
+    "comment_limit": 100,
+    "update_history": false,
+    "issues": [
+      "SCRUM-781",
+      "SCRUM-780"
+    ],
+    "execution": "Actual configured MCP calls, not synthetic responses",
+    "connector_source": "tools.mcp_tool_discovery._connect_server; returned server.session; await server.shutdown on same loop",
+    "command": "PYTHONPATH=\"$PWD\" ./venv/bin/python \"$HERMES_HOME/cache/scratch/native108-jira-trace-reader.py\" from Hermes checkout",
+    "executed_helper_evidence_path": ".gwc/tasks/SCRUM-781/evidence/readers/native108-jira-reader-executed-source.txt",
+    "executed_helper_sha256": "4e8dad8bfb9acf87d2b10e8579ab60dc8c2f7a30e721e7f26fc77a45dfbc8f6c"
+  },
+  "actual_returned_comment_count": 15,
+  "counts_by_issue": {
+    "SCRUM-781": 9,
+    "SCRUM-780": 6
+  },
+  "comment_provenance": [
+    {
+      "issue": "SCRUM-781",
+      "comment_id": "12853",
+      "body_sha256": "f3ef471ec4bf99042463a4324732757ef69c096a5396e8e10b80c875312e9ccc",
+      "body_char_count": 1571,
+      "incident_identifier_present": true,
+      "trace_term_present": false,
+      "source_urls": []
+    },
+    {
+      "issue": "SCRUM-781",
+      "comment_id": "12868",
+      "body_sha256": "fe93f4b4ce7aa651f050e52424c3f1a9f7434b7ec2159dc6ddeb08b38be77aab",
+      "body_char_count": 266,
+      "incident_identifier_present": false,
+      "trace_term_present": false,
+      "source_urls": []
+    },
+    {
+      "issue": "SCRUM-781",
+      "comment_id": "12883",
+      "body_sha256": "de51db3c376a86e29a5f14b99d447fda971bb98b096073a6495a0bd38015e5e8",
+      "body_char_count": 1049,
+      "incident_identifier_present": false,
+      "trace_term_present": false,
+      "source_urls": [
+        "https://app.notion.com/p/3d907c1c65b68116a0edfb850e9e48b2",
+        "https://app.notion.com/p/3d907c1c65b6814d87d4c296e592222b"
+      ]
+    },
+    {
+      "issue": "SCRUM-781",
+      "comment_id": "12886",
+      "body_sha256": "664fa84cc33bf7cecd21283ecacda8f6ee58b81767e33623b156a3c40fcdc741",
+      "body_char_count": 1118,
+      "incident_identifier_present": false,
+      "trace_term_present": false,
+      "source_urls": []
+    },
+    {
+      "issue": "SCRUM-781",
+      "comment_id": "12927",
+      "body_sha256": "36051bf6d835b5f343ab33b76bca5c83180591f02c3a13300007426dea57377a",
+      "body_char_count": 1802,
+      "incident_identifier_present": false,
+      "trace_term_present": false,
+      "source_urls": []
+    },
+    {
+      "issue": "SCRUM-781",
+      "comment_id": "12928",
+      "body_sha256": "9ba37c6b86c6bc19da700eabc06a42232d6de255e0233eea3075c73551476ef1",
+      "body_char_count": 520,
+      "incident_identifier_present": false,
+      "trace_term_present": false,
+      "source_urls": [
+        "https://app.notion.com/p/3e407c1c65b6818d8e03cb5d8c4298b4"
+      ]
+    },
+    {
+      "issue": "SCRUM-781",
+      "comment_id": "12931",
+      "body_sha256": "75c57066f5d8142e3f5a78ea282a344bbf07d4a51bc904c2fb208aafbb7fe89e",
+      "body_char_count": 2108,
+      "incident_identifier_present": false,
+      "trace_term_present": false,
+      "source_urls": []
+    },
+    {
+      "issue": "SCRUM-781",
+      "comment_id": "13003",
+      "body_sha256": "e12eb39a70c784897705a4b1fee56587b31c3fe46358afc3630bc65f260f08df",
+      "body_char_count": 1516,
+      "incident_identifier_present": false,
+      "trace_term_present": false,
+      "source_urls": [
+        "https://github.com/nhatnguyenquang1838-coder/DW-SuperApps/pull/154"
+      ]
+    },
+    {
+      "issue": "SCRUM-781",
+      "comment_id": "13005",
+      "body_sha256": "f2479c2ae93afbdb21c21247df0eabf7d849801302fb0f42ae8248d3b7c24cd4",
+      "body_char_count": 1573,
+      "incident_identifier_present": true,
+      "trace_term_present": false,
+      "source_urls": [
+        "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595",
+        "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6113272447"
+      ]
+    },
+    {
+      "issue": "SCRUM-780",
+      "comment_id": "12833",
+      "body_sha256": "f0ef716a1b5eeb93654e4b163d227dd17c584abb91b6734464476d5a51069d5c",
+      "body_char_count": 1250,
+      "incident_identifier_present": false,
+      "trace_term_present": false,
+      "source_urls": [
+        "https://app.notion.com/p/3d907c1c65b68116a0edfb850e9e48b2",
+        "https://app.notion.com/p/3d907c1c65b6814d87d4c296e592222b"
+      ]
+    },
+    {
+      "issue": "SCRUM-780",
+      "comment_id": "12834",
+      "body_sha256": "ec0d255d443a4bc358d1be011fc002ae4b80f3d11a6a4e78c4f3e9d04ab2c0a5",
+      "body_char_count": 1749,
+      "incident_identifier_present": true,
+      "trace_term_present": false,
+      "source_urls": [
+        "https://app.notion.com/p/3d907c1c65b68116a0edfb850e9e48b2",
+        "https://app.notion.com/p/3d907c1c65b6814d87d4c296e592222b"
+      ]
+    },
+    {
+      "issue": "SCRUM-780",
+      "comment_id": "12849",
+      "body_sha256": "8b001bdcd015a7a8d4d7c733197fd5e482c68651a17fc66091387c8ccfadf269",
+      "body_char_count": 2255,
+      "incident_identifier_present": false,
+      "trace_term_present": false,
+      "source_urls": [
+        "https://app.notion.com/p/3d907c1c65b68139ba82d5ca00c15587"
+      ]
+    },
+    {
+      "issue": "SCRUM-780",
+      "comment_id": "12866",
+      "body_sha256": "9c479474736207414799e87816c14686a7b56102d4a3b374d081fe2e8492c78f",
+      "body_char_count": 1949,
+      "incident_identifier_present": false,
+      "trace_term_present": false,
+      "source_urls": [
+        "https://app.notion.com/p/3d907c1c65b68116a0edfb850e9e48b2",
+        "https://app.notion.com/p/3d907c1c65b68139ba82d5ca00c15587",
+        "https://app.notion.com/p/3d907c1c65b6814d87d4c296e592222b",
+        "https://app.notion.com/p/3da07c1c65b681adacffff49faac9a9c"
+      ]
+    },
+    {
+      "issue": "SCRUM-780",
+      "comment_id": "12885",
+      "body_sha256": "4beea44537b72a74ef98e42ffff8ce6d0bcc88275ae9571ccc130b42f33e4eb4",
+      "body_char_count": 2345,
+      "incident_identifier_present": false,
+      "trace_term_present": false,
+      "source_urls": [
+        "https://app.notion.com/p/3d907c1c65b68116a0edfb850e9e48b2",
+        "https://app.notion.com/p/3d907c1c65b68139ba82d5ca00c15587"
+      ]
+    },
+    {
+      "issue": "SCRUM-780",
+      "comment_id": "12888",
+      "body_sha256": "97746a78867eb728ec987fa683eb21454e98b46d2b079b1b940cc400f3a0c0e3",
+      "body_char_count": 1756,
+      "incident_identifier_present": false,
+      "trace_term_present": false,
+      "source_urls": []
+    }
+  ],
+  "targeted_followup": [
+    {
+      "issue": "SCRUM-781",
+      "comment_id": "12853",
+      "body_sha256": "f3ef471ec4bf99042463a4324732757ef69c096a5396e8e10b80c875312e9ccc",
+      "body_char_count": 1571,
+      "incident_identifier_present": true,
+      "trace_term_present": false,
+      "selected_redacted_excerpts": [
+        "- Old native todo revision=0, old loop tick 49, old continuation cursors, and old DWO-LOGIN-AUTH-R1 runtime state are EVIDENCE-ONLY and MUST NOT seed the new queue/cursor."
+      ],
+      "source_urls": []
+    },
+    {
+      "issue": "SCRUM-781",
+      "comment_id": "13005",
+      "body_sha256": "f2479c2ae93afbdb21c21247df0eabf7d849801302fb0f42ae8248d3b7c24cd4",
+      "body_char_count": 1573,
+      "incident_identifier_present": true,
+      "trace_term_present": false,
+      "selected_redacted_excerpts": [
+        "Goal unchanged: certify \\*\\*GWC Universal V2\\*\\* against the real DWO-LOGIN-AUTH-R1 failure. Reproduce → RED → bounded FIX → GREEN → reload  LOAD\\*PROOF → replay the original incident beyond previous failure → regression → CAMPAIGN\\*READY\\_RUNTIME/L3  Draft PR/evidence. \\*\\*No product Login implementation/workaround, merge or deploy.\\*\\*"
+      ],
+      "source_urls": [
+        "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595",
+        "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6113272447"
+      ]
+    },
+    {
+      "issue": "SCRUM-780",
+      "comment_id": "12834",
+      "body_sha256": "ec0d255d443a4bc358d1be011fc002ae4b80f3d11a6a4e78c4f3e9d04ab2c0a5",
+      "body_char_count": 1749,
+      "incident_identifier_present": true,
+      "trace_term_present": false,
+      "selected_redacted_excerpts": [
+        "1. Materialize Parent `DWO-LOGIN-AUTH-R1` G0/G1 first.",
+        "1. `CR0 GWC Node Binding` remains the first **known unresolved blocker**, but only after Parent validation confirms topology/current child state.",
+        "1. After CR0 certifies a new exact GWC SHA, compile/replan `CR2 Login RuntimePlan` against that exact SHA plus the reconciled CR1 output.",
+        "Current materialization remains unchanged: `SCRUM-780` is the only Jira issue for this campaign; no formal child Jira issues, GWC Child Run artifacts, NodeAllocations, RuntimePlan, branch, code mutation, PR, merge, deploy, or production action were created by this refinement."
+      ],
+      "source_urls": [
+        "https://app.notion.com/p/3d907c1c65b68116a0edfb850e9e48b2",
+        "https://app.notion.com/p/3d907c1c65b6814d87d4c296e592222b"
+      ]
+    }
+  ],
+  "source_url_count": 8,
+  "discovered_source_urls": [
+    "https://app.notion.com/p/3d907c1c65b68116a0edfb850e9e48b2",
+    "https://app.notion.com/p/3d907c1c65b68139ba82d5ca00c15587",
+    "https://app.notion.com/p/3d907c1c65b6814d87d4c296e592222b",
+    "https://app.notion.com/p/3da07c1c65b681adacffff49faac9a9c",
+    "https://app.notion.com/p/3e407c1c65b6818d8e03cb5d8c4298b4",
+    "https://github.com/nhatnguyenquang1838-coder/DW-SuperApps/pull/154",
+    "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595",
+    "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6113272447"
+  ],
+  "findings": [
+    "Live reader exposed comment lists that prior description-only retrieval had not inspected.",
+    "Three incident-identifier-bearing comments were semantically inspected via selected redacted excerpts; they describe historical control state, campaign goal or planning refinement, not a recovered original failing input/error payload.",
+    "Source URLs are discovered locators, not validated original execution artifacts. No run/failure/artifact producer binding is claimed."
+  ],
+  "limitations": {
+    "upstream_comment_total": "NOT_EXPOSED;15 is returned count, not an exhaustive total",
+    "attachments": "UNKNOWN_NOT_EXPOSED despite field request; no download attempted",
+    "raw_comment_bodies_persisted": false,
+    "secrets_persisted": false,
+    "excerpt_extent": "only selected lines, bounded/redacted; not full comments",
+    "historical_control_pointers": "Not followed as typed C/E, continuation or authority; #595 collection was read only once by native M1",
+    "global_absence_claim": false
+  },
+  "blocked_action": "Authentic original DWO failure reproduction/replay",
+  "producer": {
+    "reader_owner": "DWA",
+    "reader_status": "BOUND_AND_EXERCISED",
+    "original_execution_host_owner": "NOT_VERIFIED",
+    "original_artifact_locator": "NOT_VERIFIED"
+  },
+  "next_legal_action": "Follow the newly discovered source-linked evidence/document locators with a verified read-only reader; classify provenance before any replay. Do not repeat the same15-comment inventory unless changed.",
+  "original_replay": false,
+  "load_proof": false,
+  "q0_l3_qualified": false,
+  "typed_ce_admitted": false,
+  "authority_granted": false,
+  "tests_or_verified_probe_rerun": false
+}

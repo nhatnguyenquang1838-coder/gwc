@@ -1,0 +1,48 @@
+{
+  "schema_id": "gwc.q0.reconstructed-fixture.v1",
+  "fixture_id": "SCRUM-781-Q0-C91-E52-RECONSTRUCTED-V1",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "task_id": "SCRUM-781",
+  "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+  "gate": "UR.G2",
+  "source_binding": {
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+    "baseline_sha": "80a3995ce374d678eaeaf223d25959aba4ea8d35",
+    "runtimeplan_path": "core/node-architect/scrum781-q0-fresh-execution-plan-r2.json",
+    "runtimeplan_sha256": "ac8e8b855d5564ec9e503f965cd73deb60b546caf70a7304c43140a315422500"
+  },
+  "incident": {
+    "parent_id": "DWO-LOGIN-AUTH-R1",
+    "covered_subcase": "C91/E52 legacy-G0G1-controller-block",
+    "original_trace_status": "MISSING",
+    "provenance_class": "RECONSTRUCTED_SOURCE_BOUND",
+    "previous_failure_signature": "NEEDS_EXACT_HITL",
+    "source_refs": [
+      "github://nhatnguyenquang1838-coder/gwc/issues/575",
+      "github://nhatnguyenquang1838-coder/gwc/blob/80a3995ce374d678eaeaf223d25959aba4ea8d35/tests/test_scrum781_q0_historical_replay.py",
+      "jira://SCRUM-780"
+    ],
+    "limitations": "Historical C91/E52 Universal v2 control-plane reconstruction only; NOT original DWO login input/trace, not authentic RED, not G5/L3 evidence."
+  },
+  "replay": {
+    "adapter": "tools.node_architect.universal_run_epoch:replay_c91_incident",
+    "inputs": {
+      "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+      "legacy_g01_package_present": false,
+      "universal_native_state_valid": true
+    },
+    "expected": {
+      "outcome": "UNIVERSAL_CONTINUES",
+      "needs_exact_hitl": false,
+      "advance_beyond_old_failure": true,
+      "first_state_beyond_failure": "UR.G1_TYPED_CONTROLLER_NEXT"
+    }
+  },
+  "dwo_v2_projection_contract": {
+    "source_profile": "DEV_NATIVE",
+    "sync_state": "LIVE",
+    "semantic_qualification": "PENDING",
+    "authority_state": "NOT_APPLICABLE"
+  }
+}

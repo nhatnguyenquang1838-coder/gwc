@@ -1,0 +1,36 @@
+{
+  "node_id": "q0.qualification-campaign",
+  "node_type": "workflow",
+  "title": "Q0 Universal Runtime Qualification Campaign",
+  "canonical": "canonical",
+  "authority_boundary": "q0_lifecycle_only_effect_authority_orthogonal",
+  "gates": ["UR.G0", "UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6"],
+  "description": "Runs the Q0 live runtime-qualification profile through the Universal Runtime lifecycle before the real Login R00+ workload may start.",
+  "intent": "Qualify the exact Universal Runtime candidate using the declared Q0 matrix, live probe, self-fix replay, broader regression, exact SHA certification, and Nhat acceptance/handoff.",
+  "outcome": "A typed Q0 qualification node result with exact run/profile identity, evidence references, effect-boundary decision, and Universal typed NEXT.",
+  "constraints": [
+    "Q0 is a workflow mode/profile of Universal Runtime and Node Architect, not a separate runtime or the Login workload.",
+    "Universal UR.G0..UR.G6 lifecycle semantics are not aliases for legacy GWC effect gates.",
+    "Every lifecycle advance requires gate-specific evidence and the Universal kernel transition.",
+    "Q0 certification and acceptance never grant merge, deployment, production, credentials, migration, or destructive-effect authority.",
+    "Nhat is the human Q0 acceptance decision authority; @approver may only transport/capture a decision."
+  ],
+  "exclusions": [
+    "Starting Login R00+ before CAMPAIGN_READY_RUNTIME/L3, exact certified_q0_sha, and accepted handoff.",
+    "Using legacy approval-token gates as Universal Q0 lifecycle evidence.",
+    "Protected-main mutation, merge, deployment, production config/data, secrets, migration, destructive operations, force-push, or history rewrite."
+  ],
+  "entry_guards": [
+    "runtime_epoch is UNIVERSAL_V2_DEVELOPMENT",
+    "workflow_mode is q0_live_qualification",
+    "Q0 profile digest and exact run identity are valid",
+    "effect authority is resolved separately for any concrete effect"
+  ],
+  "source_resolution": {
+    "evaluator": "tools/node_architect/q0_qualification.py",
+    "profile": "core/node-architect/q0-live-qualification-profile.json",
+    "certification_schema": "schemas/q0-certification-receipt.schema.json",
+    "acceptance_request_schema": "schemas/q0-acceptance-request.schema.json",
+    "acceptance_decision_schema": "schemas/q0-acceptance-decision-receipt.schema.json"
+  }
+}

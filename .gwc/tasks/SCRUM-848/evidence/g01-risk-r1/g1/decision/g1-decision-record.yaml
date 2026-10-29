@@ -1,0 +1,40 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-10-26T11:10:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-848
+  base_sha: f560db71705d89d0ded2a5efbcaeb4c7c4dafab8
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: Nhat Nguyen Quang
+  decided_at: '2026-10-26T11:10:00Z'
+  source: human-direct
+  explicit: true
+rationale: Human-directed SCRUM-848 scope is canonical G0/G1 and request-intake/risk
+  preparation only, with no source edit and stop at HUMAN_REQUIRED or unsafe G2 handoff.
+rejected_option_ids:
+- OPT-2
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+scope_hash: sha256:24bf1621309d15927e9d27d9c2a248f0bf6a0a5b10311a9e5b318376f13b62bf
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition: []
+  agent_allocation: []
+  execution_order: []
+  summary: No subagent distribution required for this G1 decision capture.

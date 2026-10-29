@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "evidence_class": "BRANCH_LOCAL_TEST_FIXTURE_MIGRATION_NOT_LIVE_QUALIFICATION",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "session_id": "20261014_021304_0dc728",
+  "native_tick": 90,
+  "parent_head": "69cdb75d2fd630fbb61ca938195a0d80619d9a8b",
+  "authority": "AGENTS.md UNIVERSAL_V2_DEVELOPMENT + source-bound scrum781-q0-fresh-execution-plan-r2.json tests/** and .gwc/tasks/SCRUM-781/**",
+  "bounded_action": "Migrate obsolete positive compatibility-host assertion into explicit quarantine coverage plus native UR.G0 actor/provider/readback/continuation coverage.",
+  "red": {
+    "result": "1 FAILED",
+    "kind": "FIXTURE_CONTRACT_DRIFT_NOT_PRODUCTION_REGRESSION",
+    "test": "test_q0_host_routes_ur_g0_through_live_runtime_bridge",
+    "reason": "Legacy bridge correctly returns BLOCKED/USE_UNIVERSAL_V2_EXECUTOR, not SEMANTIC_NODE_COMPLETE."
+  },
+  "green": {
+    "result": "4 passed",
+    "coverage": [
+      "Legacy UR.G0 dispatch blocked with zero provider calls, no effects, no next route.",
+      "Profile-native actor UR.G0 performs one read-only synthetic provider action, exact receipt readback, and synthetic understanding evidence permits in-memory Controller continuation to UR.G1.",
+      "Actor success without understanding evidence raises Q0_GATE_EVIDENCE_REQUIRED and leaves test RunState unchanged.",
+      "Canonical CLI actor success still returns BLOCKED/GWC_RUNTIME_DEFECT at the G0 gate boundary."
+    ]
+  },
+  "assertion_mapping": {
+    "node_id": "q0.qualification-campaign preserved in native actor receipt",
+    "authority_and_effects": "False/[] preserved on receipt and Controller decision",
+    "live_agent_event": "Replaced obsolete compatibility live_agent_event marker with native EXECUTOR actor, v2 receipt schema, route and exact provider request/readback checks; not a claim of live admission.",
+    "continuation": "Native G0->G1 decision and CONTINUE_UNIVERSAL_LANE_REMEDIATION asserted instead of obsolete legacy next_route."
+  },
+  "new_open_finding": {
+    "id": "Q0_NATIVE_CLI_G0_EVIDENCE_INGESTION_GAP",
+    "status": "OPEN_NOT_REPAIRED",
+    "evidence": [
+      "agent_runtime_cli.py calls consume_executor_receipt(receipt) without evidence_artifacts.",
+      "universal_run_controller.py requires nonempty evidence for non-G2 gates.",
+      "New CLI unit test invokes real Controller and Executor with a synthetic binding and a factory seam: provider called once, ACTION_COMPLETE receipt persisted, but CLI returns BLOCKED.",
+      "Direct native Controller test proves Q0_GATE_EVIDENCE_REQUIRED with no state advancement."
+    ],
+    "next": "Define and validate the native G0 evidence producer-to-consumer binding before wiring evidence into CLI; do not pass truthy placeholders from manifests or bypass gate checks."
+  },
+  "related_regression": {
+    "result": "75 passed, 5 failed, 5 subtests passed",
+    "all_five_failures_already_in_prior_21_failure_inventory": true
+  },
+  "unfiltered_pytest": {
+    "result": "COLLECTION_ERROR",
+    "reason": "tests/test_g2-execution-library.py is tracked Markdown with .py suffix; unchanged from parent. No full-suite PASS claimed."
+  },
+  "executable_pytest": {
+    "result": "3718 passed, 20 failed, 7 skipped, 576 subtests passed",
+    "exclusion": "tests/test_g2-execution-library.py",
+    "new_failure_ids": [],
+    "remaining_failure_ids": [
+      [
+        "tests.test_agent_runtime_entrypoint_m1_m7",
+        "test_selected_m1_m7_runs_inside_canonical_host_and_holds_without_observer"
+      ],
+      [
+        "tests.test_fastlane_process_optimization",
+        "test_chatgpt_overlay_requires_auto_ready_when_supported_then_g4_token"
+      ],
+      [
+        "tests.test_fastlane_process_optimization",
+        "test_e2e_allows_autonomous_steps_after_g2_but_blocks_merge"
+      ],
+      [
+        "tests.test_fastlane_process_optimization",
+        "test_g5_exact_sha_fallback_blocks_pr_only_false_pending"
+      ],
+      [
+        "tests.test_plan_bound_m4",
+        "test_authority_revalidation_invokes_real_validator_allowed"
+      ],
+      [
+        "tests.test_scrum_566_agent_host_wiring",
+        "test_agent_host_wires_actual_instructions_skills_provider_tool_readback_and_next"
+      ],
+      [
+        "tests.test_scrum_566_agent_host_wiring",
+        "test_llm_cannot_inject_route_or_authority"
+      ],
+      [
+        "tests.test_scrum_566_agent_host_wiring",
+        "test_provider_unknown_tool_request_fails_before_capability_execution"
+      ],
+      [
+        "tests.test_scrum_566_agent_host_wiring",
+        "test_shadow_agent_host_runs_same_llm_semantics_but_never_executes_tool"
+      ],
+      [
+        "tests.test_scrum_566_agent_runtime_loop",
+        "test_authoritative_agent_host_requires_provider_registry"
+      ],
+      [
+        "tests.test_scrum_566_agent_runtime_loop",
+        "test_authoritative_provider_registry_requires_live_eligibility"
+      ],
+      [
+        "tests.test_scrum_566_agent_runtime_loop",
+        "test_host_default_readback_fails_closed_without_external_evidence"
+      ],
+      [
+        "tests.test_scrum_566_agent_runtime_loop",
+        "test_host_default_readback_verifies_external_canonical_evidence"
+      ],
+      [
+        "tests.test_scrum_566_agent_runtime_loop",
+        "test_loop_caps_iterations_on_continue_next_node"
+      ],
+      [
+        "tests.test_scrum_566_agent_runtime_loop",
+        "test_loop_propagates_typed_next_node_to_next_route"
+      ],
+      [
+        "tests.test_scrum_566_agent_runtime_loop",
+        "test_loop_single_node_reaches_gate_boundary_on_stop_disposition"
+      ],
+      [
+        "tests.test_scrum_566_agent_runtime_loop",
+        "test_loop_terminates_when_event_blocked"
+      ],
+      [
+        "tests.test_scrum_566_agent_runtime_loop",
+        "test_provider_evidence_class_recorded_not_live_closure_eligible"
+      ],
+      [
+        "tests.test_scrum_566_agent_runtime_loop",
+        "test_registered_live_eligible_provider_passes_gate"
+      ],
+      [
+        "tests.test_scrum_566_agent_runtime_loop",
+        "test_registered_provider_uses_canonical_provider_bridge_contract"
+      ]
+    ],
+    "removed_failure_ids": [
+      [
+        "tests.test_scrum_566_agent_host_wiring",
+        "test_q0_host_routes_ur_g0_through_live_runtime_bridge"
+      ]
+    ],
+    "note": "Removal is test-contract migration with retained/replaced positive coverage, not repair or qualification of the production Q0 runtime."
+  },
+  "test_files_changed": [
+    "tests/test_scrum_566_agent_host_wiring.py",
+    "tests/test_scrum781_q0_native_host.py"
+  ],
+  "test_input_sha256": {
+    "tests/test_scrum_566_agent_host_wiring.py": "0f1ad3dda7689a48476d66b939b74cb4fb0628ac1c115069d7a0720e33cef3e6",
+    "tests/test_scrum781_q0_native_host.py": "8e472601d921f038e6d937c0173b1841ded8c4774eb5b9b0f696b079f988d042"
+  },
+  "unmodified_production_sha256": {
+    "tools/node_architect/agent_runtime_cli.py": "06db1367806a30fd437f3a3c72bef4d78e3eeeb984e10f84420b004934612031",
+    "tools/node_architect/universal_run_controller.py": "952b5c5ea894d7c37d6b6994b70401d5881b3e7dcc7992b7b00434e75a94703d",
+    "tools/node_architect/universal_run_execution.py": "2959356ab4a67fc98cff4ff04d7dee3c617cb5a0801bc22a928768534c65c97c"
+  },
+  "local_evidence_sha256": {
+    "red.xml": "f7471ce3e1dec42e75f841480a6518a2429df46ea95fe92954d91ff2506d93e3",
+    "green.xml": "8ce6ffbca7f8f7b016c6b6cc9880fd3b5473fe9ff595f6278c440586e62a6480",
+    "related.xml": "fecb03640547b736b06066ab34baceeb9b95d59bdf417f6e67a661ba61ea7a99",
+    "wide.xml": "38e4f825ee12aec7e9b5f51848ff1c61b81a50eeed22e9ac9fc254f59efd7f78",
+    "wide-executable.xml": "e46b952ba70d4b6892d959cdac97811ae3a543ceeabf02e63f57e346ba843a93"
+  },
+  "six_foreign_files_preserved": true,
+  "live_c_e_polled_or_dispatched": false,
+  "browser_wakeup": false,
+  "native_gate_receipt_claimed": false,
+  "LOAD_PROOF_or_original_replay_or_L3_claimed": false,
+  "native_settlement": "PENDING_NORMAL_NATIVE_POST_TURN_NO_MANUAL_SETTLEMENT",
+  "next_owner": "DWA"
+}

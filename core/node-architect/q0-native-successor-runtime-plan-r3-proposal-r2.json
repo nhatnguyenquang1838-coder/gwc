@@ -1,0 +1,245 @@
+{
+  "artifact_type": "Q0_NATIVE_SUCCESSOR_RUNTIME_PLAN_PROPOSAL",
+  "proposal_only": true,
+  "authority_granted": false,
+  "status": "PREPARED_NOT_ACTIVATED",
+  "schema_id": "gwc.q0.native-successor-runtime-plan-proposal/v1",
+  "schema_version": 1,
+  "parent_run_id": "scrum781-q0-fresh-20261010-r1",
+  "source_binding": {
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+    "source_head": "ad73a12bfa1b63a29d6fbf66ca78f6657c410d82"
+  },
+  "predecessor_proposal": {
+    "ref": "core/node-architect/q0-native-successor-runtime-plan-r2.json",
+    "file_sha256": "accd785a46235f55db50944b5c438784d92e6bf7e5ce0a8576eb3720d3f52f18",
+    "native_runtime_plan_digest": "sha256:bdcf4e9c44ea1b5cdeaa464c77446b9e1b66aeec98f2aaa48018564a2eedc0e6"
+  },
+  "candidate_engineering_scope": {
+    "allowed_actions": [
+      "read_exact_source",
+      "create_guarded_branch_or_worktree",
+      "modify_approved_files",
+      "run_sandboxed_validation",
+      "stage",
+      "create_commit",
+      "push_working_branch",
+      "open_or_update_draft_pr"
+    ],
+    "denied_actions": [
+      "mark_pr_ready_for_review",
+      "merge_approved_pr",
+      "deploy_approved_release",
+      "production_config_change",
+      "production_data_write",
+      "migration",
+      "credential_rotation",
+      "branch_deletion",
+      "force_push"
+    ],
+    "writable_targets": [
+      "tools/node_architect/**",
+      "core/node-architect/**",
+      "core/runbooks/Q0_LIVE_QUALIFICATION_RUNBOOK_v1.0.md",
+      "tests/**",
+      "scripts/scrum781_*.py",
+      ".gwc/tasks/SCRUM-781/**"
+    ],
+    "source_roots": [
+      "tools/node_architect",
+      "core/node-architect",
+      "tests",
+      "scripts",
+      ".gwc/tasks/SCRUM-781"
+    ],
+    "max_children": 1,
+    "max_parallel": 1,
+    "max_depth": 1
+  },
+  "native_runtime_plan": {
+    "digest": "sha256:16445abb85d78f61ac6dc2207c47c98240a45c8107e49f546b369e2d90bfa38f",
+    "node_allocations": [
+      "scrum781-q0-fresh-20261010-r1:q0.qualification-campaign:native-successor-r1",
+      "scrum781-q0-fresh-20261010-r1:r4:isolation-writer"
+    ],
+    "previous_digest": "sha256:bdcf4e9c44ea1b5cdeaa464c77446b9e1b66aeec98f2aaa48018564a2eedc0e6",
+    "qualification_profile_digest": "sha256:2a37d580c26305b74f742f45d25f4caeafae35da043a3b1307b2aedeac34932c",
+    "qualification_profile_ref": "core/node-architect/q0-live-qualification-profile.json",
+    "revision": 3,
+    "run_id": "scrum781-q0-fresh-20261010-r1",
+    "runtime_default_profile_digest": "sha256:c724c6b036a9c0cfae5a5738554d6ee1fc075fa81b6b09e132761cc18df33881",
+    "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+    "runtime_profile_ref": "core/node-architect/universal-runtime-default-profile.json",
+    "schema_id": "gwc.universal-run.runtime-plan.v2",
+    "schema_version": 2,
+    "source_binding": {
+      "repository": "nhatnguyenquang1838-coder/gwc",
+      "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+      "pre_head_sha": "ad73a12bfa1b63a29d6fbf66ca78f6657c410d82"
+    },
+    "target_contract_ref": "github://nhatnguyenquang1838-coder/gwc/issues/595#Q0-LIVE-SUCCESSOR-G1",
+    "scope": {
+      "allowed_actions": [
+        "read_exact_source",
+        "create_guarded_branch_or_worktree",
+        "modify_approved_files",
+        "run_sandboxed_validation",
+        "stage",
+        "create_commit",
+        "push_working_branch",
+        "open_or_update_draft_pr"
+      ],
+      "denied_actions": [
+        "mark_pr_ready_for_review",
+        "merge_approved_pr",
+        "deploy_approved_release",
+        "production_config_change",
+        "production_data_write",
+        "migration",
+        "credential_rotation",
+        "branch_deletion",
+        "force_push"
+      ],
+      "writable_targets": [
+        "tools/node_architect/**",
+        "core/node-architect/**",
+        "core/runbooks/Q0_LIVE_QUALIFICATION_RUNBOOK_v1.0.md",
+        "tests/**",
+        "scripts/scrum781_*.py",
+        ".gwc/tasks/SCRUM-781/**"
+      ],
+      "source_roots": [
+        "tools/node_architect",
+        "core/node-architect",
+        "tests",
+        "scripts",
+        ".gwc/tasks/SCRUM-781"
+      ],
+      "max_children": 1,
+      "max_parallel": 1,
+      "max_depth": 1
+    },
+    "coding_worker_policy": {
+      "node_allocation_id": "scrum781-q0-fresh-20261010-r1:r4:isolation-writer",
+      "two_phase_required": true,
+      "max_writer_children": 1,
+      "initial_source_write_paths": [],
+      "initial_source_write_actions": [],
+      "metadata_policy": {
+        "host_subagent_id": "REQUIRED",
+        "host_opaque_handle_digest": "REQUIRED",
+        "host_parent_session_id": "REQUIRED",
+        "correlation_id": "REQUIRED",
+        "child_run_generation": "REQUIRED_FROM_CANONICAL_CHILD_RECORD",
+        "provider": "REQUIRED",
+        "model": "REQUIRED",
+        "reasoning": "UNAVAILABLE-BUT-PERMITTED"
+      },
+      "prewrite_host_contract_status": "SCRATCH_SOURCE_READY_NOT_INSTALLED",
+      "host_generation_counter": "NOT_REQUIRED_EXISTING_HMAC_HANDLE_IDENTITY",
+      "phase_a": "HOST_PREPARED_NOT_EXECUTING"
+    },
+    "dag": {
+      "nodes": [
+        {
+          "id": "WRITER-ADMISSION",
+          "predecessors": []
+        },
+        {
+          "id": "W1",
+          "predecessors": [
+            "WRITER-ADMISSION"
+          ]
+        },
+        {
+          "id": "W2",
+          "predecessors": [
+            "W1"
+          ]
+        },
+        {
+          "id": "W3",
+          "predecessors": [
+            "W2"
+          ]
+        },
+        {
+          "id": "W4",
+          "predecessors": [
+            "W3"
+          ]
+        },
+        {
+          "id": "W5",
+          "predecessors": [
+            "W4"
+          ]
+        },
+        {
+          "id": "W6",
+          "predecessors": [
+            "W5"
+          ]
+        }
+      ]
+    }
+  },
+  "node_allocation": {
+    "record_id": "scrum781-q0-fresh-20261010-r1:r4:writer-allocation-proposal",
+    "schema_id": "gwc.universal-run.node-allocation.v2",
+    "schema_version": 2,
+    "run_id": "scrum781-q0-fresh-20261010-r1",
+    "created_at": "2026-10-24T19:46:17.562892+00:00",
+    "created_by": {
+      "profile": "default",
+      "mode": "PREPARATION_ONLY",
+      "communication_seq": 262
+    },
+    "lifecycle_profile": {
+      "id": "gwc.universal-run.v2",
+      "version": 2
+    },
+    "provenance": {
+      "predecessor_refs": [
+        "08028c21107c7abbd8e0ab3525f5d5a32b66e5f314d949f45a385541de6c3f06",
+        "sha256:bdcf4e9c44ea1b5cdeaa464c77446b9e1b66aeec98f2aaa48018564a2eedc0e6"
+      ],
+      "source_refs": [
+        "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+        "core/node-architect/q0-native-successor-runtime-plan-r2.json",
+        "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6388594591"
+      ]
+    },
+    "node_allocation_id": "scrum781-q0-fresh-20261010-r1:r4:isolation-writer",
+    "kind": "WORK",
+    "requirement": "REQUIRED",
+    "condition_ref": null,
+    "control_justification": null,
+    "independent_boundary_reasons": [
+      "INDEPENDENT_EVIDENCE",
+      "INDEPENDENT_HANDOFF"
+    ],
+    "child_instance_policy": "SINGLE_ACTIVE",
+    "content_digest": {
+      "algorithm": "sha256",
+      "canonicalization": "JCS",
+      "value": "0a960270669d8f5a6e8a79923cd3c92e162880e08bec35eb527fbd503269ef7e"
+    }
+  },
+  "budget_delta": {
+    "from": {
+      "max_children": 0,
+      "max_parallel": 1,
+      "max_depth": 0
+    },
+    "to": {
+      "max_children": 1,
+      "max_parallel": 1,
+      "max_depth": 1
+    },
+    "active": false
+  },
+  "executed_effects": [],
+  "proposal_digest": "sha256:ec3d5ee516ad22b0eaeec8ce1830ac8c916acc2ec34e62d30ddfd3a578001bf6"
+}

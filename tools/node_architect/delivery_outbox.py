@@ -16,8 +16,10 @@ authority flags are fixed false.
 """
 from __future__ import annotations
 
+from contextlib import closing
 import hashlib
 import json
+import math
 import sqlite3
 import time
 from pathlib import Path
@@ -137,14 +139,18 @@ class OutboxStoreCorruption(RuntimeError):
     """Raised on readback/integrity failure (rows must quarantine)."""
 
 
-def _connect(path: Path) -> sqlite3.Connection:
+def _connect(path: Path, *, read_only: bool = False) -> sqlite3.Connection:
     try:
-        conn = sqlite3.connect(str(path), timeout=5)
+        conn = (sqlite3.connect(path.resolve().as_uri()+"?mode=ro", uri=True, timeout=5)
+                if read_only else sqlite3.connect(str(path), timeout=5))
     except sqlite3.Error as exc:  # pragma: no cover - environment-dependent
         raise OutboxStoreUnavailable(OUTBOX_STORE_UNAVAILABLE) from exc
     conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")
-    conn.execute("PRAGMA synchronous=FULL")
+    if read_only:
+        conn.execute("PRAGMA query_only=ON")
+    else:
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA synchronous=FULL")
     return conn
 
 
@@ -202,7 +208,7 @@ def _readback_digest(conn: sqlite3.Connection, path: Path) -> str:
 
 def _readback_after_write(path: Path, expected: str) -> None:
     try:
-        with _connect(path) as conn:
+        with closing(_connect(path, read_only=True)) as conn:
             actual = _readback_digest(conn, path)
     except sqlite3.Error as exc:
         raise OutboxStoreUnavailable(OUTBOX_STORE_UNAVAILABLE) from exc
@@ -307,6 +313,7 @@ def acquire_lease(
     """
     try:
         with _connect(path) as conn:
+            conn.execute("BEGIN IMMEDIATE")
             key = (projection_target, event_source, event_id, canonical_state_digest, delivery_generation)
             row = conn.execute(
                 "SELECT * FROM delivery_outbox WHERE projection_target=? AND "
@@ -320,14 +327,16 @@ def acquire_lease(
             if row["lease_holder"] is not None and row["lease_expires_at"] > _now():
                 raise OutboxConflict(OUTBOX_LEASE_CONTENTION)
             now = _now()
-            conn.execute(
+            updated = conn.execute(
                 "UPDATE delivery_outbox SET lease_holder=?, lease_expires_at=?, state=?, "
                 "updated_at=? WHERE projection_target=? AND event_source IS ? AND event_id=? "
                 "AND canonical_state_digest=? AND delivery_generation=? AND "
-                "(lease_holder IS NULL OR lease_expires_at < ?)",
+                "(lease_holder IS NULL OR lease_expires_at <= ?)",
                 (worker_id, now + lease_ttl_s, IN_FLIGHT, now,
                  *key, _now()),
             )
+            if updated.rowcount != 1:
+                raise OutboxConflict(OUTBOX_LEASE_CONTENTION)
             expected = _readback_digest(conn, path)
         _readback_after_write(path, expected)
         return {
@@ -343,7 +352,7 @@ def acquire_lease(
 
 def _verify_lease(path: Path, *, key: tuple, worker_id: str) -> sqlite3.Row:
     """Fence: re-verify the worker still holds the lease before any send/transition."""
-    with _connect(path) as conn:
+    with closing(_connect(path, read_only=True)) as conn:
         row = conn.execute(
             "SELECT * FROM delivery_outbox WHERE projection_target=? AND event_source IS ? "
             "AND event_id=? AND canonical_state_digest=? AND delivery_generation=?",
@@ -391,13 +400,21 @@ def transition(
         else:
             next_attempt = None
         with _connect(path) as conn:
-            conn.execute(
+            conn.execute("BEGIN IMMEDIATE")
+            if to_state == ACK_CONFIRMED:
+                _verify_lease(path, key=key, worker_id=worker_id)
+                raise OutboxConflict("ACK_VERIFIER_UNAVAILABLE")
+            updated = conn.execute(
                 "UPDATE delivery_outbox SET state=?, reason_class=COALESCE(?, reason_class), "
                 "attempt_no=?, next_attempt_at=?, lease_holder=NULL, lease_expires_at=NULL, "
                 "updated_at=? WHERE projection_target=? AND event_source IS ? AND event_id=? "
-                "AND canonical_state_digest=? AND delivery_generation=?",
-                (to_state, reason_class, attempt_no, next_attempt, now, *key),
+                "AND canonical_state_digest=? AND delivery_generation=? "
+                "AND state=? AND lease_holder=? AND lease_expires_at=? AND lease_expires_at>?",
+                (to_state, reason_class, attempt_no, next_attempt, now, *key,
+                 row["state"], worker_id, row["lease_expires_at"], _now()),
             )
+            if updated.rowcount != 1:
+                raise OutboxConflict(OUTBOX_LEASE_LOST)
             expected = _readback_digest(conn, path)
         _readback_after_write(path, expected)
     except (sqlite3.Error, OutboxStoreUnavailable) as exc:
@@ -444,11 +461,19 @@ def record_attempt(
 def verify_ack(path: Path, *, ack: dict[str, Any], worker_id: str) -> tuple[bool, str]:
     """ACK_VERIFIED 5-way binding + freshness + replay resistance (SCRUM-533 L2.2).
 
-    A bare 2xx (no authenticated 5-way binding) is never ACK_CONFIRMED; it routes
-    to ACK_UNKNOWN. Returns (verified, reason_code).
+    A bare 2xx or caller-supplied signature marker is never authentication.
+    This store has no independently configured receiver-proof verifier, so even
+    consistent bindings fail closed with ACK_VERIFIER_UNAVAILABLE. No issuer,
+    callback, or caller-provided boolean is substituted for that missing trust.
     """
+    required = {
+        "destination_id", "event_source", "event_id", "delivery_generation",
+        "request_digest", "payload_digest", "created",
+    }
+    if not isinstance(ack, dict) or not required.issubset(ack):
+        return False, "ACK_BINDING_INCOMPLETE"
     try:
-        with _connect(path) as conn:
+        with closing(_connect(path, read_only=True)) as conn:
             row = conn.execute(
                 "SELECT * FROM delivery_outbox WHERE event_id=? ORDER BY delivery_generation DESC LIMIT 1",
                 (ack.get("event_id"),),
@@ -457,14 +482,10 @@ def verify_ack(path: Path, *, ack: dict[str, Any], worker_id: str) -> tuple[bool
         raise OutboxStoreUnavailable(OUTBOX_STORE_UNAVAILABLE) from exc
     if row is None:
         return False, "DELIVERY_RECORD_NOT_FOUND"
-    required = {
-        "destination_id", "event_source", "event_id", "delivery_generation",
-        "request_digest", "payload_digest", "created",
-    }
-    if not isinstance(ack, dict) or not required.issubset(ack):
-        return False, "ACK_BINDING_INCOMPLETE"
     if ack["destination_id"] != row["destination_id"] or ack["event_id"] != row["event_id"]:
         return False, "ACK_WRONG_DESTINATION"
+    if ack["event_source"] != row["event_source"] or ack["payload_digest"] != row["event_payload_digest"]:
+        return False, "ACK_BINDING_MISMATCH"
     if ack["delivery_generation"] < row["delivery_generation"]:
         return False, LATE_ACK_REJECTED
     if ack["delivery_generation"] > row["delivery_generation"]:
@@ -473,22 +494,35 @@ def verify_ack(path: Path, *, ack: dict[str, Any], worker_id: str) -> tuple[bool
         created = float(ack["created"])
     except (TypeError, ValueError):
         return False, "ACK_FRESHNESS_INVALID"
-    if _now() - created > DEFAULT_ACK_FRESHNESS_S:
+    now = _now()
+    if not math.isfinite(created) or created > now:
+        return False, "ACK_FRESHNESS_INVALID"
+    if now - created > DEFAULT_ACK_FRESHNESS_S:
         return False, "ACK_STALE"
     if not ack.get("signature_proof"):
         return False, "ACK_NOT_AUTHENTICATED"
+    semantic_id = _semantic_event_id(row["projection_target"], row["event_source"],
+                                     row["event_id"], row["canonical_state_digest"])
+    with closing(_connect(path, read_only=True)) as conn:
+        attempt = conn.execute(
+            "SELECT request_digest FROM delivery_outbox_attempts WHERE semantic_event_id=? "
+            "AND delivery_generation=? AND destination_id=? ORDER BY attempt_no DESC LIMIT 1",
+            (semantic_id, row["delivery_generation"], row["destination_id"]),
+        ).fetchone()
+    if attempt is None or attempt["request_digest"] != ack["request_digest"]:
+        return False, "ACK_REQUEST_UNBOUND"
     if not _verify_lease(path, key=(
         row["projection_target"], row["event_source"], row["event_id"],
         row["canonical_state_digest"], row["delivery_generation"],
     ), worker_id=worker_id)["lease_holder"]:
         return False, OUTBOX_LEASE_LOST
-    return True, "ACK_VERIFIED"
+    return False, "ACK_VERIFIER_UNAVAILABLE"
 
 
 def discover_restart(path: Path) -> list[dict[str, Any]]:
     """SCRUM-533 L3.2: scan non-terminal states after restart."""
     try:
-        with _connect(path) as conn:
+        with closing(_connect(path, read_only=True)) as conn:
             rows = conn.execute(
                 "SELECT * FROM delivery_outbox WHERE state IN "
                 "('PENDING','IN_FLIGHT','ACK_UNKNOWN','RETRY_SCHEDULED')"

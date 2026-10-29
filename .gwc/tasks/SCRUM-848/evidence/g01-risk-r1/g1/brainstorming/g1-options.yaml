@@ -1,0 +1,43 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-10-26T11:10:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-848
+  base_sha: f560db71705d89d0ded2a5efbcaeb4c7c4dafab8
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Canonical intake/risk preparation without source mutation
+  description: Run the canonical request-intake, source-resolution, repo-identity,
+    protected-base and risk producers for SCRUM-848, accept the natural R2 / G2_HUMAN_DIRECTION
+    result, and stop at non-authorizing G2 preparation.
+  benefits:
+  - Source-bound
+  - replayable
+  - fail-closed
+  tradeoffs:
+  - Requires explicit Human G2 before any write
+  risks:
+  - Risk class cannot be forced or lowered
+  constraint_fit: FIT
+- id: OPT-2
+  title: Skip canonical risk and reuse SCRUM-847 package
+  description: Reuse the earlier SCRUM-847 G2 preparation package for SCRUM-848.
+  benefits:
+  - Faster
+  tradeoffs:
+  - Scope mismatch
+  - stale artifacts
+  - authority borrowing
+  risks:
+  - Blocked by upstream HUMAN_REQUIRED
+  - wrong task binding
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: Only the canonical producer chain bound to SCRUM-848 and
+  main@f560 can produce a valid risk class; the SCRUM-847 package is scope-stale and
+  must not be reused.
+decision_required: true
+status: READY

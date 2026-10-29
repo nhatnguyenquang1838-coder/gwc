@@ -1,0 +1,205 @@
+{
+  "active_gate": "UR.G3",
+  "candidate_sha": "5e40763b63b27873ac2cff30ac10f0eeef5a5469",
+  "next_owner": "EXECUTOR",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "runtime_plan_digest": "sha256:936a1b411ba64f99f350f459534e939a5bd8a63bbadfdeb7afc5250f93a74dba",
+  "schema_id": "gwc.universal-run.controller-successor-snapshot.v2",
+  "schema_version": 2,
+  "sequence": 4,
+  "snapshot_digest": "sha256:82dc85a67818fa454c399cbc8dfb10e951392dad178a9763d3e5f959d6d67f38",
+  "successor_run_state": {
+    "active_gate": "UR.G3",
+    "authority_granted": false,
+    "bootstrap_provenance": {
+      "created_at": "2026-10-25T11:23:44.605665+00:00",
+      "created_by": {
+        "command_ref": "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6396648368",
+        "profile": "DWA",
+        "session_id": "20261014_021304_0dc728"
+      },
+      "execution_plan_digest": "sha256:610dbfe1686388590c6e958a35fddf25ae60c44260f73f46591c220010ba3d96",
+      "execution_plan_projected_gate": "UR.G2",
+      "execution_plan_ref": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+      "kind": "ABSENT_NATIVE_STATE_GENESIS"
+    },
+    "consumed_receipts": [
+      "sha256:e8d8c7ffa8c10c3f5d65598a55af12cb0eff99577a486133a11c96eb5c5e5cde",
+      "sha256:5e2d460495fb00519db0a1ce02ccd4fe748a693b42033c8455cb94aee84b36cb"
+    ],
+    "controller_local_completion_ledger": [
+      {
+        "action": "complete_controller_owned_gate",
+        "candidate_sha": "5e40763b63b27873ac2cff30ac10f0eeef5a5469",
+        "completion_metadata_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "evidence_digest": "sha256:3d5b7ce0fb0f4d6e18175f2321c794a76ab06def69703fff6985afca89be4fe1",
+        "gate": "UR.G1",
+        "idempotency_key": "sha256:23157d875934e9e8713dcb0129dbbc39bb392f65eb7b98b50da7a46882fe0946",
+        "next_owner": "EXECUTOR",
+        "receipt": {
+          "action": "complete_controller_owned_gate",
+          "authority_granted": false,
+          "candidate_sha": "5e40763b63b27873ac2cff30ac10f0eeef5a5469",
+          "completion_metadata": {},
+          "completion_metadata_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "evidence": {
+            "PLAN_RECEIPT": {
+              "artifact_type": "native-g1-plan-receipt",
+              "authority_granted": false,
+              "candidate_sha": "5e40763b63b27873ac2cff30ac10f0eeef5a5469",
+              "consumed": false,
+              "decision_ref": "core/node-architect/q0-native-successor-runtime-plan-r2.json",
+              "effect_authority_granted": false,
+              "node_allocation_digest": "sha256:15f2ab7654f58717240df867b1c4a488d867f688f5fe683fe0d217f0627c6252",
+              "node_allocation_id": "scrum781-q0-fresh-20261010-r1:q0.qualification-campaign:native-genesis",
+              "plan_coverage": {
+                "default_route": "PLANNED",
+                "deterministic_replay": "PLANNED",
+                "effect_authority": "PLANNED",
+                "exact_readback": "PLANNED",
+                "fresh_boot": "PLANNED",
+                "node_allocation": "PLANNED",
+                "node_architect_seam": "PLANNED",
+                "recursive_plan_dag_complete": "PLANNED",
+                "restart_recovery": "PLANNED",
+                "runtime_plan": "PLANNED",
+                "self_fix_replay": "PLANNED",
+                "stale_state_fail_closed": "PLANNED",
+                "typed_continuation": "PLANNED"
+              },
+              "provenance_ref": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+              "qualification_results": {},
+              "receipt_digest": "sha256:53f0fe02e632d0662912efc1406f3a068c13621f1450782425cbd40fd9451a32",
+              "run_id": "scrum781-q0-fresh-20261010-r1",
+              "runtime_plan_digest": "sha256:936a1b411ba64f99f350f459534e939a5bd8a63bbadfdeb7afc5250f93a74dba",
+              "schema_id": "gwc.q0.native-g1-plan-receipt.v2",
+              "schema_version": 2,
+              "source_head": "5e40763b63b27873ac2cff30ac10f0eeef5a5469",
+              "work_id": "W6",
+              "work_order": [
+                "W1",
+                "W2",
+                "W3",
+                "W4",
+                "W5",
+                "W6"
+              ]
+            }
+          },
+          "evidence_digest": "sha256:3d5b7ce0fb0f4d6e18175f2321c794a76ab06def69703fff6985afca89be4fe1",
+          "executed_effects": [],
+          "gate": "UR.G1",
+          "idempotency_key": "sha256:23157d875934e9e8713dcb0129dbbc39bb392f65eb7b98b50da7a46882fe0946",
+          "pre_state_digest": "sha256:af0fb88c3557d3ec7520f1ced4f3e1e4f14003d23f73347d9bf18ce5f7af0743",
+          "receipt_digest": "sha256:81b65d6f02379b3c52e38d1a0ac4fb5b4019340ef1d36aff0ed5d4b24bbf4193",
+          "run_id": "scrum781-q0-fresh-20261010-r1",
+          "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+          "runtime_plan_digest": "sha256:936a1b411ba64f99f350f459534e939a5bd8a63bbadfdeb7afc5250f93a74dba",
+          "runtime_protocol": "gwc.universal.controller/v2",
+          "schema_id": "gwc.universal-run.controller-local-completion-receipt.v2",
+          "schema_version": 2,
+          "sequence": 2
+        },
+        "receipt_digest": "sha256:81b65d6f02379b3c52e38d1a0ac4fb5b4019340ef1d36aff0ed5d4b24bbf4193",
+        "run_id": "scrum781-q0-fresh-20261010-r1",
+        "runtime_plan_digest": "sha256:936a1b411ba64f99f350f459534e939a5bd8a63bbadfdeb7afc5250f93a74dba",
+        "sequence": 2,
+        "to_gate": "UR.G2",
+        "transition_ref": "scrum781-q0-fresh-20261010-r1:controller-local-transition:seq2-seq3:sha256:23157d875934e9e8713dcb0129dbbc39bb392f65eb7b98b50da7a46882fe0946",
+        "typed_next": "CONTINUE_UNIVERSAL_LANE_REMEDIATION"
+      }
+    ],
+    "evidence_gap": [
+      "VERIFICATION_RECEIPT"
+    ],
+    "executed_effects": [],
+    "execution_refs": {
+      "base_sha": "8221d463a5a92ae4eeea153f54a65bc28d15519d",
+      "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+      "candidate_sha": "5e40763b63b27873ac2cff30ac10f0eeef5a5469",
+      "cursor_ref": "scrum781-q0-fresh-20261010-r1:UR.G3:seq4",
+      "node_allocation_id": "scrum781-q0-fresh-20261010-r1:q0.qualification-campaign:native-genesis",
+      "node_allocation_ref": "native-genesis://scrum781-q0-fresh-20261010-r1/allocation#record_id=scrum781-q0-fresh-20261010-r1:native-genesis-allocation",
+      "qualification_profile_digest": "sha256:2a37d580c26305b74f742f45d25f4caeafae35da043a3b1307b2aedeac34932c",
+      "runtime_plan_digest": "sha256:936a1b411ba64f99f350f459534e939a5bd8a63bbadfdeb7afc5250f93a74dba"
+    },
+    "gate_evidence": {
+      "EXECUTION_RECEIPT": {
+        "action": "q0_execute_probe",
+        "actor": "EXECUTOR",
+        "artifact_type": "executor-action-receipt",
+        "assignment_digest": "sha256:29bd2c00fd11b8fef4941ace241f5868275389e6842bbff289b649a6366a240a",
+        "authority_granted": false,
+        "event_id": "sha256:62ca8ae3505d7bccb3445280a7bfa5398c657fb05388183a912b3b028b63fb7c",
+        "evidence_refs": {
+          "executor_receipt": "scrum781-q0-fresh-20261010-r1/62ca8ae3505d7bccb3445280/executor-action-receipt.json"
+        },
+        "executed_effects": [],
+        "gate": "UR.G2",
+        "host_result_digest": "sha256:4c2646faa4b017e0c421a0f61eab513f3d389d730d33405b3431a837abd81a52",
+        "host_status": "ACTION_COMPLETE",
+        "node_allocation_id": "scrum781-q0-fresh-20261010-r1:q0.qualification-campaign:native-genesis",
+        "node_id": "q0.qualification-campaign",
+        "receipt_digest": "sha256:5e2d460495fb00519db0a1ce02ccd4fe748a693b42033c8455cb94aee84b36cb",
+        "route_id": "UNIVERSAL_RUN_NEW_RUNTIME",
+        "run_id": "scrum781-q0-fresh-20261010-r1",
+        "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+        "runtime_plan_digest": "sha256:936a1b411ba64f99f350f459534e939a5bd8a63bbadfdeb7afc5250f93a74dba",
+        "runtime_profile_digest": "sha256:c724c6b036a9c0cfae5a5738554d6ee1fc075fa81b6b09e132761cc18df33881",
+        "runtime_protocol": "gwc.universal.controller/v2",
+        "schema_id": "gwc.universal-run.executor-action-receipt.v2",
+        "schema_version": 2,
+        "sequence": 3
+      }
+    },
+    "next_owner": "EXECUTOR",
+    "node_allocation_id": "scrum781-q0-fresh-20261010-r1:q0.qualification-campaign:native-genesis",
+    "node_allocation_ref": "native-genesis://scrum781-q0-fresh-20261010-r1/allocation#record_id=scrum781-q0-fresh-20261010-r1:native-genesis-allocation",
+    "predecessor_sequence": 3,
+    "predecessor_state_digest": "sha256:d689e9b5ffc837189a0392c71ea6638b3e31a41fe4a5b4b5d000c3997b08c51b",
+    "receipt_consumption_ledger": [
+      {
+        "action": "q0_understand",
+        "assignment_digest": "sha256:dc9f7280546537d5719af4822afc7ef22e6370eeb5265e49af26dd54088f4be7",
+        "candidate_sha": "5e40763b63b27873ac2cff30ac10f0eeef5a5469",
+        "gate": "UR.G0",
+        "idempotency_key": "sha256:1e9bf19b8844d0bb2d688e7d7de96cac7fd34465faae4bcd99e4aaba701ebac3",
+        "next_owner": "CONTROLLER",
+        "receipt_digest": "sha256:e8d8c7ffa8c10c3f5d65598a55af12cb0eff99577a486133a11c96eb5c5e5cde",
+        "run_id": "scrum781-q0-fresh-20261010-r1",
+        "runtime_plan_digest": "sha256:936a1b411ba64f99f350f459534e939a5bd8a63bbadfdeb7afc5250f93a74dba",
+        "sequence": 1,
+        "to_gate": "UR.G1",
+        "transition_ref": "scrum781-q0-fresh-20261010-r1:controller-transition:seq1-seq2:sha256:e8d8c7ffa8c10c3f5d65598a55af12cb0eff99577a486133a11c96eb5c5e5cde",
+        "typed_next": "CONTINUE_UNIVERSAL_LANE_REMEDIATION"
+      },
+      {
+        "action": "q0_execute_probe",
+        "assignment_digest": "sha256:29bd2c00fd11b8fef4941ace241f5868275389e6842bbff289b649a6366a240a",
+        "candidate_sha": "5e40763b63b27873ac2cff30ac10f0eeef5a5469",
+        "gate": "UR.G2",
+        "idempotency_key": "sha256:62ca8ae3505d7bccb3445280a7bfa5398c657fb05388183a912b3b028b63fb7c",
+        "next_owner": "EXECUTOR",
+        "receipt_digest": "sha256:5e2d460495fb00519db0a1ce02ccd4fe748a693b42033c8455cb94aee84b36cb",
+        "run_id": "scrum781-q0-fresh-20261010-r1",
+        "runtime_plan_digest": "sha256:936a1b411ba64f99f350f459534e939a5bd8a63bbadfdeb7afc5250f93a74dba",
+        "sequence": 3,
+        "to_gate": "UR.G3",
+        "transition_ref": "scrum781-q0-fresh-20261010-r1:controller-transition:seq3-seq4:sha256:5e2d460495fb00519db0a1ce02ccd4fe748a693b42033c8455cb94aee84b36cb",
+        "typed_next": "MATERIALIZE_UR_G3_VERIFICATION_RECEIPT"
+      }
+    ],
+    "run_id": "scrum781-q0-fresh-20261010-r1",
+    "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+    "runtime_plan_digest": "sha256:936a1b411ba64f99f350f459534e939a5bd8a63bbadfdeb7afc5250f93a74dba",
+    "schema_id": "gwc.universal-run.run-state.v2",
+    "schema_version": 2,
+    "sequence": 4,
+    "state_digest": "sha256:77f804037d7a8a15931903f7d5ee0d6e988c0909cced6185ad8de8cc3cb4cffc",
+    "terminal_state": "OPEN",
+    "typed_next": "MATERIALIZE_UR_G3_VERIFICATION_RECEIPT"
+  },
+  "successor_state_digest": "sha256:77f804037d7a8a15931903f7d5ee0d6e988c0909cced6185ad8de8cc3cb4cffc",
+  "transition_ref": "scrum781-q0-fresh-20261010-r1:controller-transition:seq3-seq4:sha256:5e2d460495fb00519db0a1ce02ccd4fe748a693b42033c8455cb94aee84b36cb",
+  "typed_next": "MATERIALIZE_UR_G3_VERIFICATION_RECEIPT"
+}

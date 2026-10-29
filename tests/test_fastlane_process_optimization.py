@@ -9,11 +9,11 @@ def read(path: str) -> str:
 
 def test_e2e_allows_autonomous_steps_after_g2_but_blocks_merge():
     text = read("core/E2E_DRAFT_PR_DELIVERY_RULE.md")
-    assert "After valid approval, the agent may proceed without requesting confirmation" in text
+    assert "does not need additional approval for each permitted action" in text
     assert "The agent must provide concise progress updates" in text
     assert "Mark the Draft PR ready for review after G3 `PASS`" in text
-    assert "G4 remains a separate human decision" in text
-    assert "Merge or enable auto-merge" in text
+    assert "it is a separate G4 action" in text
+    assert "E2E/G2 does not itself authorize merge" in text
 
 
 def test_fastlane_limits_g2_to_branch_files_pr_and_blocks_higher_gates():
@@ -29,9 +29,9 @@ def test_fastlane_limits_g2_to_branch_files_pr_and_blocks_higher_gates():
 
 def test_chatgpt_overlay_requires_auto_ready_when_supported_then_g4_token():
     text = read("agents/chatgpt-agent/agent-instructions.md")
-    assert "metadata transition from Draft to Ready for review after G3 `PASS`" in text
-    assert "G4 merge remains a separate exact human approval" in text
-    assert "G3 PASS | G4 merge approval request after marking Draft PR ready for review when supported" in text
+    assert "Ready-for-review is G3 metadata completion only" in text
+    assert "This transition is not merge approval" in text
+    assert "G3 PASS | G4 merge approval request" in text
 
 
 def test_dwc_contract_keeps_ready_for_review_as_g3_metadata_only():
@@ -58,5 +58,5 @@ def test_g5_exact_sha_fallback_blocks_pr_only_false_pending():
     assert "CONNECTOR_OBSERVABILITY_INCOMPLETE" in dwc
 
     assert "event=push" in chatgpt
-    assert "fall back to a known `run_id`" in chatgpt
+    assert "post-merge lookup cannot prove the target SHA" in chatgpt
     assert "CONNECTOR_OBSERVABILITY_INCOMPLETE" in chatgpt

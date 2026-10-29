@@ -1,0 +1,420 @@
+{
+  "active_default_branch_rulesets": [
+    {
+      "enforcement": "active",
+      "id": 19370578,
+      "include": [
+        "~DEFAULT_BRANCH"
+      ],
+      "name": "DEAR",
+      "rules": [
+        "deletion",
+        "non_fast_forward"
+      ]
+    }
+  ],
+  "base_sha": "f560db71705d89d0ded2a5efbcaeb4c7c4dafab8",
+  "github_repo_view": {
+    "defaultBranchRef": {
+      "name": "main"
+    },
+    "nameWithOwner": "nhatnguyenquang1838-coder/gwc"
+  },
+  "observed_at": "2026-10-26T11:05:44Z",
+  "protected_base_capture": {
+    "artifact_type": "protected-base-capture",
+    "captured_at": "2026-10-26T11:05:44Z",
+    "commit_authority_granted": false,
+    "decision_digest": "sha256:1ece23744d61979a0f1e2de9ad1b319d7f1c96453b4c85d245a47b3d5526b1cf",
+    "deployment_authority_granted": false,
+    "drift_state": "NONE",
+    "evidence_source": "git ls-remote origin refs/heads/main readback=f560db71705d89d0ded2a5efbcaeb4c7c4dafab8",
+    "merge_authority_granted": false,
+    "next_allowed_nodes": [
+      "intake_context.risk-classification"
+    ],
+    "observed_at": "2026-10-26T11:05:44Z",
+    "outcome": "ACCEPTED",
+    "pr_authority_granted": false,
+    "prior_base_sha": null,
+    "production_authority_granted": false,
+    "protected_base_sha": "f560db71705d89d0ded2a5efbcaeb4c7c4dafab8",
+    "push_authority_granted": false,
+    "read_only_projection": true,
+    "readback_status": "VERIFIED",
+    "reason_code": "BASE_CAPTURED",
+    "reason_codes": [
+      "BASE_CAPTURED"
+    ],
+    "remediation": null,
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "schema_version": "1.0",
+    "task_id": "SCRUM-848",
+    "verified_sha": "f560db71705d89d0ded2a5efbcaeb4c7c4dafab8",
+    "write_authority_granted": false
+  },
+  "repo_identity": {
+    "artifact_type": "repo-identity",
+    "base_sha": "f560db71705d89d0ded2a5efbcaeb4c7c4dafab8",
+    "commit_authority_granted": false,
+    "decision_digest": "sha256:dbc17768634ce29ea18245a74db8446fc68dda68c7eaa5c4187aea314182d5bd",
+    "deployment_authority_granted": false,
+    "identity_match": true,
+    "merge_authority_granted": false,
+    "missing_fields": [],
+    "observed_at": "2026-10-26T11:05:44Z",
+    "observed_identity": {
+      "default_branch": "main",
+      "execution_mode": "MAIN_GOVERNANCE",
+      "name": "gwc",
+      "owner": "nhatnguyenquang1838-coder",
+      "protected_branch": "main"
+    },
+    "outcome": "ACCEPTED",
+    "pr_authority_granted": false,
+    "production_authority_granted": false,
+    "push_authority_granted": false,
+    "read_only_projection": true,
+    "reason_code": "ACCEPTED",
+    "reason_codes": [
+      "ACCEPTED"
+    ],
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "schema_version": "1.0",
+    "task_id": "SCRUM-848",
+    "verified_source": {
+      "default_branch": "main",
+      "execution_mode": "MAIN_GOVERNANCE",
+      "name": "gwc",
+      "owner": "nhatnguyenquang1838-coder",
+      "protected_branch": "main"
+    },
+    "write_authority_granted": false
+  },
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "request_intake": {
+    "artifact_type": "intake-request",
+    "base_sha": "f560db71705d89d0ded2a5efbcaeb4c7c4dafab8",
+    "commit_authority_granted": false,
+    "decision_digest": "sha256:1f2484c41c4516dae80a25fff7d650f50c716dc8ff9b25fea22dc04cde41fb15",
+    "deployment_authority_granted": false,
+    "intent_authority_signals": [],
+    "merge_authority_granted": false,
+    "missing_fields": [],
+    "next_allowed_nodes": [
+      "intake_context.source-resolution",
+      "intake_context.context-gap-escalation"
+    ],
+    "normalized_intake": {
+      "actor": "Nhat Nguyen Quang",
+      "constraints": [
+        "Input must be provided via the canonical request shape.",
+        "Ambiguous or conflicting signals must cause fail-closed rejection.",
+        "Typed intake fields must remain bounded to the existing node family."
+      ],
+      "entry_guards": [
+        "G0_CONTEXT",
+        "read_only"
+      ],
+      "exclusions": [
+        "Production runtime behavior.",
+        "Deployment, migration, or credential operations.",
+        "Broader gate authority beyond G0_CONTEXT."
+      ],
+      "intent": "Produce canonical G0/G1 and request-intake/risk preparation artifacts for the child defect; no source mutation before a valid task-bound Human G2.",
+      "reason_codes": {
+        "INTAKE_ACCEPTED": "INTAKE_ACCEPTED",
+        "INTAKE_AMBIGUOUS_INTENT": "INTAKE_AMBIGUOUS_INTENT",
+        "INTAKE_AUTHORITY_INTENT_DETECTED": "INTAKE_AUTHORITY_INTENT_DETECTED",
+        "INTAKE_HUMAN_REQUIRED": "INTAKE_HUMAN_REQUIRED",
+        "INTAKE_MALFORMED_INPUT": "INTAKE_MALFORMED_INPUT",
+        "INTAKE_MISSING_IDENTITY": "INTAKE_MISSING_IDENTITY",
+        "INTAKE_MISSING_REPOSITORY_INTENT": "INTAKE_MISSING_REPOSITORY_INTENT",
+        "INTAKE_MISSING_REQUESTED_OUTCOME": "INTAKE_MISSING_REQUESTED_OUTCOME",
+        "INTAKE_MISSING_TASK_BINDING": "INTAKE_MISSING_TASK_BINDING",
+        "INTAKE_REPLAY_IDEMPOTENT": "INTAKE_REPLAY_IDEMPOTENT",
+        "INTAKE_SCOPE_DRIFT": "INTAKE_SCOPE_DRIFT"
+      },
+      "repository_intent": "GWC child defect on protected main base; intake and risk path only",
+      "requested_outcome": "Produce canonical G0/G1 and request-intake/risk preparation artifacts for the child defect; no source mutation before a valid task-bound Human G2.",
+      "task": "SCRUM-848"
+    },
+    "observed_at": "2026-10-26T11:05:44Z",
+    "outcome": "ACCEPTED",
+    "pr_authority_granted": false,
+    "production_authority_granted": false,
+    "push_authority_granted": false,
+    "read_only_projection": true,
+    "reason_code": "INTAKE_ACCEPTED",
+    "reason_codes": [
+      "INTAKE_ACCEPTED"
+    ],
+    "remediation": null,
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "request": {
+      "provenance": {
+        "actor": "Nhat Nguyen Quang",
+        "source_ref": "https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-848"
+      },
+      "raw_text": "Provide a canonical, typed, source-bound way to record explicit Human scope direction for a request whose intent is authority-sensitive, so the canonical intake path can proceed to risk classification without dropping or rewriting the original intent and risk signals. The recorded direction resolves scope ambiguity only; it is not an approval, an execution grant, or a risk override, and it must not change the risk class determined by the canonical classifier.",
+      "repository_intent": "GWC child defect on protected main base; intake and risk path only",
+      "requested_outcome": "Produce canonical G0/G1 and request-intake/risk preparation artifacts for the child defect; no source mutation before a valid task-bound Human G2.",
+      "source": "USER",
+      "task_binding": "SCRUM-848"
+    },
+    "schema_version": "1.0",
+    "task_id": "SCRUM-848",
+    "write_authority_granted": false
+  },
+  "risk_policy": {
+    "digest": "sha256:2bb0d2687c3c2224444088ce380b63e858bc560bd7a195469a4266109f818270",
+    "policy_id": "gwc-risk-policy",
+    "required_gate_by_level": {
+      "R0": "G2_AUTOMATIC_BOUNDED",
+      "R1": "G2_AUTOMATIC_BOUNDED",
+      "R2": "G2_HUMAN_DIRECTION",
+      "R3": "G2_HUMAN_DIRECTION"
+    },
+    "rules": {
+      "destructive_operation": {
+        "additional_authority_gates": [],
+        "reason_code": "RISK_DESTRUCTIVE_OPERATION",
+        "risk_flag": "destructive_operation",
+        "risk_level": "R3"
+      },
+      "migration": {
+        "additional_authority_gates": [],
+        "reason_code": "RISK_MIGRATION",
+        "risk_flag": "migration",
+        "risk_level": "R2"
+      },
+      "production_scope": {
+        "additional_authority_gates": [
+          "G6_PRODUCTION_DATA"
+        ],
+        "reason_code": "RISK_PRODUCTION_OPERATION",
+        "risk_flag": "production_scope",
+        "risk_level": "R3"
+      },
+      "release_deployment": {
+        "additional_authority_gates": [
+          "G5_DEPLOY"
+        ],
+        "reason_code": "RISK_RELEASE_DEPLOYMENT",
+        "risk_flag": "release_deployment",
+        "risk_level": "R3"
+      },
+      "repository_change": {
+        "additional_authority_gates": [],
+        "reason_code": "RISK_UNCLASSIFIED",
+        "risk_flag": "bounded_repository_change",
+        "risk_level": "R1"
+      },
+      "schema_change": {
+        "additional_authority_gates": [],
+        "reason_code": "RISK_UNCLASSIFIED",
+        "risk_flag": "schema_change",
+        "risk_level": "R2"
+      },
+      "secret_change": {
+        "additional_authority_gates": [
+          "G6_PRODUCTION_DATA"
+        ],
+        "reason_code": "RISK_SECRET_CHANGE",
+        "risk_flag": "secret_change",
+        "risk_level": "R3"
+      },
+      "workflow_change": {
+        "additional_authority_gates": [],
+        "reason_code": "RISK_UNCLASSIFIED",
+        "risk_flag": "workflow_change",
+        "risk_level": "R2"
+      }
+    },
+    "version": "1.0"
+  },
+  "risk_profile": {
+    "additional_authority_gates": [],
+    "approval_requirements": [
+      "Bounded G2 execution envelope is required before any write.",
+      "Explicit human direction is required before downstream execution."
+    ],
+    "artifact_type": "risk-profile",
+    "base_sha": "f560db71705d89d0ded2a5efbcaeb4c7c4dafab8",
+    "classified_at": "2026-10-26T11:05:44Z",
+    "commit_authority_granted": false,
+    "contract_revision": "risk-classification/v1",
+    "contributing_signals": [
+      {
+        "reason_code": "RISK_UNCLASSIFIED",
+        "risk_flag": "bounded_repository_change",
+        "risk_level": "R1",
+        "signal": "repository_change",
+        "source": "request_intake"
+      },
+      {
+        "reason_code": "RISK_UNCLASSIFIED",
+        "risk_flag": "schema_change",
+        "risk_level": "R2",
+        "signal": "schema_change",
+        "source": "request_intake"
+      },
+      {
+        "reason_code": "RISK_UNCLASSIFIED",
+        "risk_flag": "workflow_change",
+        "risk_level": "R2",
+        "signal": "workflow_change",
+        "source": "request_intake"
+      }
+    ],
+    "decision_digest": "sha256:d16510cd3376869ae8304133cd0bdf7bc4db181e35a1b81b250bf4164f0a98c8",
+    "deployment_authority_granted": false,
+    "merge_authority_granted": false,
+    "next_allowed_nodes": [
+      "intake_context.files-read-scope",
+      "intake_context.files-write-scope"
+    ],
+    "outcome": "ACCEPTED",
+    "policy_provenance": {
+      "digest": "sha256:2bb0d2687c3c2224444088ce380b63e858bc560bd7a195469a4266109f818270",
+      "policy_id": "gwc-risk-policy",
+      "rules_digest": "sha256:e24612053d06495b7d83b77204819d0c0fbca8019b9102f129b364487a4f5b12",
+      "source": "declared-policy",
+      "version": "1.0"
+    },
+    "pr_authority_granted": false,
+    "production_authority_granted": false,
+    "push_authority_granted": false,
+    "read_only_projection": true,
+    "reason_code": "RISK_CLASSIFIED_R2",
+    "reason_codes": [
+      "RISK_CLASSIFIED_R2"
+    ],
+    "remediation": null,
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "required_gate": "G2_HUMAN_DIRECTION",
+    "risk_flags": [
+      "bounded_repository_change",
+      "schema_change",
+      "workflow_change"
+    ],
+    "risk_level": "R2",
+    "schema_version": "1.0",
+    "source_bindings": {
+      "base_sha": "f560db71705d89d0ded2a5efbcaeb4c7c4dafab8",
+      "protected_base_capture": "sha256:1ece23744d61979a0f1e2de9ad1b319d7f1c96453b4c85d245a47b3d5526b1cf",
+      "repo_identity": "sha256:dbc17768634ce29ea18245a74db8446fc68dda68c7eaa5c4187aea314182d5bd",
+      "repository": "nhatnguyenquang1838-coder/gwc",
+      "request_intake": "sha256:1f2484c41c4516dae80a25fff7d650f50c716dc8ff9b25fea22dc04cde41fb15",
+      "source_resolution": "sha256:d524c90193cdb2c1ca3adc2c27b7ee84792dab726fdffadc5268e185c37c787f"
+    },
+    "task_id": "SCRUM-848",
+    "write_authority_granted": false
+  },
+  "schema_validation": {
+    "protected_base_capture": [],
+    "repo_identity": [],
+    "request_intake": [],
+    "risk_profile": [],
+    "source_resolution": []
+  },
+  "source_blob_shas": {
+    "AGENTS.md": "fe0351be65ebe3b08964dcf7ce7ddb5c9b22554e",
+    "core/Agent_Behavior_Semantic_Contract_v1.0.md": "956e557fedee58bc7d6eb2d53c2615524db8b16f",
+    "core/Agent_Operating_Runtime_Contract_v1.0.md": "0c477a509737accb28b022ec3504b4a3151680db",
+    "core/Agent_Response_Presentation_Contract_v1.0.md": "244ba257d995971f5026a86e5668bc8ede8767e2",
+    "core/Coding_Project_Governance_v1.0.md": "ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3",
+    "core/E2E_DRAFT_PR_DELIVERY_RULE.md": "626da4a219aca3d64cd75c1b94d4ec8fe3113859",
+    "core/GATE_LIFECYCLE_CONTRACT_v1.0.md": "c6c8cc254d7b7946f55a8825bb0f58f2451b2a49",
+    "core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md": "51283934bde6df414248dded3ba960cdec5d2b25",
+    "core/node-architect/node-catalog/gate_authority/approval-command-validation.node.json": "e5549c55bf97d614168a62c0c0636901f992ff67",
+    "core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md": "bc116f07b27ae08c2646a73a021e3cf2e06a0362",
+    "core/task-lifecycle/gate-transition-map.yaml": "16eb7c82bca303784ff4326c09196cb8dda317e4",
+    "governance/agent-runtime-profiles/dwc.yaml": "d06ab5631a7888fd09ee44839de48840c8131eb5",
+    "governance/risk-profiles/default.yaml": "351ce67c9bc1cfea180dc4f37d37e4063db590d6",
+    "projects/gwc/project-extension.md": "3d96df8e7d85a3a66c90969b1b9873e6bfdbfd50",
+    "projects/gwc/project-instructions.md": "b1ca598c0b2f4f927b5adaac8f93f08e171a8cfe",
+    "projects/gwc/project-profile.yaml": "487bb5e227b20cd9cde85ad6a17305e8610177dc",
+    "schemas/g2-execution-envelope.schema.json": "b4c3e316c8a0d147db5d62924eed01215252aa50",
+    "schemas/gate-approval-request.schema.json": "214a225fa90ed12e004285c6ff749e10f55647dc",
+    "schemas/gate-approval-validation.schema.json": "2285bc1129f8557d8dfdbd91aa669435663b2c3a",
+    "tests/test_gate_authority_g2_execution_envelope_render_m5.py": "becdf52b3976c013692795157957435f8d03cdb8",
+    "tests/test_gate_authority_m5_family_flow.py": "fa001815c4d523df3a41eb8eb0e491c8ba7e03a7",
+    "tests/test_scrum809_g2_action_vocabulary.py": "9419674ce47ffd39422bf9856a2e6247169c31bc",
+    "tests/test_scrum844_g2_approval_preparation.py": "25ec5a72bba7614dabb08734522c275553b225d9",
+    "tools/node_architect/approval_command_validation.py": "d1723fe8b9a4f5f602e9efa70b19eff8bb718f7f",
+    "tools/node_architect/approval_token_generation.py": "380a54a8594a5bc2b0dbe620260c13d365326767",
+    "tools/node_architect/authority_boundary_check.py": "d0980b2f0aeb45faf2e8d160582d1219b80b876e",
+    "tools/node_architect/evidence_artifact_map.py": "5fe705e9853c4bf1e6d06cc9e9de88bee561665a",
+    "tools/node_architect/g2_approval_preparation.py": "3f0418dac84d79366c39f0cc26d76415cee7db05",
+    "tools/node_architect/g2_execution_envelope_render.py": "0632da12ae2ec436587af86e6a9a89a4a4d112a9",
+    "tools/node_architect/gate_state_resolution.py": "db168113aab1f099c63126cc2a80f209ba1a400c",
+    "tools/node_architect/risk_classification.py": "3e7eb851ac736540ebbad9a8d0578d0664b9b05a",
+    "tools/node_architect/scope_hash_calculation.py": "fef7239da476f5e2bc3791785b7a296453a53b76"
+  },
+  "source_resolution": {
+    "artifact_type": "source-resolution",
+    "authoritative_source": {
+      "domain": "REPO",
+      "path": "AGENTS.md",
+      "precedence": 10,
+      "provenance_origin": "git-object-readback",
+      "ref": "main@f560db71705d89d0ded2a5efbcaeb4c7c4dafab8",
+      "sha": "fe0351be65ebe3b08964dcf7ce7ddb5c9b22554e",
+      "source_class": "REPO_INSTRUCTION",
+      "source_id": "gwc-protected-base-agents"
+    },
+    "base_sha": "f560db71705d89d0ded2a5efbcaeb4c7c4dafab8",
+    "commit_authority_granted": false,
+    "decision_digest": "sha256:cf6138031dbccd5dad15d5e1666258334d04c283b2d3dd0faa10bc7c45578d76",
+    "declared_mode": "REPO",
+    "deployment_authority_granted": false,
+    "invalidated_evidence": [],
+    "merge_authority_granted": false,
+    "next_allowed_nodes": [
+      "intake_context.repo-identity-check",
+      "intake_context.context-gap-escalation"
+    ],
+    "observed_at": "2026-10-26T11:05:44Z",
+    "outcome": "ACCEPTED",
+    "pr_authority_granted": false,
+    "production_authority_granted": false,
+    "push_authority_granted": false,
+    "read_only_projection": true,
+    "reason_code": "SOURCE_ACCEPTED",
+    "reason_codes": [
+      "SOURCE_ACCEPTED"
+    ],
+    "rejected_alternatives": [],
+    "remediation": null,
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "schema_version": "1.0",
+    "selected_sources": [
+      {
+        "domain": "REPO",
+        "path": "AGENTS.md",
+        "precedence": 10,
+        "provenance_origin": "git-object-readback",
+        "ref": "main@f560db71705d89d0ded2a5efbcaeb4c7c4dafab8",
+        "sha": "fe0351be65ebe3b08964dcf7ce7ddb5c9b22554e",
+        "source_class": "REPO_INSTRUCTION",
+        "source_id": "gwc-protected-base-agents"
+      },
+      {
+        "domain": "REPO",
+        "path": "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+        "precedence": 20,
+        "provenance_origin": "git-object-readback",
+        "ref": "main@f560db71705d89d0ded2a5efbcaeb4c7c4dafab8",
+        "sha": "c6c8cc254d7b7946f55a8825bb0f58f2451b2a49",
+        "source_class": "REPO_CORE_CONTRACT",
+        "source_id": "gwc-gate-lifecycle-contract"
+      }
+    ],
+    "source_mode": "REPO",
+    "source_set_digest": "sha256:d524c90193cdb2c1ca3adc2c27b7ee84792dab726fdffadc5268e185c37c787f",
+    "task_id": "SCRUM-848",
+    "write_authority_granted": false
+  },
+  "task_id": "SCRUM-848"
+}

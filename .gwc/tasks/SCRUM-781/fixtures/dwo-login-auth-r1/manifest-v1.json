@@ -1,0 +1,46 @@
+{
+  "schema_id": "gwc.q0.dwo-login-fixture-suite/v1",
+  "suite_id": "DWO-LOGIN-AUTH-R1-RECONSTRUCTED-V1",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+  "gate": "UR.G2",
+  "auth_contract": "DWO_LOGIN_AUTH_V1_REQUIREMENTS",
+  "dwo_projection_mode": "READ_ONLY",
+  "source_binding": {
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+    "baseline_sha": "93767709a148e137f60f7e3458c0872d076943dd",
+    "runtimeplan_path": "core/node-architect/scrum781-q0-fresh-execution-plan-r2.json",
+    "runtimeplan_sha256": "ac8e8b855d5564ec9e503f965cd73deb60b546caf70a7304c43140a315422500"
+  },
+  "incident": {
+    "parent_id": "DWO-LOGIN-AUTH-R1",
+    "original_trace_status": "MISSING",
+    "provenance_class": "RECONSTRUCTED_REQUIREMENTS_BOUND",
+    "authentic_incident_replay": false,
+    "original_failure_reproduced": false
+  },
+  "oracle_sources": [
+    {
+      "id": "DWO_NOTION_ARCH_20260913",
+      "url": "https://app.notion.com/p/3d907c1c65b6814d87d4c296e592222b",
+      "scope": "Sections 9.1–9.4, 10: auth, SSR, guarded routes, redirect, logout, generic errors; approved design, not observed runtime"
+    },
+    {
+      "id": "SCRUM_780",
+      "url": "https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-780",
+      "scope": "Supabase email/password, /runs protection, SSR session, logout; excludes signup/OAuth/MFA/RBAC"
+    }
+  ],
+  "scenario_count": 16,
+  "scenarios_sha256": "462e7fe30fac5189bb13410bd9f156533084d88292528f9f2b27715015282145",
+  "redaction": "All addresses use reserved .invalid example namespace; no real passwords, tokens, cookies, Supabase key, customer identifiers or session IDs.",
+  "limitations": [
+    "Requirements-derived model only; no DWO app or Supabase network call",
+    "GWC route probe is native v2 epoch route only, not a live NodeAllocation or authority receipt",
+    "LangGraph route tests are process-local mechanics and do not certify a protected effect",
+    "No original incident trace, actual RED, DWO functional end-to-end, Q0 LOAD_PROOF or L3 certification"
+  ],
+  "expected_run": "python -m scripts.scrum781_q0_login_fixture --engine native",
+  "expected_graph": "python -m scripts.scrum781_q0_login_fixture --engine langgraph"
+}

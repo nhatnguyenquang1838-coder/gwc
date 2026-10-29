@@ -1,0 +1,112 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-10-26T11:05:44Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-848
+  base_sha: f560db71705d89d0ded2a5efbcaeb4c7c4dafab8
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: Canonical G2 preparation currently rejects R3 and advanced-HEAD scope;
+    child defect must preserve source-bound R2/R3 classification and non-authorizing
+    pending behavior.
+  why_now: 'Human-directed COMMAND #311 requires this bootstrap defect to be isolated,
+    risk-classified and prepared on main@f560 before any source write.'
+desired_outcome: Produce a validated child G0/G1 package and, only if canonical risk
+  classification and existing preparation pass, a non-authorizing G2 pending request/envelope
+  for the bounded bootstrap repair.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - GWC Node Architect G2 approval-preparation producer
+  - GWC gate approval request/envelope consumers
+scope:
+  in_scope:
+  - tools/node_architect/g2_approval_preparation.py
+  - tests/test_scrum844_g2_approval_preparation.py
+  - task-scoped G0/G1/G2 artifacts under .gwc/tasks/SCRUM-847
+  non_goals:
+  - SCRUM-846 source edits
+  - SCRUM-781/Q0 source or cursor work
+  - 'PR #609/#613 source integration'
+  - alternate or legacy issuer
+  - commit/push/PR update before later applicable gate
+  - main write, merge, deploy, production, secret, migration, or destructive operation
+constraints:
+- Canonical base is main@f560db71705d89d0ded2a5efbcaeb4c7c4dafab8
+- Proposed implementation head remains equal to base during G0/G1 and G2 preparation
+- No branch/worktree creation or source write before a valid Human G2
+- Use canonical risk classifier without forcing a class
+- No agent child dispatch
+assumptions:
+- The active GitHub DEAR ruleset applies to the default branch; its observed rules
+  are deletion and non_fast_forward only, while GWC policy independently prohibits
+  main writes.
+- The local Q0 worktree at 29b58922 is excluded from trusted child analysis; source
+  authority comes from the exact remote protected-base readback.
+risks:
+- description: Caller-supplied or stale HEAD could be mistaken for a trusted advanced-HEAD
+    observation.
+  id: RISK-1
+  impact: high
+  mitigation: Require a source-bound host-observed HEAD seam; reject stale or foreign
+    branch/head bindings.
+- description: A risk downgrade or hardcoded R2 can incorrectly prepare an approval
+    request.
+  id: RISK-2
+  impact: high
+  mitigation: Use only canonical producer outputs and recompute policy-bound classification;
+    preserve false authority flags.
+- description: UA graph metadata is stale relative to main@f560, so graph coverage
+    is UNKNOWN.
+  id: RISK-3
+  impact: medium
+  mitigation: Use exact-SHA source/import/caller scan and report graph-derived impact
+    as unavailable, not low.
+acceptance_criteria:
+- id: AC-1
+  statement: G0/G1 artifacts validate against schemas at the exact main@f560 source
+    baseline.
+  verifiable: true
+- id: AC-2
+  statement: Canonical risk classifier output is accepted only from real intake/source/repository/protected-base
+    producer outputs; no risk class is forced.
+  verifiable: true
+- id: AC-3
+  statement: Canonical G2 preparation either emits a task-bound AWAITING_APPROVAL
+    request/envelope with all authority flags false, or a precise blocked reason.
+  verifiable: true
+- id: AC-4
+  statement: No branch/worktree creation or source write occurs before a valid task-bound
+    Human G2.
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - create_guarded_branch
+  - modify_scoped_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+  - monitor_ci
+  - repair_repository_fixable_ci
+  - independent_g3_review
+  - mark_pr_ready_for_review_after_g3_pass
+  downstream_non_goals:
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_config_change
+  - credential_rotation
+  - production_data_access
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+    - g3_delivery_record_pass
+    - current_pr_head_sha_match
+    - required_ci_success
+    - review_closure_non_stale
+    - scope_drift_false
+unresolved_questions: []
+status: READY

@@ -1,0 +1,92 @@
+{
+  "schema_id": "gwc.legacy-runtime-quarantine-manifest.v1",
+  "schema_version": 1,
+  "runtime_family": "GWC_V1",
+  "load_by_default": false,
+  "runtime_authority": "NONE",
+  "fallback": "GWC_RUNTIME_DEFECT",
+  "replay_policy": "EXPLICIT_HISTORICAL_PROFILE_ONLY",
+  "quarantine_reason": "Historical GWC v1 runtime/governance is evidence only and is excluded from Universal v2 boot, lifecycle, authority, and control decisions.",
+  "quarantined_sources": [
+    {
+      "source_path": "tools/node_architect/agent_runtime_entrypoint.py",
+      "archive_path": "legacy/gwc-v1/sources/tools/node_architect/agent_runtime_entrypoint.py",
+      "sha256": "2bafacc3e762a176ed3361f6485beb933faf98b1498c8a4530ec393811623729"
+    },
+    {
+      "source_path": "tools/node_architect/live_runtime_bridge.py",
+      "archive_path": "legacy/gwc-v1/sources/tools/node_architect/live_runtime_bridge.py",
+      "sha256": "76167b95f521753171bfa844e2f8288b087d40e97912dd4a569a6c95494617d1"
+    },
+    {
+      "source_path": "tools/node_architect/universal_run_continuation.py",
+      "archive_path": "legacy/gwc-v1/sources/tools/node_architect/universal_run_continuation.py",
+      "sha256": "2befc020b9afb79f55b25edbd50a9cf06e31c13682f4d62572740e4a9aa5a55d"
+    },
+    {
+      "source_path": "tools/node_architect/universal_run_legacy.py",
+      "archive_path": "legacy/gwc-v1/sources/tools/node_architect/universal_run_legacy.py",
+      "sha256": "d9f24ea430ad25e43d685aa60d0311cac2fdb2b3c327f2411cd198882ad0dc5c"
+    },
+    {
+      "source_path": "schemas/node-architect/universal-run/child-run-materialization-receipt.schema.json",
+      "archive_path": "legacy/gwc-v1/schemas/node-architect/universal-run/child-run-materialization-receipt.schema.json",
+      "sha256": "cbe2ad451722ecb4b457fa399040b3069d3d9b34810c66dac584afb58968bf97"
+    },
+    {
+      "source_path": "schemas/node-architect/universal-run/context-snapshot.schema.json",
+      "archive_path": "legacy/gwc-v1/schemas/node-architect/universal-run/context-snapshot.schema.json",
+      "sha256": "6026ed821f7128a351b4d91ae92ba8c67dee3e80b8253d8120ed44d37e08ab27"
+    },
+    {
+      "source_path": "schemas/node-architect/universal-run/lifecycle-transition.schema.json",
+      "archive_path": "legacy/gwc-v1/schemas/node-architect/universal-run/lifecycle-transition.schema.json",
+      "sha256": "dcd739f84ad38c5d4bc523d4a8607d1e2f1a34a8ab906f65173e79793c6e1438"
+    },
+    {
+      "source_path": "schemas/node-architect/universal-run/node-allocation.schema.json",
+      "archive_path": "legacy/gwc-v1/schemas/node-architect/universal-run/node-allocation.schema.json",
+      "sha256": "f04dcb6782d2b8ec35a43ffce938b725604c96dda70a0f60d76396bafc6765de"
+    },
+    {
+      "source_path": "schemas/node-architect/universal-run/record-envelope.schema.json",
+      "archive_path": "legacy/gwc-v1/schemas/node-architect/universal-run/record-envelope.schema.json",
+      "sha256": "921314b90356ddf10c1872693733ac905ac3fc8a52ef7d55cfd6bd797ca9bda2"
+    },
+    {
+      "source_path": "schemas/node-architect/universal-run/run-manifest-revision.schema.json",
+      "archive_path": "legacy/gwc-v1/schemas/node-architect/universal-run/run-manifest-revision.schema.json",
+      "sha256": "dffc9b6bd9f5f8edb364d7ed42ad2c324139e053c735fc55be1c9a70e147238c"
+    },
+    {
+      "source_path": "schemas/node-architect/universal-run/run-state-record.schema.json",
+      "archive_path": "legacy/gwc-v1/schemas/node-architect/universal-run/run-state-record.schema.json",
+      "sha256": "a590f46d99f70dfca009648d8ddb95ecf11416fcc1201f427def2a4f8862b416"
+    },
+    {
+      "source_path": "tests/test_universal_run_execution.py",
+      "archive_path": "legacy/gwc-v1/sources/tests/test_universal_run_execution.py",
+      "sha256": "8a03e1236bab952fb6ea961e4a594d32cc6d60c32b1f9219ca99a271e5ee8f79"
+    },
+    {
+      "source_path": "tests/test_universal_run_legacy_v1.py",
+      "archive_path": "legacy/gwc-v1/sources/tests/test_universal_run_legacy_v1.py",
+      "sha256": "fc605ec0f29471e7a1fdcf237eb24a5c24cda0e2fcef070e2cc0d28fd3aaf585"
+    },
+    {
+      "source_path": "tests/test_scrum_566_w13_live_runtime_bridge.py",
+      "archive_path": "legacy/gwc-v1/sources/tests/test_scrum_566_w13_live_runtime_bridge.py",
+      "sha256": "7f8a6e87d0c3aa09fea50216229c515c7bbe870524db66d98b34e8915a97db5e"
+    },
+    {
+      "source_path": "tests/test_universal_run_continuation_v2.py",
+      "archive_path": "legacy/gwc-v1/sources/tests/test_universal_run_continuation_v2.py",
+      "sha256": "1790f74ee745e20da1e7d0d8d4265396ecab65e6c0f217b54ca90918f86f4910"
+    },
+    {
+      "source_path": "tests/test_scrum_566_agent_runtime_production_entrypoint.py",
+      "archive_path": "legacy/gwc-v1/sources/tests/test_scrum_566_agent_runtime_production_entrypoint.py",
+      "sha256": "97d184727539c05b95839dac5a311483e34584139152ae5ea0bb2539061352ff"
+    }
+  ]
+}

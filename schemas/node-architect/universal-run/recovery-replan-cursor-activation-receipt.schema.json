@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gwc.dev/schemas/node-architect/universal-run/v2/recovery-replan-cursor-activation-receipt.schema.json",
+  "title": "Universal V2 recovery-replan cursor activation receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id", "schema_version", "activation_result", "authorization_digest", "checkpoint_ref",
+    "prior_checkpoint_file_sha256", "corrupt_incident_archive_ref", "corrupt_incident_archive_file_sha256",
+    "recovery_generation_ref", "recovery_generation_file_sha256", "checkpoint_readback_file_sha256",
+    "run_id", "runtime_plan_digest", "candidate_sha", "sequence", "active_gate", "next_owner",
+    "typed_next", "state_digest", "authority_granted", "executed_effects", "receipt_digest"
+  ],
+  "properties": {
+    "schema_id": {"const": "gwc.universal-run.recovery-replan-cursor-activation-receipt.v2"},
+    "schema_version": {"const": 2},
+    "activation_result": {"const": "INSTALLED"},
+    "authorization_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "checkpoint_ref": {"type": "string", "minLength": 1},
+    "prior_checkpoint_file_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "corrupt_incident_archive_ref": {"type": "string", "minLength": 1},
+    "corrupt_incident_archive_file_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "recovery_generation_ref": {"type": "string", "minLength": 1},
+    "recovery_generation_file_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "checkpoint_readback_file_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "run_id": {"type": "string", "minLength": 1},
+    "runtime_plan_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "candidate_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "sequence": {"const": 15},
+    "active_gate": {"const": "UR.G2"},
+    "next_owner": {"const": "EXECUTOR"},
+    "typed_next": {"const": "EXECUTE_Q0_R7_UR_G2_REPLAY_PROBE"},
+    "state_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "authority_granted": {"const": false},
+    "executed_effects": {"const": []},
+    "receipt_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

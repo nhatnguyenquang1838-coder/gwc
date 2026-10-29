@@ -4,9 +4,10 @@
 The graph (frozen SCRUM-841) emits a data-only ``native_loop_settlement_request``
 with a stable idempotency key (``{operation_id}:M7:settlement``). The Hermes
 host owns the actual native LoopManager settlement call; this reconciler is the
-host-side guard that guarantees the native settlement is invoked **exactly
-once per idempotency key**, persisting a durable ledger receipt so a replay
-after crash/resume is a no-op.
+host-side at-most-once invocation guard. A durable pre-effect intent plus a
+serialized ledger prevents blind retries; ambiguous outcomes require independent
+native readback. This alone is not a transaction with the scheduler and does not
+prove end-to-end exactly-once semantics.
 
 Hermes core is out of scope: the native settlement function is injected by the
 caller (the harness passes the live LoopManager settlement adapter). No Hermes
@@ -68,7 +69,14 @@ def _write_ledger(path: Path, payload: dict[str, Any]) -> None:
     try:
         with os.fdopen(tmp_fd, "w", encoding="utf-8") as handle:
             handle.write(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+            handle.flush()
+            os.fsync(handle.fileno())
         os.replace(tmp_path, str(path))
+        directory_fd = os.open(str(path.parent), os.O_RDONLY)
+        try:
+            os.fsync(directory_fd)
+        finally:
+            os.close(directory_fd)
     except BaseException:
         try:
             os.unlink(tmp_path)
@@ -121,6 +129,25 @@ class LoopSettlementReconciler:
         settlement_request: Mapping[str, Any],
         native_settlement: Callable[[Mapping[str, Any]], Any],
     ) -> dict[str, Any]:
+        """Serialize cross-process claims; ambiguous intent requires readback."""
+        import fcntl
+        _require_idempotency_key(settlement_request)
+        self.ledger_path.parent.mkdir(parents=True, exist_ok=True)
+        with self.ledger_path.with_suffix(self.ledger_path.suffix + ".lock").open("a+") as lock:
+            try:
+                fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError as exc:
+                raise SettlementReconcilerError("SETTLEMENT_BUSY") from exc
+            try:
+                return self._settle_locked(settlement_request, native_settlement)
+            finally:
+                fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+
+    def _settle_locked(
+        self,
+        settlement_request: Mapping[str, Any],
+        native_settlement: Callable[[Mapping[str, Any]], Any],
+    ) -> dict[str, Any]:
         """Invoke the native LoopManager settlement at most once per key.
 
         Returns ``{"outcome": "SETTLED", "invoked": True, "receipt": ...}`` on
@@ -144,6 +171,16 @@ class LoopSettlementReconciler:
                 "receipt": dict(existing),
             }
 
+        if isinstance(existing, Mapping) and existing.get("settled") is not True:
+            raise SettlementReconcilerError("SETTLEMENT_UNKNOWN_OUTCOME_REQUIRES_READBACK")
+        # Persist intent before the callback. A crash/exception after this point
+        # is ambiguous, never permission to repeat the native effect.
+        ledger["settlements"][key] = {
+            "settled": False,
+            "state": "INTENT_RECORDED",
+            "request_digest": _digest(dict(settlement_request)),
+        }
+        _write_ledger(self.ledger_path, ledger)
         native_result = native_settlement(dict(settlement_request))
         if not _is_verified(native_result):
             raise SettlementReconcilerError("SETTLEMENT_NATIVE_RESULT_UNVERIFIED")

@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "evidence_class": "ENGINEERING_NATIVE_COVERAGE_ADD_NOT_NATIVE_GATE_RECEIPT",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "session_id": "20261014_021304_0dc728",
+  "native_tick": 98,
+  "source_head": "c58a180",
+  "collected_at": "2026-10-18T23:55:00Z",
+  "native_preflight": "ENGINEERING_PREFLIGHT_PASS",
+  "finding": "Q0_MATERIALIZER_SYMLINK_BRANCH_ZERO_COVERAGE",
+  "diagnosis": {
+    "gap": "The Q0_VERIFICATION_RECEIPT_PATH_SYMLINK fail-closed branch in materialize_q0_verification_receipt had ZERO test coverage. The materializer must never follow a symlink when writing an immutable receipt; a symlink at the target path must fail closed. No test exercised this branch.",
+    "not_a_code_defect": true,
+    "not_a_failure": true
+  },
+  "repair": {
+    "file": "tests/test_scrum781_q0_verify_functions_coverage.py",
+    "change": "Added test_materialize_q0_verification_receipt_rejects_symlink_target: creates a real sealed verification receipt, points a symlink at the target path, and asserts materialize_q0_verification_receipt fails closed with Q0_VERIFICATION_RECEIPT_PATH_SYMLINK.",
+    "green_verified": true,
+    "focused_suite": "tests/test_scrum781_q0_verify_functions_coverage.py: 9 passed"
+  },
+  "wide_suite": {
+    "command": "pytest tests/ --ignore=tests/test_g2-execution-library.py",
+    "passed": 3748,
+    "failed": 16,
+    "skipped": 7,
+    "subtests_passed": 576,
+    "new_tests_added": 1,
+    "new_failure_ids": 0,
+    "excluded_file": "tests/test_g2-execution-library.py — tracked Markdown file with .py suffix breaks unfiltered pytest collection; unchanged at parent HEAD, excluded by name only, not a repository pytest PASS"
+  },
+  "remaining_failures": {
+    "count": 16,
+    "classification": "LEGACY_GATE_FIXTURE_REJECTED_BY_V2",
+    "modules": [
+      "tests.test_agent_runtime_entrypoint_m1_m7 (1)",
+      "tests.test_scrum_566_agent_host_wiring (4)",
+      "tests.test_scrum_566_agent_runtime_loop (11)"
+    ],
+    "all_reproduced_in_prior_q0_baseline": true,
+    "all_closed": false,
+    "note": "All 16 are legacy v1 host/gate fixtures that the Universal V2 quarantine intentionally rejects (ValueError: UNIVERSAL_GATE_INVALID from live_runtime_bridge GATES allowlist). No new failure IDs introduced across ticks 89-98."
+  },
+  "foreign_files_preserved": 6,
+  "hashes_intact": true,
+  "single_writer": true,
+  "no_new_branch": true,
+  "no_core_or_plugin_edit": true,
+  "no_destructive_action": true,
+  "no_merge_or_deploy": true,
+  "m1_hold_unchanged": true,
+  "never_claimed": [
+    "LOAD_PROOF",
+    "original replay",
+    "L3",
+    "native gate receipt"
+  ]
+}

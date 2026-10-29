@@ -1,0 +1,177 @@
+{
+  "node_allocation": {
+    "child_instance_policy": "SINGLE_ACTIVE",
+    "condition_ref": null,
+    "content_digest": {
+      "algorithm": "sha256",
+      "canonicalization": "JCS",
+      "value": "15f2ab7654f58717240df867b1c4a488d867f688f5fe683fe0d217f0627c6252"
+    },
+    "control_justification": null,
+    "created_at": "2026-10-25T11:23:44.605665+00:00",
+    "created_by": {
+      "command_ref": "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6396648368",
+      "profile": "DWA",
+      "session_id": "20261014_021304_0dc728"
+    },
+    "independent_boundary_reasons": [],
+    "kind": "WORK",
+    "lifecycle_profile": {
+      "id": "gwc.universal-run.v2",
+      "version": 2
+    },
+    "node_allocation_id": "scrum781-q0-fresh-20261010-r1:q0.qualification-campaign:native-genesis",
+    "provenance": {
+      "predecessor_refs": [],
+      "source_refs": [
+        "q0.qualification-campaign",
+        "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+        "5e40763b63b27873ac2cff30ac10f0eeef5a5469"
+      ]
+    },
+    "record_id": "scrum781-q0-fresh-20261010-r1:native-genesis-allocation",
+    "requirement": "REQUIRED",
+    "run_id": "scrum781-q0-fresh-20261010-r1",
+    "schema_id": "gwc.universal-run.node-allocation.v2",
+    "schema_version": 2
+  },
+  "profile": {
+    "controller_entrypoint": "tools.node_architect.universal_run_controller:UniversalController",
+    "default_entrypoint": "tools.node_architect.agent_runtime_cli:main",
+    "executor_entrypoint": "tools.node_architect.universal_run_execution:UniversalExecutor",
+    "legacy_gwc_v1": {
+      "authority": "NONE",
+      "fallback": "GWC_RUNTIME_DEFECT",
+      "load_by_default": false,
+      "replay_policy": "EXPLICIT_HISTORICAL_PROFILE_ONLY"
+    },
+    "lifecycle_gates": [
+      "UR.G0",
+      "UR.G1",
+      "UR.G2",
+      "UR.G3",
+      "UR.G4",
+      "UR.G5",
+      "UR.G6"
+    ],
+    "lifecycle_profile": {
+      "id": "gwc.universal-run.v2",
+      "version": 2
+    },
+    "profile_digest": "sha256:c724c6b036a9c0cfae5a5738554d6ee1fc075fa81b6b09e132761cc18df33881",
+    "q0_qualification_profile_ref": "core/node-architect/q0-live-qualification-profile.json",
+    "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+    "runtime_family": "UNIVERSAL_V2",
+    "runtime_protocol": "gwc.universal.controller/v2",
+    "schema_id": "gwc.universal-runtime.default-profile.v2",
+    "schema_version": 2
+  },
+  "run_state": {
+    "active_gate": "UR.G0",
+    "authority_granted": false,
+    "bootstrap_provenance": {
+      "created_at": "2026-10-25T11:23:44.605665+00:00",
+      "created_by": {
+        "command_ref": "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6396648368",
+        "profile": "DWA",
+        "session_id": "20261014_021304_0dc728"
+      },
+      "execution_plan_digest": "sha256:610dbfe1686388590c6e958a35fddf25ae60c44260f73f46591c220010ba3d96",
+      "execution_plan_projected_gate": "UR.G2",
+      "execution_plan_ref": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+      "kind": "ABSENT_NATIVE_STATE_GENESIS"
+    },
+    "consumed_receipts": [],
+    "evidence_gap": [
+      "UNDERSTANDING_RECEIPT"
+    ],
+    "executed_effects": [],
+    "execution_refs": {
+      "base_sha": "8221d463a5a92ae4eeea153f54a65bc28d15519d",
+      "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+      "candidate_sha": "5e40763b63b27873ac2cff30ac10f0eeef5a5469",
+      "node_allocation_id": "scrum781-q0-fresh-20261010-r1:q0.qualification-campaign:native-genesis",
+      "node_allocation_ref": "native-genesis://scrum781-q0-fresh-20261010-r1/allocation#record_id=scrum781-q0-fresh-20261010-r1:native-genesis-allocation",
+      "qualification_profile_digest": "sha256:2a37d580c26305b74f742f45d25f4caeafae35da043a3b1307b2aedeac34932c",
+      "runtime_plan_digest": "sha256:936a1b411ba64f99f350f459534e939a5bd8a63bbadfdeb7afc5250f93a74dba"
+    },
+    "gate_evidence": {},
+    "next_owner": "EXECUTOR",
+    "node_allocation_id": "scrum781-q0-fresh-20261010-r1:q0.qualification-campaign:native-genesis",
+    "node_allocation_ref": "native-genesis://scrum781-q0-fresh-20261010-r1/allocation#record_id=scrum781-q0-fresh-20261010-r1:native-genesis-allocation",
+    "run_id": "scrum781-q0-fresh-20261010-r1",
+    "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+    "runtime_plan_digest": "sha256:936a1b411ba64f99f350f459534e939a5bd8a63bbadfdeb7afc5250f93a74dba",
+    "schema_id": "gwc.universal-run.run-state.v2",
+    "schema_version": 2,
+    "sequence": 1,
+    "state_digest": "sha256:758819900d91c77f9e40230345cc481c725402b3b820ece6e8b5c706397a3e32",
+    "terminal_state": "OPEN",
+    "typed_next": "EXECUTE_Q0_UNDERSTANDING"
+  },
+  "runtime_plan": {
+    "dag": {
+      "nodes": [
+        {
+          "id": "NATIVE-PLAN-ACTIVATION",
+          "predecessors": []
+        },
+        {
+          "id": "W1",
+          "predecessors": [
+            "NATIVE-PLAN-ACTIVATION"
+          ]
+        },
+        {
+          "id": "W2",
+          "predecessors": [
+            "W1"
+          ]
+        },
+        {
+          "id": "W3",
+          "predecessors": [
+            "W2"
+          ]
+        },
+        {
+          "id": "W4",
+          "predecessors": [
+            "W3"
+          ]
+        },
+        {
+          "id": "W5",
+          "predecessors": [
+            "W4"
+          ]
+        },
+        {
+          "id": "W6",
+          "predecessors": [
+            "W5"
+          ]
+        }
+      ]
+    },
+    "digest": "sha256:936a1b411ba64f99f350f459534e939a5bd8a63bbadfdeb7afc5250f93a74dba",
+    "node_allocations": [
+      "scrum781-q0-fresh-20261010-r1:q0.qualification-campaign:native-genesis"
+    ],
+    "previous_digest": null,
+    "qualification_profile_digest": "sha256:2a37d580c26305b74f742f45d25f4caeafae35da043a3b1307b2aedeac34932c",
+    "revision": 1,
+    "run_id": "scrum781-q0-fresh-20261010-r1",
+    "runtime_default_profile_digest": "sha256:c724c6b036a9c0cfae5a5738554d6ee1fc075fa81b6b09e132761cc18df33881",
+    "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+    "schema_id": "gwc.universal-run.runtime-plan.v2",
+    "schema_version": 2,
+    "source_binding": {
+      "base_sha": "8221d463a5a92ae4eeea153f54a65bc28d15519d",
+      "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+      "pre_head_sha": "5e40763b63b27873ac2cff30ac10f0eeef5a5469",
+      "repository": "nhatnguyenquang1838-coder/gwc"
+    },
+    "target_contract_ref": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json"
+  }
+}

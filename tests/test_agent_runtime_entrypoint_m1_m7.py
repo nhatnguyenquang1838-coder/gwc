@@ -179,4 +179,3 @@ def test_checkpoint_resume_reuses_same_operation_and_does_not_duplicate_host_act
     resumed_checkpoint = next(iter(resumed_store["checkpoints"].values()))
     assert resumed_store["revision"] == 2
     assert resumed_checkpoint["state"]["current_activity"] == "M7"
-

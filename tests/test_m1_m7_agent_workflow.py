@@ -612,6 +612,3 @@ def test_m7_emits_data_only_settlement_request_for_qualified_host():
     assert result["authority_granted"] is False
     assert "complete_tick" not in result
     assert result["checkpoint_projection"]["gate_readout"] == {"G1": "PASSED", "G2": "ACTIVE"}
-
-
-

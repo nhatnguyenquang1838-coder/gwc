@@ -21,7 +21,7 @@ from tools.node_architect.universal_run_kernel import (
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_ROOT = ROOT / "schemas" / "node-architect" / "universal-run"
-PROFILE = {"id": "gwc.universal-run", "version": 1}
+PROFILE = {"id": "gwc.universal-run.v2", "version": 2}
 
 
 def _record() -> dict:
@@ -91,7 +91,7 @@ class RecordEnvelopeTests(unittest.TestCase):
 
     def test_unknown_lifecycle_version_fails_closed(self):
         raw = _record()
-        raw["lifecycle_profile"] = {"id": "gwc.universal-run", "version": 2}
+        raw["lifecycle_profile"] = {"id": "gwc.universal-run.v2", "version": 1}
         with self.assertRaises(UniversalRunKernelError) as ctx:
             seal_immutable_record(raw)
         self.assertEqual(ctx.exception.code, "LIFECYCLE_PROFILE_UNSUPPORTED")
@@ -105,67 +105,67 @@ class RecordEnvelopeTests(unittest.TestCase):
 class LifecycleTests(unittest.TestCase):
     def test_initial_state_starts_at_g0_only(self):
         state = initial_run_state(PROFILE)
-        self.assertEqual(state["gate_states"]["G0"], "ACTIVE")
-        self.assertTrue(all(state["gate_states"][g] == "NOT_STARTED" for g in ("G1", "G2", "G3", "G4", "G5", "G6")))
+        self.assertEqual(state["gate_states"]["UR.G0"], "ACTIVE")
+        self.assertTrue(all(state["gate_states"][g] == "NOT_STARTED" for g in ("UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6")))
         self.assertEqual(state["terminal_state"], "OPEN")
 
     def test_advance_requires_passed_and_exact_next_gate(self):
         decision = transition_lifecycle(
             lifecycle_profile=PROFILE,
-            current_gate="G1",
+            current_gate="UR.G1",
             current_state="PASSED",
             action="ADVANCE",
-            target_gate="G2",
+            target_gate="UR.G2",
         )
-        self.assertEqual(decision["next_gate"], "G2")
+        self.assertEqual(decision["next_gate"], "UR.G2")
         self.assertEqual(decision["next_state"], "ACTIVE")
 
     def test_silent_gate_skip_is_rejected(self):
         with self.assertRaises(UniversalRunKernelError) as ctx:
             transition_lifecycle(
                 lifecycle_profile=PROFILE,
-                current_gate="G1",
+                current_gate="UR.G1",
                 current_state="PASSED",
                 action="ADVANCE",
-                target_gate="G3",
+                target_gate="UR.G3",
             )
         self.assertEqual(ctx.exception.code, "LIFECYCLE_EDGE_UNDECLARED")
 
     def test_wait_and_continue_are_same_gate_edges(self):
         waiting = transition_lifecycle(
             lifecycle_profile=PROFILE,
-            current_gate="G2",
+            current_gate="UR.G2",
             current_state="ACTIVE",
             action="WAIT",
         )
-        self.assertEqual((waiting["next_gate"], waiting["next_state"]), ("G2", "WAITING"))
+        self.assertEqual((waiting["next_gate"], waiting["next_state"]), ("UR.G2", "WAITING"))
         resumed = transition_lifecycle(
             lifecycle_profile=PROFILE,
-            current_gate="G2",
+            current_gate="UR.G2",
             current_state="WAITING",
             action="CONTINUE",
         )
-        self.assertEqual((resumed["next_gate"], resumed["next_state"]), ("G2", "ACTIVE"))
+        self.assertEqual((resumed["next_gate"], resumed["next_state"]), ("UR.G2", "ACTIVE"))
 
     def test_replan_returns_to_g1_without_changing_run_identity(self):
         decision = transition_lifecycle(
             lifecycle_profile=PROFILE,
-            current_gate="G4",
+            current_gate="UR.G4",
             current_state="BLOCKED",
             action="REPLAN",
         )
-        self.assertEqual((decision["next_gate"], decision["next_state"]), ("G1", "ACTIVE"))
+        self.assertEqual((decision["next_gate"], decision["next_state"]), ("UR.G1", "ACTIVE"))
         self.assertEqual(decision["edge_kind"], "NON_FORWARD")
 
     def test_g4_no_transfer_requires_explicit_typed_outcome(self):
         decision = transition_lifecycle(
             lifecycle_profile=PROFILE,
-            current_gate="G4",
+            current_gate="UR.G4",
             current_state="ACTIVE",
             action="COMPLETE",
             explicit_outcome="NO_TRANSFER_REQUIRED",
         )
-        self.assertEqual(decision["next_gate"], "G4")
+        self.assertEqual(decision["next_gate"], "UR.G4")
         self.assertEqual(decision["next_state"], "PASSED")
         self.assertEqual(decision["explicit_outcome"], "NO_TRANSFER_REQUIRED")
 
@@ -173,14 +173,14 @@ class LifecycleTests(unittest.TestCase):
         with self.assertRaises(UniversalRunKernelError) as ctx:
             transition_lifecycle(
                 lifecycle_profile=PROFILE,
-                current_gate="G4",
+                current_gate="UR.G4",
                 current_state="ACTIVE",
                 action="COMPLETE",
             )
         self.assertEqual(ctx.exception.code, "G4_OUTCOME_REQUIRED")
 
     def test_accepted_terminal_requires_g6_pass_and_handoff(self):
-        states = {g: "PASSED" for g in ("G0", "G1", "G2", "G3", "G4", "G5", "G6")}
+        states = {g: "PASSED" for g in ("UR.G0", "UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6")}
         with self.assertRaises(UniversalRunKernelError) as ctx:
             derive_terminal_state(states, closure_outcome="ACCEPTED", handoff_present=False)
         self.assertEqual(ctx.exception.code, "HANDOFF_REQUIRED")
@@ -192,10 +192,10 @@ class LifecycleTests(unittest.TestCase):
     def test_transition_matches_schema(self):
         decision = transition_lifecycle(
             lifecycle_profile=PROFILE,
-            current_gate="G0",
+            current_gate="UR.G0",
             current_state="PASSED",
             action="ADVANCE",
-            target_gate="G1",
+            target_gate="UR.G1",
         )
         schema = json.loads((SCHEMA_ROOT / "lifecycle-transition.schema.json").read_text())
         jsonschema.validate(decision, schema)

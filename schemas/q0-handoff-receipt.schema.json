@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/q0-handoff-receipt.schema.json",
+  "title": "Q0 HandoffReceipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "run_id", "target", "certified_q0_sha", "acceptance_receipt_ref", "closure_receipt_ref", "status", "created_at", "receipt_digest"],
+  "properties": {
+    "schema_version": {"const": "1.0"}, "artifact_type": {"const": "handoff-receipt"},
+    "run_id": {"type": "string", "minLength": 1}, "target": {"const": "LOGIN_R00_PLUS"},
+    "certified_q0_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "acceptance_receipt_ref": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "closure_receipt_ref": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "status": {"const": "Q0_ACCEPTED_AUTONOMOUS_HANDOFF"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "receipt_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

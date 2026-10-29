@@ -37,7 +37,7 @@ from tools.node_architect.universal_run_lifecycle import (
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = REPO_ROOT / "schemas" / "node-architect" / "universal-run" / "lifecycle-transition.schema.json"
 
-PROFILE = {"id": "gwc.universal-run", "version": 1}
+PROFILE = {"id": "gwc.universal-run.v2", "version": 2}
 
 
 def _schema_validator():
@@ -53,13 +53,13 @@ class TestC1ContractIdentityAndVersion(unittest.TestCase):
     """C1: contract identity, version, fixed seven-position lifecycle."""
 
     def test_gates_are_fixed_seven_positions(self):
-        self.assertEqual(tuple(GATES), ("G0", "G1", "G2", "G3", "G4", "G5", "G6"))
+        self.assertEqual(tuple(GATES), ("UR.G0", "UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6"))
 
     def test_lifecycle_profile_identity(self):
         sm = LifecycleStateMachine(profile=PROFILE)
         self.assertEqual(sm.profile, PROFILE)
         result = evaluate_transition(
-            profile=PROFILE, current_gate="G0", current_state="ACTIVE",
+            profile=PROFILE, current_gate="UR.G0", current_state="ACTIVE",
             action="COMPLETE",
         )
         self.assertEqual(result.outcome["lifecycle_profile"], PROFILE)
@@ -68,7 +68,7 @@ class TestC1ContractIdentityAndVersion(unittest.TestCase):
         with self.assertRaises(Exception):
             evaluate_transition(
                 profile={"id": "gwc.other", "version": 2},
-                current_gate="G0", current_state="ACTIVE", action="COMPLETE",
+                current_gate="UR.G0", current_state="ACTIVE", action="COMPLETE",
             )
 
 
@@ -78,7 +78,7 @@ class TestC1IllegalTransitionRejection(unittest.TestCase):
     def test_advance_from_not_started_rejected(self):
         with self.assertRaises(Exception) as ctx:
             evaluate_transition(
-                profile=PROFILE, current_gate="G0", current_state="NOT_STARTED",
+                profile=PROFILE, current_gate="UR.G0", current_state="NOT_STARTED",
                 action="ADVANCE",
             )
         self.assertIn("LIFECYCLE", str(ctx.exception))
@@ -86,7 +86,7 @@ class TestC1IllegalTransitionRejection(unittest.TestCase):
     def test_advance_from_active_rejected(self):
         with self.assertRaises(Exception) as ctx:
             evaluate_transition(
-                profile=PROFILE, current_gate="G0", current_state="ACTIVE",
+                profile=PROFILE, current_gate="UR.G0", current_state="ACTIVE",
                 action="ADVANCE",
             )
         self.assertIn("LIFECYCLE_EDGE_UNDECLARED", str(ctx.exception))
@@ -94,7 +94,7 @@ class TestC1IllegalTransitionRejection(unittest.TestCase):
     def test_g6_has_no_forward_gate(self):
         with self.assertRaises(Exception) as ctx:
             evaluate_transition(
-                profile=PROFILE, current_gate="G6", current_state="PASSED",
+                profile=PROFILE, current_gate="UR.G6", current_state="PASSED",
                 action="ADVANCE",
             )
         self.assertIn("LIFECYCLE_EDGE_UNDECLARED", str(ctx.exception))
@@ -103,15 +103,15 @@ class TestC1IllegalTransitionRejection(unittest.TestCase):
         # G0 PASSED -> G2 without G1 is illegal.
         with self.assertRaises(Exception) as ctx:
             evaluate_transition(
-                profile=PROFILE, current_gate="G0", current_state="PASSED",
-                action="ADVANCE", target_gate="G2",
+                profile=PROFILE, current_gate="UR.G0", current_state="PASSED",
+                action="ADVANCE", target_gate="UR.G2",
             )
         self.assertIn("LIFECYCLE_EDGE_UNDECLARED", str(ctx.exception))
 
     def test_wait_requires_active(self):
         with self.assertRaises(Exception) as ctx:
             evaluate_transition(
-                profile=PROFILE, current_gate="G1", current_state="PASSED",
+                profile=PROFILE, current_gate="UR.G1", current_state="PASSED",
                 action="WAIT",
             )
         self.assertIn("LIFECYCLE", str(ctx.exception))
@@ -119,7 +119,7 @@ class TestC1IllegalTransitionRejection(unittest.TestCase):
     def test_unknown_action_rejected(self):
         with self.assertRaises(Exception) as ctx:
             evaluate_transition(
-                profile=PROFILE, current_gate="G0", current_state="ACTIVE",
+                profile=PROFILE, current_gate="UR.G0", current_state="ACTIVE",
                 action="DO_WRITE",
             )
         self.assertIn("LIFECYCLE_ACTION_UNKNOWN", str(ctx.exception))
@@ -149,7 +149,7 @@ class TestC1EdgeMatrixCoverage(unittest.TestCase):
                 legal = edge_is_legal(gate=gate, state=state, action=action)
                 if legal:
                     kwargs = dict(profile=PROFILE, current_gate=gate, current_state=state, action=action)
-                    if gate == "G4" and state == "ACTIVE" and action == "COMPLETE":
+                    if gate == "UR.G4" and state == "ACTIVE" and action == "COMPLETE":
                         kwargs["explicit_outcome"] = "NO_TRANSFER_REQUIRED"
                     result = evaluate_transition(**kwargs)
                     self.assertIsInstance(result, TransitionResult)
@@ -164,31 +164,31 @@ class TestC5TypedNoOpOutcomes(unittest.TestCase):
     """C5: typed no-op outcomes — no silent step execution."""
 
     def test_every_legal_transition_returns_typed_outcome(self):
-        result = evaluate_transition(profile=PROFILE, current_gate="G0", current_state="ACTIVE", action="COMPLETE")
+        result = evaluate_transition(profile=PROFILE, current_gate="UR.G0", current_state="ACTIVE", action="COMPLETE")
         self.assertIsInstance(result, TransitionResult)
         self.assertIsInstance(result.outcome, dict)
         self.assertEqual(result.outcome["artifact_type"], "universal-lifecycle-transition")
         self.assertEqual(result.outcome["execution_performed"], False)
 
     def test_noop_reason_is_typed(self):
-        result = evaluate_transition(profile=PROFILE, current_gate="G0", current_state="ACTIVE", action="COMPLETE")
+        result = evaluate_transition(profile=PROFILE, current_gate="UR.G0", current_state="ACTIVE", action="COMPLETE")
         self.assertIsInstance(result.noop, NoOpOutcome)
         self.assertTrue(result.noop.reason_code)
         self.assertIn(result.noop.reason_code, classify_noop(result.outcome))
 
     def test_noop_reason_is_deterministic(self):
-        reason_a = evaluate_transition(profile=PROFILE, current_gate="G0", current_state="ACTIVE", action="COMPLETE").noop.reason_code
-        reason_b = evaluate_transition(profile=PROFILE, current_gate="G0", current_state="ACTIVE", action="COMPLETE").noop.reason_code
+        reason_a = evaluate_transition(profile=PROFILE, current_gate="UR.G0", current_state="ACTIVE", action="COMPLETE").noop.reason_code
+        reason_b = evaluate_transition(profile=PROFILE, current_gate="UR.G0", current_state="ACTIVE", action="COMPLETE").noop.reason_code
         self.assertEqual(reason_a, reason_b)
 
     def test_never_returns_none_or_silent(self):
         for gate, state, action in (
-            ("G0", "ACTIVE", "COMPLETE"),
-            ("G1", "ACTIVE", "COMPLETE"),
-            ("G4", "ACTIVE", "COMPLETE"),
+            ("UR.G0", "ACTIVE", "COMPLETE"),
+            ("UR.G1", "ACTIVE", "COMPLETE"),
+            ("UR.G4", "ACTIVE", "COMPLETE"),
         ):
             kwargs = dict(profile=PROFILE, current_gate=gate, current_state=state, action=action)
-            if gate == "G4":
+            if gate == "UR.G4":
                 kwargs["explicit_outcome"] = "NO_TRANSFER_REQUIRED"
             result = evaluate_transition(**kwargs)
             self.assertIsNotNone(result.outcome)
@@ -199,28 +199,28 @@ class TestC5ExecutionReceiptAndIdempotency(unittest.TestCase):
     """C5: execution receipts, effect idempotency, no silent step."""
 
     def test_transition_result_has_receipt(self):
-        result = evaluate_transition(profile=PROFILE, current_gate="G0", current_state="ACTIVE", action="COMPLETE")
+        result = evaluate_transition(profile=PROFILE, current_gate="UR.G0", current_state="ACTIVE", action="COMPLETE")
         self.assertTrue(result.receipt)
         self.assertIn("transition_digest", result.receipt)
         self.assertEqual(result.receipt["execution_performed"], False)
 
     def test_identical_request_is_idempotent(self):
-        kwargs = dict(profile=PROFILE, current_gate="G0", current_state="ACTIVE", action="COMPLETE")
+        kwargs = dict(profile=PROFILE, current_gate="UR.G0", current_state="ACTIVE", action="COMPLETE")
         a = evaluate_transition(**kwargs)
         b = evaluate_transition(**kwargs)
         self.assertEqual(a.receipt, b.receipt)
         self.assertEqual(a.outcome, b.outcome)
 
     def test_lifecycle_edge_digest_stable(self):
-        kwargs = dict(profile=PROFILE, current_gate="G0", current_state="ACTIVE", action="COMPLETE")
+        kwargs = dict(profile=PROFILE, current_gate="UR.G0", current_state="ACTIVE", action="COMPLETE")
         d1 = lifecycle_edge_digest(**kwargs)
         d2 = lifecycle_edge_digest(**kwargs)
         self.assertEqual(d1, d2)
         self.assertRegex(d1, r"^sha256:[0-9a-f]{64}$")
 
     def test_receipt_changes_on_material_difference(self):
-        a = evaluate_transition(profile=PROFILE, current_gate="G0", current_state="ACTIVE", action="COMPLETE")
-        b = evaluate_transition(profile=PROFILE, current_gate="G0", current_state="ACTIVE", action="WAIT")
+        a = evaluate_transition(profile=PROFILE, current_gate="UR.G0", current_state="ACTIVE", action="COMPLETE")
+        b = evaluate_transition(profile=PROFILE, current_gate="UR.G0", current_state="ACTIVE", action="WAIT")
         # WAIT from ACTIVE is legal; outcome differs so receipt must differ.
         self.assertNotEqual(a.receipt, b.receipt)
 
@@ -229,8 +229,8 @@ class TestC5ExecutionReceiptAndIdempotency(unittest.TestCase):
         # identical outcomes and no external mutation occurs.
         sm1 = LifecycleStateMachine(profile=PROFILE)
         sm2 = LifecycleStateMachine(profile=PROFILE)
-        r1 = sm1.evaluate(current_gate="G0", current_state="ACTIVE", action="COMPLETE")
-        r2 = sm2.evaluate(current_gate="G0", current_state="ACTIVE", action="COMPLETE")
+        r1 = sm1.evaluate(current_gate="UR.G0", current_state="ACTIVE", action="COMPLETE")
+        r2 = sm2.evaluate(current_gate="UR.G0", current_state="ACTIVE", action="COMPLETE")
         self.assertEqual(r1.outcome, r2.outcome)
 
 
@@ -239,14 +239,14 @@ class TestSchemaConformance(unittest.TestCase):
 
     def test_legal_transition_matches_schema(self):
         validator = _schema_validator()
-        result = evaluate_transition(profile=PROFILE, current_gate="G0", current_state="ACTIVE", action="COMPLETE")
+        result = evaluate_transition(profile=PROFILE, current_gate="UR.G0", current_state="ACTIVE", action="COMPLETE")
         errors = list(validator.iter_errors(result.outcome))
         self.assertEqual(errors, [])
 
     def test_g4_explicit_outcome_matches_schema(self):
         validator = _schema_validator()
         result = evaluate_transition(
-            profile=PROFILE, current_gate="G4", current_state="ACTIVE",
+            profile=PROFILE, current_gate="UR.G4", current_state="ACTIVE",
             action="COMPLETE", explicit_outcome="NO_TRANSFER_REQUIRED",
         )
         errors = list(validator.iter_errors(result.outcome))
@@ -294,7 +294,7 @@ class RecoveryAttemptWiringTests(unittest.TestCase):
             UNIVERSAL_PROFILE,
             evaluate_transition,
         )
-        r = evaluate_transition(profile=UNIVERSAL_PROFILE, current_gate="G2",
+        r = evaluate_transition(profile=UNIVERSAL_PROFILE, current_gate="UR.G2",
                                 current_state="FAILED", action="RETRY",
                                 recovery_attempt=1, max_recovery_attempts=3)
         self.assertIn("recovery", r.receipt)
@@ -306,7 +306,7 @@ class RecoveryAttemptWiringTests(unittest.TestCase):
             evaluate_transition,
         )
         with self.assertRaises(RecoveryAttemptError):
-            evaluate_transition(profile=UNIVERSAL_PROFILE, current_gate="G2",
+            evaluate_transition(profile=UNIVERSAL_PROFILE, current_gate="UR.G2",
                                 current_state="FAILED", action="RETRY",
                                 recovery_attempt=4, max_recovery_attempts=3)
 
@@ -315,6 +315,6 @@ class RecoveryAttemptWiringTests(unittest.TestCase):
             UNIVERSAL_PROFILE,
             evaluate_transition,
         )
-        r = evaluate_transition(profile=UNIVERSAL_PROFILE, current_gate="G2",
+        r = evaluate_transition(profile=UNIVERSAL_PROFILE, current_gate="UR.G2",
                                 current_state="PASSED", action="ADVANCE")
         self.assertNotIn("recovery", r.receipt)

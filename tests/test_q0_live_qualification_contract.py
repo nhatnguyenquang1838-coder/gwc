@@ -117,6 +117,13 @@ def test_runbook_requires_clean_final_certification_activation():
     assert "fresh runtime activation" in RUNBOOK
 
 
+def test_runbook_q0_acceptance_is_g6_and_not_effect_authority():
+    assert "Formal Q0 acceptance occurs at `UR.G6`, not `UR.G4`." in RUNBOOK
+    assert "Nhat` is the human decision authority" in RUNBOOK
+    assert "does not authorize PR, merge" in RUNBOOK
+    assert "Q0_ACCEPTED_AUTONOMOUS_HANDOFF" in RUNBOOK
+
+
 def test_runtime_loaded_rejects_stale_worktree_head():
     r = _receipt(status="FIX_LOADED")
     r["worktree_head"] = "0" * 40

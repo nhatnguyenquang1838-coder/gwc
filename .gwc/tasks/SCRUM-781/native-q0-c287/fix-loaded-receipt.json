@@ -1,0 +1,35 @@
+{
+  "artifact_type": "q0-live-fix-receipt",
+  "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+  "candidate_fix_sha": "5e40763b63b27873ac2cff30ac10f0eeef5a5469",
+  "defect_id": "CF-SCENARIO-STABLE-JSON-READ",
+  "fix_base_sha": "8221d463a5a92ae4eeea153f54a65bc28d15519d",
+  "incident": {
+    "fixture_digest": "sha256:cd1f4a280cab83ed453ddfd9b2bdd84e6fb6187ce322fa9e9347db3906768cb2",
+    "previous_failure_state": "json.JSONDecodeError raised by json.loads(path.read_text())"
+  },
+  "loaded_surfaces": {
+    "controller_contract_digest": "sha256:936a1b411ba64f99f350f459534e939a5bd8a63bbadfdeb7afc5250f93a74dba",
+    "instructions": [
+      "AGENTS.md#sha256:d1c1a099000963478e60f9fba135103a190a2c8c1b92d30bae51774789905433"
+    ],
+    "modules": [
+      "scripts/scrum781_cf_load_replay_certify.py#sha256:5076d2ff5d4d5ba51d6668e64ecc35123728d5e5be1c9955857df3b13316c667",
+      "tools/node_architect/q0_qualification.py#sha256:9e6df68a20e56f0700a651da4bb980a0c93bee4d3e26ba645320a1564e5bf0c5",
+      "tools/node_architect/stable_json.py#sha256:42f968725ec014bc13a42b8c1e1c521b27ccf2116f296ac08eb670067f6c48ef",
+      "tools/node_architect/universal_run_controller.py#sha256:160a12ca7dedc0376a54f0bab48b7637183173ef6794b174f8e4e7acccfabd69"
+    ]
+  },
+  "q0_baseline_sha": "5e40763b63b27873ac2cff30ac10f0eeef5a5469",
+  "runtime_activation": {
+    "activation_id": "q0-stable-json-d42c6527-f68f-49b0-aea6-d65dbf4394e0",
+    "loaded_source_sha": "5e40763b63b27873ac2cff30ac10f0eeef5a5469",
+    "process_or_session_id": "26189",
+    "source_root": "/Users/mac/prj/DW-SuperApps/worktrees/gwc/SCRUM-781-q0-fresh-20261010-r1"
+  },
+  "schema_version": "1.0",
+  "status": "FIX_LOADED",
+  "task_id": "SCRUM-781",
+  "worktree": "/Users/mac/prj/DW-SuperApps/worktrees/gwc/SCRUM-781-q0-fresh-20261010-r1",
+  "worktree_head": "5e40763b63b27873ac2cff30ac10f0eeef5a5469"
+}

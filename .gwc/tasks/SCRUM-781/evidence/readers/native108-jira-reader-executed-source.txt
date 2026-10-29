@@ -1,0 +1,85 @@
+"""Read existing Jira MCP and retain sanitized provenance, never raw comments."""
+import asyncio,json,hashlib,re,os
+from pathlib import Path
+from urllib.parse import urlsplit,urlunsplit
+from hermes_cli.config import load_config
+from tools.mcp_tool_discovery import _connect_server
+
+HOME=Path(os.environ['HERMES_HOME'])
+OUT=HOME/'loop-checkpoints/scrum781-q0-fresh-20261010-r1/native108-jira-reader-followup.json'
+
+def unwrap(value):
+    for _ in range(5):
+        if isinstance(value,str):
+            try:value=json.loads(value);continue
+            except ValueError:break
+        if isinstance(value,dict) and isinstance(value.get('result'),str):value=value['result'];continue
+        break
+    return value
+
+def inspect_tree(value,path=''):
+    found=[]
+    if isinstance(value,dict):
+        for k,v in value.items():
+            nextpath=path+'.'+k
+            if k in {'comments','comment','attachments','attachment','remote_links','total','maxResults','startAt','isLast'}:
+                found.append({'path':nextpath,'type':type(v).__name__,'count':len(v) if isinstance(v,(list,dict)) else v if isinstance(v,(int,bool)) else None})
+            if isinstance(v,dict):found.extend(inspect_tree(v,nextpath))
+    return found
+
+def summarize_comments(value):
+    lists=[]
+    def visit(v):
+        if isinstance(v,dict):
+            for k,child in v.items():
+                if k in {'comments','comment'} and isinstance(child,list):lists.append(child)
+                elif isinstance(child,dict):visit(child)
+    visit(value);rows=[]
+    for comments in lists:
+        for c in comments:
+            if not isinstance(c,dict):continue
+            if str(c.get('id','')) not in {'12853','13005','12834'}:continue
+            text=str(c.get('body',''))
+            fragments=[]
+            for line in text.splitlines():
+                if re.search(r'(?i)DWO-LOGIN-AUTH-R1|incident|fixture|trace|failure|error|artifact|CR0',line):
+                    line=re.sub(r'(?i)(bearer\s+)[^\s]+',r'\1[REDACTED]',line)
+                    line=re.sub(r'(?i)((?:token|password|api[_-]?key|secret|authorization|cookie)\s*[:=]\s*)[^\s,;]+',r'\1[REDACTED]',line)
+                    line=re.sub(r'\b(?:gh[pousr]_[A-Za-z0-9_]+|eyJ[A-Za-z0-9_.-]+)\b','[REDACTED]',line)
+                    line=re.sub(r'[^\s@]+@[^\s@]+\.[^\s@]+','[REDACTED]',line)
+                    fragments.append(line[:350])
+            # Store IDs, digests and safe structural matches only. No raw bodies,
+            # auth strings, account IDs, customer records or URL query strings.
+            urls=[]
+            for u in re.findall(r'https?://[^\s<>"\]\)]+',text):
+                parsed=urlsplit(u)
+                if parsed.hostname in {'github.com','nhatnguyenquang1838.atlassian.net','app.notion.com'}:
+                    urls.append(urlunsplit((parsed.scheme,parsed.netloc,parsed.path,'',parsed.fragment if parsed.hostname=='github.com' and parsed.fragment.startswith('issuecomment-') else '')))
+            rows.append({'comment_id':str(c.get('id','')),'body_sha256':hashlib.sha256(text.encode()).hexdigest(),
+                         'body_char_count':len(text),'incident_identifier_present':'DWO-LOGIN-AUTH-R1' in text,
+                         'trace_term_present':bool(re.search(r'(?i)original.{0,40}trace|traceback|artifact.{0,30}locator|failure.{0,30}boundary',text)),
+                         'selected_redacted_excerpts':fragments[:8],
+                         'source_urls':sorted(set(urls))})
+    return rows
+
+async def main():
+    cfg=load_config()['mcp_servers']['jira'];server=await _connect_server('jira',cfg)
+    result={'reader':'configured Jira MCP / jira_get_issue include=comments,remote_links',
+            'native_tick':108,'raw_comment_bodies_persisted':False,'issues':[]}
+    try:
+        tools=await server.session.list_tools()
+        result['available_metadata_tools']=[t.name for t in tools.tools if any(w in t.name for w in ['attach','comment','remote_link'])]
+        for key in ['SCRUM-781','SCRUM-780']:
+            response=await asyncio.wait_for(server.session.call_tool('jira_get_issue',{
+                'issue_key':key,'fields':'summary,attachment,comment','comment_limit':100,
+                'include':'comments,remote_links','update_history':False}),timeout=50)
+            value=unwrap(''.join(getattr(c,'text','') for c in response.content))
+            if not isinstance(value,dict):
+                result['issues'].append({'key':key,'error':'UNEXPECTED_RESPONSE_TYPE','type':type(value).__name__});continue
+            result['issues'].append({'key':key,'response_keys':sorted(value),'containers':inspect_tree(value),
+                                    'comments':summarize_comments(value)})
+        OUT.write_text(json.dumps(result,indent=2));print(json.dumps(result,indent=2))
+    finally:
+        await server.shutdown()
+
+asyncio.run(main())

@@ -1,0 +1,83 @@
+{
+  "schema_id": "gwc.q0.engineering-frontier/v1",
+  "runtime_plan_ref": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+  "authority_granted": false,
+  "items": [
+    {
+      "id": "CF-LIVE-EXECUTOR",
+      "plan_node_id": "F1-PLAN-IDENTITY",
+      "objective": "Validate isolated live activation executor receipt, checkpoint, recovery, rollback, and cold-start resolution.",
+      "action": "run_sandboxed_validation",
+      "argv": [
+        "-m",
+        "pytest",
+        "tests/test_q0_native_g1_admission.py",
+        "tests/test_q0_universal_qualification.py",
+        "-q"
+      ],
+      "expected_result": "Q0_LIVE_ACTIVATION_EXECUTOR_CODE_READY",
+      "read_paths": [],
+      "priority": 2,
+      "depends_on": [],
+      "write_paths": [],
+      "verification_profile": "Q0_TERMINAL_RESULT_SUITE",
+      "required_test_files": [
+        "tests/test_q0_native_g1_admission.py",
+        "tests/test_q0_universal_qualification.py"
+      ],
+      "minimum_tests_passed": 85
+    },
+    {
+      "id": "CF-G1-ADMISSION",
+      "plan_node_id": "F1-PLAN-IDENTITY",
+      "objective": "Validate native G1 admission, qualification evidence separation, and durable Universal RunState genesis.",
+      "action": "run_sandboxed_validation",
+      "argv": [
+        "-m",
+        "pytest",
+        "tests/test_q0_native_g1_admission.py",
+        "tests/test_q0_universal_qualification.py",
+        "tests/test_scrum781_q0_mandatory_matrix_coverage.py",
+        "tests/test_scrum781_q0_native_host.py",
+        "-q"
+      ],
+      "expected_result": "Q0_LIVE_ACTIVATION_BRIDGE_CODE_READY",
+      "read_paths": [
+        "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json"
+      ],
+      "priority": 1,
+      "depends_on": [],
+      "write_paths": [],
+      "verification_profile": "Q0_TERMINAL_RESULT_SUITE",
+      "required_test_files": [
+        "tests/test_q0_native_g1_admission.py",
+        "tests/test_q0_universal_qualification.py",
+        "tests/test_scrum781_q0_mandatory_matrix_coverage.py",
+        "tests/test_scrum781_q0_native_host.py"
+      ],
+      "minimum_tests_passed": 75
+    },
+    {
+      "id": "CF-REAL-TARGET-ADAPTER",
+      "priority": 3,
+      "plan_node_id": "F1-PLAN-IDENTITY",
+      "action": "run_sandboxed_validation",
+      "worktree_required": true,
+      "argv": [
+        "-m",
+        "pytest",
+        "tests/test_q0_native_g1_admission.py",
+        "tests/test_q0_universal_qualification.py",
+        "-q"
+      ],
+      "required_test_files": [
+        "tests/test_q0_native_g1_admission.py",
+        "tests/test_q0_universal_qualification.py"
+      ],
+      "minimum_tests_passed": 101,
+      "expected_result": "Q0_REAL_TARGET_ADAPTER_A_CODE_READY",
+      "verification_profile": "Q0_TERMINAL_RESULT_SUITE",
+      "write_paths": []
+    }
+  ]
+}

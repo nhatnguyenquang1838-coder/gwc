@@ -137,6 +137,37 @@ It MUST preserve the semantic preconditions and original failure boundary while 
 2. exact readback matches the contract;
 3. execution reaches at least one legal state beyond the previous failure point.
 
+### Sealed replay provenance and subject distinction
+
+New Q0 certification receipts use schema version `1.1` and require a
+digest-sealed `replay_provenance` object. Its `subject` distinguishes
+`ORIGINAL_DWO` from `APPROVED_DISTINCT_CONTROLLED`; every provenance record
+also identifies a non-empty scenario, observed prestate, observed error, and
+defect class. The digest is the canonical module digest over the complete
+provenance object with `provenance_digest` omitted. The provenance digest and
+`qualification_matrix_digest` are independent evidence boundaries: provenance
+is not included in the matrix digest, and neither digest substitutes for the
+other.
+
+`ORIGINAL_DWO` requires `original_incident_replayed: true`. A deliberately
+controlled distinct scenario requires `authorization_ref` and
+`original_incident_replayed: false`; it cannot be presented as the original
+DWO incident. `incident_replay_refs` remains required and an empty list still
+fails with `ORIGINAL_INCIDENT_REPLAY_REQUIRED`.
+
+The mandatory matrix entry `self_fix_replay` may be `PASS` only for
+`GENUINE_GWC_RUNTIME_DEFECT`. A scenario classified
+`INJECTED_FAULT_RESILIENCE` cannot satisfy that matrix entry: claiming `PASS`
+fails with `SELF_FIX_REPLAY_REQUIRES_GENUINE_DEFECT`, and a non-`PASS` result
+fails closed with `INJECTED_FAULT_CANNOT_SATISFY_SELF_FIX_REPLAY` because the
+complete mandatory matrix requires every entry to pass. Controlled injected
+fault tests therefore cannot certify as Q0 self-fix proof.
+
+The verifier supports sealed schema versions `1.0` and `1.1`. Historical `1.0`
+receipts remain verifiable without provenance; a `1.1` receipt must include
+valid provenance. Unknown schema versions, stale qualification-profile
+digests, runtime identity drift, and load-proof identity mismatch are rejected.
+
 If the old failure persists for the same root cause, continue the same defect branch. If a new independent defect appears after successful advance, accept the current fix first and open a new defect branch from the accepted SHA.
 
 ## Final clean certification
@@ -173,4 +204,74 @@ Q0 MUST cover, when applicable:
 
 ## Authority boundary
 
-This runbook changes qualification semantics only. It grants no G2/G3/G4/G5/G6 authority. Branch creation, repository mutation, PR delivery, merge, runtime reload with external effect, deployment, production configuration, credentials, migrations, or production data remain governed by their applicable authority contracts.
+The runbook changes qualification semantics only. It grants no G2/G3/G4/G5/G6 authority. Branch creation, repository mutation, PR delivery, merge, runtime reload with external effect, deployment, production configuration, credentials, migrations, or production data remain governed by their applicable authority contracts.
+
+## UNIVERSAL_V2_DEVELOPMENT lane addendum
+
+When the Q0 lane selects `runtime_epoch = UNIVERSAL_V2_DEVELOPMENT` (SCRUM-781
+Q0 development branch, see AGENTS.md and
+`tools/node_architect/universal_run_epoch.py`), the following lane-local
+semantics supersede the generic per-defect branch/worktree wording above for
+that lane only:
+
+- ONE Q0 run -> ONE development branch -> ONE canonical writable worktree ->
+  additive immutable repair commits. A discovered defect produces an incident
+  identity, RED regression, bounded fix, additive commit, and replay evidence
+  on the same canonical lineage; it MUST NOT create a new defect branch or
+  worktree.
+- Missing or failing Universal v2 components are `GWC_RUNTIME_DEFECT` and
+  enter the self-fix loop; there is no fallback into the legacy GWC runtime.
+- Missing legacy G0/G1 artifacts are compatibility findings only and never
+  block Universal parent progress or trigger Human HITL.
+- `EFFECT_HOLD != CONTROL_LOOP_STOP`: a prohibited effect stops only that
+  effect while safe Controller-owned preparation/self-remediation continues.
+- Self-remediable Q0 defects proceed autonomously (reproduce -> RED -> fix ->
+  GREEN -> additive commit/push same branch -> reload -> replay -> exact
+  readback -> continue) without per-defect Human approval. Hard boundaries
+  (protected `main`, merge/deploy/production/secrets/migrations/destructive
+  operations) remain human authority.
+
+## Universal Q0 campaign lifecycle and result contracts
+
+`q0_live_qualification` is a workflow mode/profile of the Universal Runtime +
+Node Architect, not a separate runtime or a real product workload. Its parent
+campaign uses the namespaced Universal lifecycle; those gates are not aliases
+for legacy repository/effect gates:
+
+| Universal gate | Qualification completion evidence |
+|---|---|
+| `UR.G0 UNDERSTAND` | exact run/target/source context evidence |
+| `UR.G1 PLAN / DECOMPOSE` | immutable qualification plan/profile evidence |
+| `UR.G2 EXECUTE` | `EXECUTION_RECEIPT` or equivalent execution evidence |
+| `UR.G3 VERIFY` | `VERIFICATION_RECEIPT` |
+| `UR.G4 INTEGRATE` | `INTEGRATION_RECEIPT`, or valid explicit `IN_PLACE`, `NO_TRANSFER_REQUIRED`, or domain-defined outcome |
+| `UR.G5 VALIDATE IN TARGET` | `TARGET_VALIDATION_RECEIPT` bound to the integrated target identity |
+| `UR.G6 ACCEPT & HANDOFF` | `Q0_ACCEPTANCE_RECEIPT` + `CLOSURE_RECEIPT` + `HANDOFF_RECEIPT` |
+
+The Universal kernel (`universal_run_kernel.py` / `universal_run_lifecycle.py`)
+owns legal lifecycle edges. Continuation must not maintain a second gate-order
+state machine or advance by sequence increments alone. Missing evidence leaves
+the same gate/cursor and emits a typed evidence wait.
+
+Q0 certification is distinct from lifecycle progression and effect authority.
+A `Q0CertificationReceipt` may certify only a complete mandatory qualification
+matrix with no unresolved defects, exact candidate/loaded-source SHA equality,
+load proof bound to activation + runtime session/process + loaded profile digest
+and per-module/instruction SHA-256 identities, passing original-incident replay
+with exact readback and forward progress, passing broader regression, and a
+complete recursive plan/work DAG. Success is `CAMPAIGN_READY_RUNTIME / L3`
+bound to `certified_q0_sha`.
+
+Formal Q0 acceptance occurs at `UR.G6`, not `UR.G4`. A native
+`Q0AcceptanceRequest` / `Q0AcceptanceDecisionReceipt` binds the exact certified
+SHA, certification receipt, matrix digest, and `LOGIN_R00_PLUS` handoff target.
+`Nhat` is the human decision authority; `@approver` may only transport/capture
+the decision and is optional. Q0 acceptance does not authorize PR, merge,
+deployment, production configuration/data, or any other effect. Legacy
+approval-token artifacts remain isolated to their supported effect gates and
+cannot satisfy Universal lifecycle evidence.
+
+Only the conjunction of `CAMPAIGN_READY_RUNTIME / L3`, exact
+`certified_q0_sha`, and `Q0_ACCEPTED_AUTONOMOUS_HANDOFF` permits the real Login
+R00+ workload to start. Q0 qualification alone never starts that workload.
+

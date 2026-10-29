@@ -1,0 +1,403 @@
+{
+  "artifact_type": "Q0_NATIVE_SUCCESSOR_RUNTIME_PLAN_PROPOSAL",
+  "authority_granted": false,
+  "candidate_engineering_scope": {
+    "allowed_actions": [
+      "read_exact_source",
+      "create_guarded_branch_or_worktree",
+      "modify_approved_files",
+      "run_sandboxed_validation",
+      "stage",
+      "create_commit",
+      "push_working_branch",
+      "open_or_update_draft_pr"
+    ],
+    "denied_actions": [
+      "mark_pr_ready_for_review",
+      "merge_approved_pr",
+      "deploy_approved_release",
+      "production_config_change",
+      "production_data_write",
+      "migration",
+      "credential_rotation",
+      "branch_deletion",
+      "force_push"
+    ],
+    "max_children": 0,
+    "max_depth": 0,
+    "max_parallel": 1,
+    "source_roots": [
+      "tools/node_architect",
+      "core/node-architect",
+      "tests",
+      "scripts",
+      ".gwc/tasks/SCRUM-781"
+    ],
+    "writable_targets": [
+      "tools/node_architect/**",
+      "core/node-architect/**",
+      "core/runbooks/Q0_LIVE_QUALIFICATION_RUNBOOK_v1.0.md",
+      "tests/**",
+      "scripts/scrum781_*.py",
+      ".gwc/tasks/SCRUM-781/**"
+    ]
+  },
+  "candidate_frontier_ref": "core/node-architect/q0-native-successor-frontier-r1.json",
+  "candidate_work_dag": {
+    "atomic": false,
+    "children": [
+      {
+        "atomic": true,
+        "depends_on": [],
+        "id": "NATIVE-PLAN-ACTIVATION"
+      },
+      {
+        "atomic": true,
+        "depends_on": [
+          "NATIVE-PLAN-ACTIVATION"
+        ],
+        "id": "W1"
+      },
+      {
+        "atomic": true,
+        "depends_on": [
+          "W1"
+        ],
+        "id": "W2"
+      },
+      {
+        "atomic": true,
+        "depends_on": [
+          "W2"
+        ],
+        "id": "W3"
+      },
+      {
+        "atomic": true,
+        "depends_on": [
+          "W3"
+        ],
+        "id": "W4"
+      },
+      {
+        "atomic": true,
+        "depends_on": [
+          "W4"
+        ],
+        "id": "W5"
+      },
+      {
+        "atomic": true,
+        "depends_on": [
+          "W5"
+        ],
+        "id": "W6"
+      }
+    ],
+    "id": "Q0-NATIVE-SUCCESSOR-G1"
+  },
+  "consumer_ref": "LOGIN_R00_PLUS",
+  "controller_command_ref": {
+    "comment_id": 6332320463,
+    "seq": 159,
+    "url": "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6332320463"
+  },
+  "executed_effects": [],
+  "native_runtime_plan": {
+    "digest": "sha256:bdcf4e9c44ea1b5cdeaa464c77446b9e1b66aeec98f2aaa48018564a2eedc0e6",
+    "node_allocations": [
+      "scrum781-q0-fresh-20261010-r1:q0.qualification-campaign:native-successor-r1"
+    ],
+    "previous_digest": "sha256:dbbd7a4abb1607c9f4346696d68b1fa18a6844dceb340ca35aa58e21e3f6232e",
+    "qualification_profile_digest": "sha256:2a37d580c26305b74f742f45d25f4caeafae35da043a3b1307b2aedeac34932c",
+    "qualification_profile_ref": "core/node-architect/q0-live-qualification-profile.json",
+    "revision": 2,
+    "run_id": "scrum781-q0-fresh-20261010-r1",
+    "runtime_default_profile_digest": "sha256:c724c6b036a9c0cfae5a5738554d6ee1fc075fa81b6b09e132761cc18df33881",
+    "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+    "runtime_profile_ref": "core/node-architect/universal-runtime-default-profile.json",
+    "schema_id": "gwc.universal-run.runtime-plan.v2",
+    "schema_version": 2,
+    "source_binding": {
+      "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+      "pre_head_sha": "79191b54cc59c34becbfc9ccf8c521f87718d12e",
+      "repository": "nhatnguyenquang1838-coder/gwc"
+    },
+    "target_contract_ref": "github://nhatnguyenquang1838-coder/gwc/issues/595#Q0-LIVE-SUCCESSOR-G1"
+  },
+  "node_allocation": {
+    "child_instance_policy": "SINGLE_ACTIVE",
+    "condition_ref": null,
+    "content_digest": {
+      "algorithm": "sha256",
+      "canonicalization": "JCS",
+      "value": "823a4b984d0f580958470c89536ce0804508bf5fd9ef65c343ba756b1d261151"
+    },
+    "control_justification": null,
+    "created_at": "2026-10-22T04:29:33Z",
+    "created_by": {
+      "controller_command_seq": 159,
+      "mode": "Q0_SUCCESSOR_NATIVE_PLAN_PROPOSAL",
+      "profile": "DWA"
+    },
+    "independent_boundary_reasons": [],
+    "kind": "WORK",
+    "lifecycle_profile": {
+      "id": "gwc.universal-run.v2",
+      "version": 2
+    },
+    "node_allocation_id": "scrum781-q0-fresh-20261010-r1:q0.qualification-campaign:native-successor-r1",
+    "provenance": {
+      "predecessor_refs": [
+        "gwc.scrum781.q0-execution-plan.v3:3"
+      ],
+      "source_refs": [
+        "q0.qualification-campaign",
+        "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+        "core/node-architect/q0-live-successor-g1-20261022-r2.json",
+        "79191b54cc59c34becbfc9ccf8c521f87718d12e"
+      ]
+    },
+    "record_id": "NA-scrum781-q0-fresh-20261010-r1-native-successor-r1",
+    "requirement": "REQUIRED",
+    "run_id": "scrum781-q0-fresh-20261010-r1",
+    "schema_id": "gwc.universal-run.node-allocation.v2",
+    "schema_version": 2
+  },
+  "old_context_binding": {
+    "active_engineering_plan_digest": "sha256:08028c21107c7abbd8e0ab3525f5d5a32b66e5f314d949f45a385541de6c3f06",
+    "active_engineering_plan_ref": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+    "active_frontier_digest": "sha256:08b99c63183b03b23811b417d7a643434e393e06415d31bb2ab022b91a781b5d",
+    "active_frontier_ref": "core/node-architect/q0-controlled-failure-frontier-r3.json",
+    "checkpoint_ref": "/Users/mac/.hermes/cache/scratch/q0-m1-m7-host/20261014_021304_0dc728/3926191c93f475aa0c35c3efddce056e3a155f8a/checkpoint.sqlite",
+    "context_digest": "sha256:9369deda8c64e9a5ad414aea95c6faced44beab29efe092cc7d487d8aee2e5a5",
+    "native_universal_state_in_bound_checkpoint": "NOT_PRESENT",
+    "surface": "M1_M7_ENGINEERING_TASK_CONTEXT"
+  },
+  "parent_run_id": "scrum781-q0-fresh-20261010-r1",
+  "parent_task": "SCRUM-781",
+  "predecessor_proposal": {
+    "file_sha256": "9aa8e55a8291d602314bcceddf2f60b303864a2030dfa8e682438aad4f12a256",
+    "proposal_digest": "sha256:f0d776617aa514b8ac57b98f0373a09ff39d4b555c0f141551f12d8ec92ba22c",
+    "ref": "core/node-architect/q0-live-successor-g1-20261022-r2.json",
+    "superseded_by_controller_command": 159,
+    "superseded_claim": "The prior candidate named UR.G6 as a possible successor activation gate; #159 clarifies UR.G6 is final acceptance and native plan activation requires its own exact contract/decision."
+  },
+  "proposal_digest": "sha256:e90753db6ee04ab9f5af38af48a0d3344cb3efa3081386cd38b1ff9b97e4e459",
+  "proposal_only": true,
+  "schema_id": "gwc.q0.native-successor-runtime-plan-proposal/v1",
+  "schema_version": 1,
+  "source_binding": {
+    "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "source_head": "79191b54cc59c34becbfc9ccf8c521f87718d12e"
+  },
+  "source_bindings": [
+    {
+      "ref": "AGENTS.md",
+      "sha256": "d1c1a099000963478e60f9fba135103a190a2c8c1b92d30bae51774789905433"
+    },
+    {
+      "ref": "core/engineering/Q0_LIVE_QUALIFICATION_BRANCHING_STRATEGY_v1.0.md",
+      "sha256": "1c2135a27f80427b4a459b4eb82543463b5e55c60487f04166dab6bf9d150f75"
+    },
+    {
+      "ref": "core/node-architect/q0-controlled-failure-frontier-r3.json",
+      "sha256": "08b99c63183b03b23811b417d7a643434e393e06415d31bb2ab022b91a781b5d"
+    },
+    {
+      "ref": "core/node-architect/q0-engineering-coordination-route-r1.json",
+      "sha256": "75c9ebb0d8c07ba8f659532a3a2cab0633a47f9731894307462f2746e01994ea"
+    },
+    {
+      "ref": "core/node-architect/q0-live-qualification-profile.json",
+      "sha256": "aaab03dc97119243e962c90c0f640031589b9024e0f468e35143ffbba972c1c3"
+    },
+    {
+      "ref": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+      "sha256": "08028c21107c7abbd8e0ab3525f5d5a32b66e5f314d949f45a385541de6c3f06"
+    },
+    {
+      "ref": "core/node-architect/scrum781-q0-fresh-execution-plan-r2.json",
+      "sha256": "ac8e8b855d5564ec9e503f965cd73deb60b546caf70a7304c43140a315422500"
+    },
+    {
+      "ref": "core/node-architect/universal-runtime-default-profile.json",
+      "sha256": "09ba2777aed85a499ff86a7951dae959e99795233d97e4902655c3e27ff60df8"
+    },
+    {
+      "ref": "core/runbooks/Q0_LIVE_QUALIFICATION_RUNBOOK_v1.0.md",
+      "sha256": "1019b7f41950e2c4d9e6b902f594e674baaedfac6fc040fe01a9550b455f9d11"
+    },
+    {
+      "ref": "requirements/langgraph-agent-workflow.txt",
+      "sha256": "d62d9a2fa1671145600bb6105cde9c63ddc6dca0ebc4c8da756fea0a846ae511"
+    },
+    {
+      "ref": "schemas/node-architect/universal-run/controller-successor-snapshot.schema.json",
+      "sha256": "4ff2e8fa7d5efd1927fb48a0601c876c0cc0ad6cbcbaa4ec395435700e5cd062"
+    },
+    {
+      "ref": "schemas/node-architect/universal-run/controller-transition-receipt.schema.json",
+      "sha256": "a89cecc3558a90df42b7a7880c3c178d3cbd4e704ad3acd49fa70d0322c88771"
+    },
+    {
+      "ref": "schemas/node-architect/universal-run/executor-action-receipt.schema.json",
+      "sha256": "74428c7bcb7f76564a8f783dd731a433e89410c6fd99581792c872f59c7a1eb0"
+    },
+    {
+      "ref": "schemas/node-architect/universal-run/node-allocation.schema.json",
+      "sha256": "eacabaeab114fe77fc3e2567407f6e1eedb4ebe8c41d5d36ee05b2bee7f6fd33"
+    },
+    {
+      "ref": "schemas/node-architect/universal-run/run-state-record.schema.json",
+      "sha256": "81d6e9f87b1220d93a24c522ca9f19736072ad793168a45211a75c00f25564c5"
+    },
+    {
+      "ref": "tests/q0_langgraph_checkpoint_resume_worker.py",
+      "sha256": "f4f0edc65715b85c968c48e7d641737edcb5ac67f306eceebc979329067e5fa5"
+    },
+    {
+      "ref": "tests/test_scrum781_q0_langgraph_checkpoint_resume.py",
+      "sha256": "ba4f91a9489807fe212570f983da61e5932ac8d3b97eeea31df4830fd7e9dc42"
+    },
+    {
+      "ref": "tests/test_scrum781_q0_native_host.py",
+      "sha256": "24f4bd0023d9c72f3808f6e6f2269fb6f89a55fddcebe2b0f1bc279b2317f27b"
+    },
+    {
+      "ref": "tests/test_universal_v2_core_isolation.py",
+      "sha256": "dec06020932927c7a63c4f104d747a1a7ccb722bb29d75162fa68778c7abe6a0"
+    },
+    {
+      "ref": "tools/node_architect/agent_runtime_cli.py",
+      "sha256": "a853475341635480a15a49a9e8dc1c1dde743d17b64895079ff8836ced8f02c6"
+    },
+    {
+      "ref": "tools/node_architect/engineering_m1_m7_workflow.py",
+      "sha256": "6dc64b9349b91c2ae3e350a770989521ce37c8d442ee72da89e3f60f54a94cbc"
+    },
+    {
+      "ref": "tools/node_architect/engineering_work_frontier.py",
+      "sha256": "99139c7731e714400db468b774e25a0e06099ae2fac687d6278c202e2ba821e3"
+    },
+    {
+      "ref": "tools/node_architect/q0_browser_binding.py",
+      "sha256": "4f48dd07fc3e157cefa5e978952ebef81ef3f4bd821c0c3179243d870656bf64"
+    },
+    {
+      "ref": "tools/node_architect/q0_m1_m7_integration.py",
+      "sha256": "37241eca35cc93b2139daf6be91dd57558f7b3d7894648a9bae343acb90325b7"
+    },
+    {
+      "ref": "tools/node_architect/q0_python_env.py",
+      "sha256": "17f283388e96af1911590bfa780f64f1cfb023329e82b8d2be61db5e639a9bc0"
+    },
+    {
+      "ref": "tools/node_architect/q0_qualification.py",
+      "sha256": "4be54cf544e778c42705541bd6ac0d1c77947a56930904335204944ed613a4b8"
+    },
+    {
+      "ref": "tools/node_architect/resolve_gate_node_route.py",
+      "sha256": "ee85b6c9a2872004ab69bc50dc70851342894d12f2c69ab6db7e8b8952f8bb15"
+    },
+    {
+      "ref": "tools/node_architect/task_context_binding.py",
+      "sha256": "bc7867fccb4aa05a6127e34e24326d60ba26e779390ceee41b66b4db64b488c1"
+    },
+    {
+      "ref": "tools/node_architect/universal_run_controller.py",
+      "sha256": "952b5c5ea894d7c37d6b6994b70401d5881b3e7dcc7992b7b00434e75a94703d"
+    },
+    {
+      "ref": "tools/node_architect/universal_run_epoch.py",
+      "sha256": "e9fd211f9b990446242ad8104b8e83f38a2b37d5beea15ff2f0f821187584aeb"
+    },
+    {
+      "ref": "tools/node_architect/universal_run_execution.py",
+      "sha256": "2959356ab4a67fc98cff4ff04d7dee3c617cb5a0801bc22a928768534c65c97c"
+    },
+    {
+      "ref": "tools/node_architect/universal_run_persistence.py",
+      "sha256": "4f7b4e59856d6aaa7abb497fb058e755af88cf0c5701c66d4e9e99e8c00739d3"
+    },
+    {
+      "ref": "tools/node_architect/universal_run_plan.py",
+      "sha256": "af38edc64818f10bd3535770c29bfb1a4d420668e64c8a37907feeb50e0261a8"
+    },
+    {
+      "ref": "tools/node_architect/universal_run_state.py",
+      "sha256": "94fc6bcbc76cdbf8e1412a4be9f02613793a3d94db5ce91491bea8003866038c"
+    },
+    {
+      "ref": "tools/node_architect/universal_run_topology.py",
+      "sha256": "84447b8aba9869e9b51b46f6c7afba4aab94fcf484a2ec45c84d762f4938ab9a"
+    },
+    {
+      "ref": "tools/node_architect/universal_runtime_profile.py",
+      "sha256": "7164240b387d1fb15300ebc9bdb8da817cfc9c9af769fdda9c6aecf8fe3159ab"
+    }
+  ],
+  "status": "PROPOSED_NOT_ACTIVATED",
+  "transition_proposal": {
+    "activation_status": "NOT_ACTIVATED",
+    "authority_granted": false,
+    "canonical_transition_surfaces": [
+      {
+        "applies_to": "M1-M7 TaskContext plan transition only",
+        "executed": false,
+        "preconditions": [
+          "resolve_active_plan(new_ref)",
+          "activation_receipt_ref exists",
+          "exact prior context readback"
+        ],
+        "ref": "tools/node_architect/engineering_m1_m7_workflow.py::reconcile_engineering_plan_transition"
+      },
+      {
+        "applies_to": "validates caller-supplied native RuntimePlan+RunState+NodeAllocation and emits actions; no persistent cross-context activation",
+        "executed": false,
+        "ref": "tools/node_architect/universal_run_controller.py::UniversalController"
+      },
+      {
+        "applies_to": "same-sequence recovery and a scenario-specific seq14/UR.G5→seq15/UR.G2 recovery replan; not generic successor activation",
+        "executed": false,
+        "ref": "tools/node_architect/universal_run_persistence.py"
+      },
+      {
+        "applies_to": "UR.G1 currently checks only nonempty PLAN_RECEIPT; no PLAN_RECEIPT schema/builder found",
+        "executed": false,
+        "ref": "tools/node_architect/q0_qualification.py::complete_q0_gate"
+      }
+    ],
+    "executed_effects": [],
+    "from_context_digest": "sha256:9369deda8c64e9a5ad414aea95c6faced44beab29efe092cc7d487d8aee2e5a5",
+    "missing_contract": [
+      "source-defined native G1 PLAN_RECEIPT structure/provenance validator",
+      "source-defined bridge from this exact M1-M7 context digest to a native RunState and plan activation record",
+      "separate exact selector/checkpoint activation authority"
+    ],
+    "next_owner": "GPT Controller to specify/authorize the exact native activation and typed transition contract; not UR.G6",
+    "status": "BLOCKED_NO_CANONICAL_NATIVE_G1_TRANSITION_RECEIPT",
+    "to_frontier_ref": "core/node-architect/q0-native-successor-frontier-proposal-r1.json",
+    "to_runtime_plan_digest": "sha256:dbbd7a4abb1607c9f4346696d68b1fa18a6844dceb340ca35aa58e21e3f6232e",
+    "typed_transition_receipt_ref": null
+  },
+  "validator_readback": {
+    "authority_granted": false,
+    "controller_assignment_action": "q0_plan_decompose",
+    "controller_assignment_actor": "CONTROLLER",
+    "effect_authority": "NONE",
+    "executed_effects": [],
+    "frontier_projector_statuses": {
+      "NATIVE-PLAN-ACTIVATION": "BLOCKED_AUTHORITY",
+      "W1": "WAIT_INPUT",
+      "W2": "WAIT_INPUT",
+      "W3": "WAIT_INPUT",
+      "W4": "BLOCKED_EXTERNAL_EVIDENCE",
+      "W5": "WAIT_INPUT",
+      "W6": "BLOCKED_AUTHORITY"
+    },
+    "frontier_selected_work": null,
+    "native_controller_constructor": "PASS"
+  }
+}
