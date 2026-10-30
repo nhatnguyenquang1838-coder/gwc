@@ -162,13 +162,13 @@ def resolve_installed_hermes_skills(context,*,home,host_session_id,preview=None,
 def resolve_hermes_skills(context,*,skill_path,host_session_id,preview,outbox):
     c=validate_task_context(context)
     require(host_session_id==c['executor']['session_id'],'HOST_SESSION_MISMATCH')
-    p=Path(skill_path).resolve();source=p.read_text()
+    p=Path(skill_path).resolve();raw=p.read_bytes();source=raw.decode('utf-8')
     name=re.search(r'^name:\s*[\"\']?([^\"\'\n]+)',source,re.M)
     if name is None:
         raise ValueError('HOST_SKILL_IDENTITY_MISMATCH')
     require(name.group(1).strip()==c['capabilities']['controller_exchange']['skill_ref'],'HOST_SKILL_IDENTITY_MISMATCH')
     metadata={'skill_ref':name.group(1).strip(),'skill_path':str(p),
-              'skill_sha256':hashlib.sha256(source.encode()).hexdigest(),'session_id':host_session_id,
+              'skill_sha256':hashlib.sha256(raw).hexdigest(),'session_id':host_session_id,
               'dispatch_owner':'current_hermes_agent','evidence_class':'BROWSER_CAPABILITY_ONLY',
               'typed_observer_registered':False,'controller_url':c['controller']['conversation_url']}
     if preview is None:

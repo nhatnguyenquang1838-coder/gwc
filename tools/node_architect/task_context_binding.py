@@ -58,7 +58,7 @@ def bind_from_plan(root, *, plan_ref, conversation_url, session_id, checkpoint_r
     def git(*args):
         return subprocess.check_output(['git','-C',str(root),*args])
     head = git('rev-parse','HEAD').decode().strip()
-    source = git('show',head+':'+str(plan_path.relative_to(root)))
+    source = git('show',head+':'+plan_path.relative_to(root).as_posix())
     require(plan_path.read_bytes() == source, 'TASK_PLAN_SOURCE_DRIFT')
     p = json.loads(source); branch = git('branch','--show-current').decode().strip()
     require(branch == p['branch'], 'TASK_BRANCH_MISMATCH')

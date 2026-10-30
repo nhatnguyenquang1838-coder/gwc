@@ -1,4 +1,5 @@
 
+from contextlib import closing
 import pytest
 from test_engineering_work_frontier import setup_frontier
 
@@ -33,8 +34,9 @@ def test_agent_claim_blocks_duplicate_start_and_request_is_not_completion(tmp_pa
     reserve_agent_work(c,r,guard=lambda:True);start_agent_work(c,r,guard=lambda:True)
     with pytest.raises(ValueError,match='AGENT_WORK_STATE_CONFLICT'):
         start_agent_work(c,r,guard=lambda:True)
-    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
-        assert db.execute('SELECT status FROM engineering_work WHERE fingerprint=?',(r['work_fingerprint'],)).fetchone()[0]=='IN_FLIGHT'
+    with closing(sqlite3.connect(c['workflow']['checkpoint_ref'])) as db:
+        with db:
+            assert db.execute('SELECT status FROM engineering_work WHERE fingerprint=?',(r['work_fingerprint'],)).fetchone()[0]=='IN_FLIGHT'
 
 
 def test_agent_completion_requires_actual_git_delta_and_log_readback(tmp_path):
@@ -58,8 +60,9 @@ def test_agent_completion_requires_actual_git_delta_and_log_readback(tmp_path):
     current=copy.deepcopy(c);current['repository']['head_sha']=git('rev-parse','HEAD')
     projection=read_source_bound_frontier(current,profile_ref='agent-profile.json',guard=lambda:True)
     assert projection['selected_work'] is None and projection['items'][0]['status']=='VERIFIED'
-    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
-        assert db.execute('SELECT status FROM engineering_work WHERE fingerprint=?',(r['work_fingerprint'],)).fetchone()[0]=='VERIFIED'
+    with closing(sqlite3.connect(c['workflow']['checkpoint_ref'])) as db:
+        with db:
+            assert db.execute('SELECT status FROM engineering_work WHERE fingerprint=?',(r['work_fingerprint'],)).fetchone()[0]=='VERIFIED'
     with pytest.raises(ValueError,match='AGENT_WORK_STATE_CONFLICT'):
         verify_agent_execution(c,r,artifact_ref=artifact,guard=lambda:True)
 

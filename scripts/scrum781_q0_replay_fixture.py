@@ -129,28 +129,55 @@ def _ref(ref: Any, *, seam: bool = False) -> None:
 def _read_artifact(ref: dict, root: Path) -> bytes:
     _ref(ref)
     # Directory-relative O_NOFOLLOW reads prohibit symlink races at every level.
-    fd = None
-    try:
-        fd = os.open(root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
-        parts = ref['path'].split('/')
-        for part in parts[:-1]:
-            child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=fd)
+    # On platforms without dir_fd/O_DIRECTORY/O_NOFOLLOW (e.g. Windows) fall back
+    # to a plain bounded read; the path is already allowlisted and escape-checked
+    # by _ref, and the digest is verified below.
+    if os.open in os.supports_dir_fd and all(hasattr(os, name) for name in ('O_DIRECTORY', 'O_NOFOLLOW')):
+        fd = None
+        try:
+            fd = os.open(root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+            parts = ref['path'].split('/')
+            for part in parts[:-1]:
+                child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=fd)
+                os.close(fd)
+                fd = child
+            child = os.open(parts[-1], os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=fd)
             os.close(fd)
             fd = child
-        child = os.open(parts[-1], os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=fd)
-        os.close(fd)
-        fd = child
-        info = os.fstat(fd)
-        _require(stat.S_ISREG(info.st_mode) and info.st_size <= MAX_BYTES, 'ARTIFACT_NOT_BOUNDED_FILE')
-        with os.fdopen(fd, 'rb') as stream:
-            fd = None
-            raw = stream.read(MAX_BYTES + 1)
+            info = os.fstat(fd)
+            _require(stat.S_ISREG(info.st_mode) and info.st_size <= MAX_BYTES, 'ARTIFACT_NOT_BOUNDED_FILE')
+            with os.fdopen(fd, 'rb') as stream:
+                fd = None
+                raw = stream.read(MAX_BYTES + 1)
+            _require(len(raw) <= MAX_BYTES, 'ARTIFACT_TOO_LARGE')
+        except OSError as exc:
+            raise ReplayFixtureError('ARTIFACT_UNREADABLE') from exc
+        finally:
+            if fd is not None:
+                os.close(fd)
+    else:  # pragma: no cover - Windows
+        # Windows lacks dir_fd/O_NOFOLLOW. Fail closed on symlinks and any other
+        # reparse-point component, then verify canonical containment before the
+        # bounded read. This prevents a pre-existing junction/symlink from
+        # escaping the fixture root; strict race-free publication remains owned
+        # by the host's stronger atomic artifact fence.
+        try:
+            root_path = root.resolve(strict=True)
+            candidate = root_path
+            for part in ref['path'].split('/'):
+                candidate = candidate / part
+                info = candidate.lstat()
+                attrs = getattr(info, 'st_file_attributes', 0)
+                if stat.S_ISLNK(info.st_mode) or attrs & 0x400:  # FILE_ATTRIBUTE_REPARSE_POINT
+                    raise ReplayFixtureError('ARTIFACT_UNREADABLE')
+            resolved = candidate.resolve(strict=True)
+            _require(resolved.is_relative_to(root_path), 'ARTIFACT_PATH_ESCAPE')
+            raw = resolved.read_bytes()
+        except ReplayFixtureError:
+            raise
+        except (OSError, RuntimeError, ValueError) as exc:
+            raise ReplayFixtureError('ARTIFACT_UNREADABLE') from exc
         _require(len(raw) <= MAX_BYTES, 'ARTIFACT_TOO_LARGE')
-    except OSError as exc:
-        raise ReplayFixtureError('ARTIFACT_UNREADABLE') from exc
-    finally:
-        if fd is not None:
-            os.close(fd)
     _require(digest(raw) == ref.get('sha256'), 'ARTIFACT_DIGEST_MISMATCH')
     try:
         _nonsecret(raw.decode('utf-8'))
@@ -481,13 +508,38 @@ def verify_replay(fixture: dict, receipt_refs: dict, *, root: Path, policy: dict
 def _read_cli_json(path: str) -> Any:
     fd = None
     try:
-        fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
-        info = os.fstat(fd)
-        _require(stat.S_ISREG(info.st_mode) and info.st_size <= MAX_BYTES, 'CLI_INPUT_NOT_BOUNDED_FILE')
-        with os.fdopen(fd, 'rb') as stream:
-            fd = None
-            raw = stream.read(MAX_BYTES + 1)
-        _require(len(raw) <= MAX_BYTES, 'CLI_INPUT_TOO_LARGE')
+        nofollow = getattr(os, 'O_NOFOLLOW', None)
+        nonblock = getattr(os, 'O_NONBLOCK', 0)
+        dirfd_open = os.open in getattr(os, 'supports_dir_fd', set())
+        if dirfd_open and nofollow is not None:
+            fd = os.open(path, os.O_RDONLY | nofollow | nonblock)
+            info = os.fstat(fd)
+            _require(stat.S_ISREG(info.st_mode) and info.st_size <= MAX_BYTES, 'CLI_INPUT_NOT_BOUNDED_FILE')
+            with os.fdopen(fd, 'rb') as stream:
+                fd = None
+                raw = stream.read(MAX_BYTES + 1)
+            _require(len(raw) <= MAX_BYTES, 'CLI_INPUT_TOO_LARGE')
+        else:  # pragma: no cover - Windows
+            # Windows lacks O_NOFOLLOW. Fail closed on a symlink or any reparse
+            # point in the supplied path, then verify bounded regular-file status.
+            # The CLI input path is caller-selected; we do not require it to live
+            # under the fixture root, only that it is a plain local file.
+            candidate = Path(path)
+            current = Path(candidate.anchor)
+            components = candidate.parts[1:] if candidate.anchor else candidate.parts
+            for component in components:
+                current = current / component
+                info = current.lstat()
+                attrs = getattr(info, 'st_file_attributes', 0)
+                if stat.S_ISLNK(info.st_mode) or attrs & 0x400:  # FILE_ATTRIBUTE_REPARSE_POINT
+                    raise ReplayFixtureError('CLI_INPUT_UNREADABLE')
+            resolved = candidate.resolve(strict=True)
+            info = resolved.stat()
+            _require(stat.S_ISREG(info.st_mode) and info.st_size <= MAX_BYTES, 'CLI_INPUT_NOT_BOUNDED_FILE')
+            raw = resolved.read_bytes()
+            _require(len(raw) <= MAX_BYTES, 'CLI_INPUT_TOO_LARGE')
+    except ReplayFixtureError:
+        raise
     except OSError as exc:
         raise ReplayFixtureError('CLI_INPUT_UNREADABLE') from exc
     finally:

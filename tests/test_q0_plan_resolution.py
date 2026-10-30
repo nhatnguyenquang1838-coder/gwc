@@ -1,4 +1,5 @@
 """CF-PRECHECK: activation is receipt-bound, and PENDING is never silent R2."""
+from contextlib import closing
 import hashlib
 import json
 
@@ -40,12 +41,13 @@ def _plan(root, ref):
 def _receipt(root, ref, digest, checkpoint_receipt='sha256:deadbeef', generation=1):
     import sqlite3
     checkpoint = root / 'checkpoint.sqlite'
-    with sqlite3.connect(checkpoint) as db:
-        db.execute('CREATE TABLE IF NOT EXISTS engineering_plan_activation '
-                   '(plan_ref TEXT PRIMARY KEY, plan_digest TEXT, context_digest TEXT, '
-                   'generation INTEGER, activated_at TEXT)')
-        db.execute('INSERT OR REPLACE INTO engineering_plan_activation VALUES (?,?,?,?,?)',
-                   (ref, digest, checkpoint_receipt, generation, '2026-10-20T00:00:00Z'))
+    with closing(sqlite3.connect(checkpoint)) as db:
+        with db:
+            db.execute('CREATE TABLE IF NOT EXISTS engineering_plan_activation '
+                       '(plan_ref TEXT PRIMARY KEY, plan_digest TEXT, context_digest TEXT, '
+                       'generation INTEGER, activated_at TEXT)')
+            db.execute('INSERT OR REPLACE INTO engineering_plan_activation VALUES (?,?,?,?,?)',
+                       (ref, digest, checkpoint_receipt, generation, '2026-10-20T00:00:00Z'))
     path = root / ACTIVATION_RECEIPT_REF
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps({'schema_id': 'gwc.q0.plan-activation/v1',
@@ -101,7 +103,8 @@ def test_activated_without_checkpoint_activation_row_fails_closed(tmp_path):
     _route(tmp_path, R3, status='ACTIVATED')
     digest = _plan(tmp_path, R3)
     _receipt(tmp_path, R3, digest)
-    with sqlite3.connect(tmp_path / 'checkpoint.sqlite') as db:
-        db.execute('DELETE FROM engineering_plan_activation')
+    with closing(sqlite3.connect(tmp_path / 'checkpoint.sqlite')) as db:
+        with db:
+            db.execute('DELETE FROM engineering_plan_activation')
     with pytest.raises(ValueError, match='Q0_PLAN_ACTIVATION_INVALID'):
         resolve_active_plan(tmp_path)

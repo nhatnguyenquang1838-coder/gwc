@@ -24,6 +24,7 @@ import json
 import os
 import sys
 import tempfile
+from contextlib import closing
 import time
 import unittest
 from pathlib import Path
@@ -161,9 +162,10 @@ class DeliveryOutboxTest(unittest.TestCase):
         import sqlite3
         rec = _record()
         outbox.enqueue(self.path, **rec)
-        with sqlite3.connect(self.path) as db:
-            db.execute("CREATE TRIGGER refuse_lease BEFORE UPDATE OF lease_holder "
-                       "ON delivery_outbox BEGIN SELECT RAISE(IGNORE); END")
+        with closing(sqlite3.connect(self.path)) as db:
+            with db:
+                db.execute("CREATE TRIGGER refuse_lease BEFORE UPDATE OF lease_holder "
+                           "ON delivery_outbox BEGIN SELECT RAISE(IGNORE); END")
         with self.assertRaisesRegex(outbox.OutboxConflict, "OUTBOX_LEASE_CONTENTION"):
             outbox.acquire_lease(self.path, worker_id="denied", **_key(rec))
         row = outbox.discover_restart(self.path)[0]
@@ -274,8 +276,9 @@ class DeliveryOutboxTest(unittest.TestCase):
     def test_ack_requires_actual_persisted_request_attempt(self):
         import sqlite3
         ack = self._bound_ack()
-        with sqlite3.connect(self.path) as db:
-            db.execute("DELETE FROM delivery_outbox_attempts")
+        with closing(sqlite3.connect(self.path)) as db:
+            with db:
+                db.execute("DELETE FROM delivery_outbox_attempts")
         verified, code = outbox.verify_ack(self.path, ack=ack, worker_id="w1")
         self.assertFalse(verified)
         self.assertEqual(code, "ACK_REQUEST_UNBOUND")
@@ -301,15 +304,17 @@ class DeliveryOutboxTest(unittest.TestCase):
     def test_delivery_observation_does_not_change_uninitialized_store_policy(self):
         import sqlite3
         target = self.path.parent/"sentinel.sqlite"
-        with sqlite3.connect(target) as db:
-            db.execute("CREATE TABLE sentinel(value TEXT)")
+        with closing(sqlite3.connect(target)) as db:
+            with db:
+                db.execute("CREATE TABLE sentinel(value TEXT)")
         db.close()
         before = target.read_bytes()
         with self.assertRaises(outbox.OutboxStoreUnavailable):
             outbox.discover_restart(target)
         self.assertEqual(target.read_bytes(), before)
-        with sqlite3.connect(target) as db:
-            self.assertEqual(db.execute("PRAGMA journal_mode").fetchone()[0], "delete")
+        with closing(sqlite3.connect(target)) as db:
+            with db:
+                self.assertEqual(db.execute("PRAGMA journal_mode").fetchone()[0], "delete")
         db.close()
 
     def test_transition_cannot_bypass_ack_authentication(self):

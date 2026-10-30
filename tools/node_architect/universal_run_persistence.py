@@ -13,6 +13,7 @@ import os
 import tempfile
 from pathlib import Path
 from typing import Any, Mapping
+from .durable_fsync import flush_directory
 
 
 class CheckpointPersistenceError(ValueError):
@@ -369,11 +370,7 @@ def persist_same_sequence_checkpoint_recovery(
                 os.fsync(stream.fileno())
             _require(cp_path.read_bytes() == current_bytes, "NATIVE_CHECKPOINT_CAS_CONFLICT")
             os.replace(temp, cp_path)
-            dir_fd = os.open(cp_path.parent, os.O_RDONLY)
-            try:
-                os.fsync(dir_fd)
-            finally:
-                os.close(dir_fd)
+            flush_directory(cp_path.parent)
         finally:
             temp.unlink(missing_ok=True)
         readback = cp_path.read_bytes()
@@ -604,11 +601,7 @@ def persist_recovery_replan_cursor_activation(
                 stream.write(payload); stream.flush(); os.fsync(stream.fileno())
             _require(cp_path.read_bytes() == current_bytes, "NATIVE_CHECKPOINT_CAS_CONFLICT")
             os.replace(temp, cp_path)
-            dir_fd = os.open(cp_path.parent, os.O_RDONLY)
-            try:
-                os.fsync(dir_fd)
-            finally:
-                os.close(dir_fd)
+            flush_directory(cp_path.parent)
         finally:
             temp.unlink(missing_ok=True)
         readback = cp_path.read_bytes()

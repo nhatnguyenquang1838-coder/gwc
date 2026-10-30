@@ -8,7 +8,7 @@ import sys
 
 PYTHON_ENV_VAR = 'Q0_PYTHON'
 CANONICAL_VENV = Path.home() / '.hermes/cache/scratch/q0-langgraph-venv'
-SITE_PACKAGES_RE = re.compile(r'/lib/python(\d+)\.(\d+)/site-packages/?$')
+SITE_PACKAGES_RE = re.compile(r'[/\\]lib[/\\]python(\d+)\.(\d+)[/\\]site-packages[/\\]?$')
 
 
 def _canonical_venv() -> Path:
@@ -49,9 +49,14 @@ def canonical_python() -> Path:
         path = Path(override).expanduser()
         if path.is_file() and os.access(path, os.X_OK):
             return path
-    candidate = _canonical_venv() / 'bin/python'
-    if candidate.exists() and candidate.is_file() and os.access(candidate, os.X_OK):
-        return candidate
+    venv = _canonical_venv()
+    # CPython venv layout is platform-specific: Scripts/python.exe on Windows,
+    # bin/python on POSIX. Check both in deterministic host-native-first order.
+    candidates = ((venv / 'Scripts/python.exe', venv / 'bin/python')
+                  if os.name == 'nt' else (venv / 'bin/python', venv / 'Scripts/python.exe'))
+    for candidate in candidates:
+        if candidate.exists() and candidate.is_file() and os.access(candidate, os.X_OK):
+            return candidate
     return Path(sys.executable)
 
 
@@ -74,7 +79,7 @@ def describe() -> dict:
     python = canonical_python()
     if os.environ.get(PYTHON_ENV_VAR) and python == Path(os.environ[PYTHON_ENV_VAR]).expanduser():
         source = 'Q0_PYTHON'
-    elif python == _canonical_venv() / 'bin/python':
+    elif python in {_canonical_venv() / 'bin/python', _canonical_venv() / 'Scripts/python.exe'}:
         source = 'CANONICAL_VENV'
     else:
         source = 'sys.executable'

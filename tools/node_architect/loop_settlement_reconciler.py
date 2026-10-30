@@ -21,6 +21,13 @@ import os
 from pathlib import Path
 import tempfile
 from typing import Any, Callable, Mapping
+from .durable_fsync import flush_directory
+
+try:
+    import fcntl
+except ImportError:  # pragma: no cover - Windows
+    fcntl = None
+    import msvcrt
 
 SETTLEMENT_LEDGER_SCHEMA_VERSION = "1.0"
 SETTLEMENT_LEDGER_ARTIFACT_TYPE = "runtime-settlement-ledger"
@@ -72,11 +79,8 @@ def _write_ledger(path: Path, payload: dict[str, Any]) -> None:
             handle.flush()
             os.fsync(handle.fileno())
         os.replace(tmp_path, str(path))
-        directory_fd = os.open(str(path.parent), os.O_RDONLY)
-        try:
-            os.fsync(directory_fd)
-        finally:
-            os.close(directory_fd)
+        # Flush the directory entry on every platform, Windows included.
+        flush_directory(path.parent)
     except BaseException:
         try:
             os.unlink(tmp_path)
@@ -130,18 +134,30 @@ class LoopSettlementReconciler:
         native_settlement: Callable[[Mapping[str, Any]], Any],
     ) -> dict[str, Any]:
         """Serialize cross-process claims; ambiguous intent requires readback."""
-        import fcntl
         _require_idempotency_key(settlement_request)
         self.ledger_path.parent.mkdir(parents=True, exist_ok=True)
         with self.ledger_path.with_suffix(self.ledger_path.suffix + ".lock").open("a+") as lock:
-            try:
-                fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-            except BlockingIOError as exc:
-                raise SettlementReconcilerError("SETTLEMENT_BUSY") from exc
-            try:
-                return self._settle_locked(settlement_request, native_settlement)
-            finally:
-                fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+            if fcntl is not None:
+                try:
+                    fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                except BlockingIOError as exc:
+                    raise SettlementReconcilerError("SETTLEMENT_BUSY") from exc
+                try:
+                    return self._settle_locked(settlement_request, native_settlement)
+                finally:
+                    fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+            else:  # pragma: no cover - Windows
+                lock.seek(0, os.SEEK_END)
+                lock_pos = lock.tell()
+                try:
+                    msvcrt.locking(lock.fileno(), msvcrt.LK_NBLCK, 1)
+                except OSError as exc:
+                    raise SettlementReconcilerError("SETTLEMENT_BUSY") from exc
+                try:
+                    return self._settle_locked(settlement_request, native_settlement)
+                finally:
+                    lock.seek(lock_pos)
+                    msvcrt.locking(lock.fileno(), msvcrt.LK_UNLCK, 1)
 
     def _settle_locked(
         self,

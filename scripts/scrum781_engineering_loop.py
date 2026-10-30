@@ -8,6 +8,7 @@ workflow supports explicit user calls without manufacturing a native firing.
 No scheduler writes, typed C/E reads, qualifications or leases.
 """
 from __future__ import annotations
+from contextlib import closing
 import argparse
 import hashlib
 import json
@@ -65,12 +66,13 @@ def inspect(args: argparse.Namespace) -> dict:
                         and plan.get('runtime_epoch') == 'UNIVERSAL_V2_DEVELOPMENT'
                         and plan.get('contract_mode') == 'EXECUTE'
                         and 'UNIVERSAL_V2_DEVELOPMENT override' in agents)
-    with sqlite3.connect((home/'state.db').as_uri()+'?mode=ro', uri=True) as db:
-        session = db.execute('SELECT id,source,profile_name FROM sessions WHERE id=?', (args.session,)).fetchone()
-        states = {}
-        for label in ('loop', 'goal', 'heartbeat'):
-            row = db.execute('SELECT value FROM state_meta WHERE key=?', (f'{label}:{args.session}',)).fetchone()
-            states[label] = json.loads(row[0]) if row else None
+    with closing(sqlite3.connect((home/'state.db').as_uri()+'?mode=ro', uri=True)) as db:
+        with db:
+            session = db.execute('SELECT id,source,profile_name FROM sessions WHERE id=?', (args.session,)).fetchone()
+            states = {}
+            for label in ('loop', 'goal', 'heartbeat'):
+                row = db.execute('SELECT value FROM state_meta WHERE key=?', (f'{label}:{args.session}',)).fetchone()
+                states[label] = json.loads(row[0]) if row else None
     if not states['loop'] or not session:
         raise ValueError('NATIVE_SESSION_OR_LOOP_NOT_FOUND')
     leases_path = home/'runtime/active_sessions.json'
@@ -123,11 +125,12 @@ def select_workflow_checkpoint(root,run_id):
     root=Path(root)
     candidates=[]
     for path in sorted(root.glob('*/checkpoint.sqlite')):
-        with sqlite3.connect(path.resolve().as_uri()+'?mode=ro',uri=True) as db:
-            tables={r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
-            if any(table in tables and db.execute('SELECT 1 FROM '+table+' WHERE run=?',(run_id,)).fetchone()
-                   for table in ['workflow','engineering_workflow']):
-                candidates.append(path)
+        with closing(sqlite3.connect(path.resolve().as_uri()+'?mode=ro',uri=True)) as db:
+            with db:
+                tables={r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+                if any(table in tables and db.execute('SELECT 1 FROM '+table+' WHERE run=?',(run_id,)).fetchone()
+                       for table in ['workflow','engineering_workflow']):
+                    candidates.append(path)
     if len(candidates)>1:
         raise ValueError('WORKFLOW_CHECKPOINT_SELECTION_AMBIGUOUS')
     return candidates[0] if candidates else root/'run-checkpoint'/'checkpoint.sqlite'
@@ -238,10 +241,11 @@ def workflow(args: argparse.Namespace, *, host_capabilities=None) -> dict:
             HISTORICAL_CONTEXT_NOT_PROVABLE, _historical_context_recovery,
             reconcile_engineering_source_head, resolve_prior_context,
         )
-        with sqlite3.connect(str(path)) as db:
-            row = db.execute('SELECT context_digest FROM engineering_workflow WHERE run=?',
-                             (preflight['run_id'],)).fetchone()
-            stored_digest = row[0] if row else None
+        with closing(sqlite3.connect(str(path))) as db:
+            with db:
+                row = db.execute('SELECT context_digest FROM engineering_workflow WHERE run=?',
+                                 (preflight['run_id'],)).fetchone()
+                stored_digest = row[0] if row else None
         manifests = load_context_manifests(path,preflight['run_id'])
         old = None
         for sealed in manifests:
@@ -258,12 +262,13 @@ def workflow(args: argparse.Namespace, *, host_capabilities=None) -> dict:
             except (TypeError,ValueError,json.JSONDecodeError):
                 continue
         if old is None:
-            with sqlite3.connect(str(path)) as db:
-                telemetry = db.execute("SELECT 1 FROM sqlite_master WHERE type='table' "
-                                       "AND name='engineering_firing_telemetry'").fetchone()
-                row = (db.execute('SELECT source_head FROM engineering_firing_telemetry '
-                                  'WHERE run=? ORDER BY rowid DESC LIMIT 1',
-                                  (preflight['run_id'],)).fetchone() if telemetry else None)
+            with closing(sqlite3.connect(str(path))) as db:
+                with db:
+                    telemetry = db.execute("SELECT 1 FROM sqlite_master WHERE type='table' "
+                                           "AND name='engineering_firing_telemetry'").fetchone()
+                    row = (db.execute('SELECT source_head FROM engineering_firing_telemetry '
+                                      'WHERE run=? ORDER BY rowid DESC LIMIT 1',
+                                      (preflight['run_id'],)).fetchone() if telemetry else None)
             previous_head = row[0] if row else None
             if previous_head:
                 old = json.loads(json.dumps(context))
@@ -299,18 +304,19 @@ def _attach_stall(result: dict, args) -> dict:
     checkpoint = result.get("workflow_checkpoint")
     if checkpoint and Path(checkpoint).is_file():
         try:
-            with sqlite3.connect(checkpoint) as db:
-                db.execute("CREATE TABLE IF NOT EXISTS engineering_firing_telemetry "
-                           "(run TEXT,firing TEXT,activity TEXT,reason_code TEXT,status TEXT,"
-                           "source_head TEXT,result_digest TEXT,request_created INTEGER,"
-                           "PRIMARY KEY(run,firing))")
-                cur = db.execute(
-                    "SELECT firing, activity, reason_code, status, source_head "
-                    "FROM engineering_firing_telemetry WHERE run=? ORDER BY rowid DESC LIMIT 12",
-                    (result.get("run_id"),),
-                )
-                cols = ("firing", "activity", "reason_code", "status", "source_head")
-                rows = [dict(zip(cols, row)) for row in cur.fetchall()]
+            with closing(sqlite3.connect(checkpoint)) as db:
+                with db:
+                    db.execute("CREATE TABLE IF NOT EXISTS engineering_firing_telemetry "
+                               "(run TEXT,firing TEXT,activity TEXT,reason_code TEXT,status TEXT,"
+                               "source_head TEXT,result_digest TEXT,request_created INTEGER,"
+                               "PRIMARY KEY(run,firing))")
+                    cur = db.execute(
+                        "SELECT firing, activity, reason_code, status, source_head "
+                        "FROM engineering_firing_telemetry WHERE run=? ORDER BY rowid DESC LIMIT 12",
+                        (result.get("run_id"),),
+                    )
+                    cols = ("firing", "activity", "reason_code", "status", "source_head")
+                    rows = [dict(zip(cols, row)) for row in cur.fetchall()]
         except sqlite3.Error:
             rows = []
     result["stall"] = detect_stall(rows)

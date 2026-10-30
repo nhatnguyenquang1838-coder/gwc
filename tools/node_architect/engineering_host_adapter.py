@@ -4,6 +4,7 @@ These capabilities are engineering evidence only. No typed C/E/continuation read
 GUI, credential access, Loop lifecycle operation or legacy gate receipt is used.
 """
 from __future__ import annotations
+from contextlib import closing
 import hashlib
 import json
 import os
@@ -58,7 +59,7 @@ def local_engineering_capabilities(context,*,guard,artifact_directory,allowed_co
         branch=subprocess.check_output(['git','-C',str(root),'branch','--show-current'],text=True).strip()
         if head!=c['repository']['head_sha'] or branch!=c['repository']['branch']:return False
         ref=c['run']['runtime_plan_ref'];raw=(root/ref).read_bytes()
-        return raw==subprocess.check_output(['git','-C',str(root),'show',head+':'+ref]) and 'sha256:'+hashlib.sha256(raw).hexdigest()==c['run']['runtime_plan_digest']
+        return raw.replace(b"\r\n", b"\n")==subprocess.check_output(['git','-C',str(root),'show',head+':'+ref]) and 'sha256:'+hashlib.sha256(raw).hexdigest()==c['run']['runtime_plan_digest']
     def read_once(c):
         require(guard() is True,'ENGINEERING_HOST_OWNER_UNVERIFIED')
         match=re.fullmatch(r'github://([^/]+/[^/]+)/issues/([1-9][0-9]*)',c['communication']['issue_ref'])
@@ -77,21 +78,20 @@ def local_engineering_capabilities(context,*,guard,artifact_directory,allowed_co
     def preflight(c,item):
         """Validate source, policy and command bindings without starting the task subprocess."""
         try:
-            require(os.open in os.supports_dir_fd and all(hasattr(os,name) for name in ('O_DIRECTORY','O_NOFOLLOW')),
-                    'ENGINEERING_ARTIFACT_FENCE_UNAVAILABLE')
             require(validate(c),'ENGINEERING_SOURCE_OR_OWNER_CHANGED')
             argv=tuple(item.get('argv',[]));require(argv in {tuple(a) for a in allowed_commands},'ENGINEERING_COMMAND_NOT_ALLOWLISTED')
             hashes={}
             for ref in item['read_paths']:
                 path=(root/ref).resolve();require(path.is_relative_to(root),'ENGINEERING_SOURCE_PATH_ESCAPE')
-                data=path.read_bytes();require(data==subprocess.check_output(['git','-C',str(root),'show',c['repository']['head_sha']+':'+ref]),'ENGINEERING_INPUT_SOURCE_DRIFT')
+                data=path.read_bytes()
+                require(data.replace(b"\r\n", b"\n")==subprocess.check_output(['git','-C',str(root),'show',c['repository']['head_sha']+':'+ref]),'ENGINEERING_INPUT_SOURCE_DRIFT')
                 hashes[ref]=hashlib.sha256(data).hexdigest()
             policy_ref=item.get('_source_policy_ref')
             policy_sha256=None
             if policy_ref:
                 policy_path=(root/policy_ref).resolve();require(policy_path.is_relative_to(root),'ENGINEERING_POLICY_PATH_ESCAPE')
                 policy_raw=policy_path.read_bytes()
-                require(policy_raw==subprocess.check_output(['git','-C',str(root),'show',c['repository']['head_sha']+':'+policy_ref]),'ENGINEERING_POLICY_SOURCE_DRIFT')
+                require(policy_raw.replace(b"\r\n", b"\n")==subprocess.check_output(['git','-C',str(root),'show',c['repository']['head_sha']+':'+policy_ref]),'ENGINEERING_POLICY_SOURCE_DRIFT')
                 policy_sha256=hashlib.sha256(policy_raw).hexdigest()
                 require(policy_sha256==item.get('_source_policy_sha256') and hashes==item.get('_source_input_hashes'),
                         'ENGINEERING_INPUT_BINDINGS_DRIFT')
@@ -105,6 +105,11 @@ def local_engineering_capabilities(context,*,guard,artifact_directory,allowed_co
                     'ENGINEERING_ARTIFACT_PATH_ESCAPE')
             require(item['action'] in c['runtime_plan']['scope']['allowed_actions'] and item['action']=='run_sandboxed_validation','ENGINEERING_EFFECT_AUTHORITY_REQUIRED')
             require(validate(c),'ENGINEERING_EFFECT_REVALIDATION_FAILED')
+            # Validate the request first for precise fail-closed reason codes. The
+            # atomic artifact fence is still required before any task subprocess or
+            # publication; Windows without dir_fd/O_NOFOLLOW remains unavailable.
+            require(os.open in os.supports_dir_fd and all(hasattr(os,name) for name in ('O_DIRECTORY','O_NOFOLLOW')),
+                    'ENGINEERING_ARTIFACT_FENCE_UNAVAILABLE')
             return {'argv':list(argv),'source_head':c['repository']['head_sha'],'input_hashes':hashes,
                     'task_context_digest':digest(c),
                     'input_policy_ref':policy_ref,'input_policy_sha256':policy_sha256,
@@ -141,11 +146,17 @@ def local_engineering_capabilities(context,*,guard,artifact_directory,allowed_co
         # Fence the publication syscall, not just an earlier pathname lookup.
         # Exclusive creation also refuses hardlinks and existing regular files.
         try:
-            directory_fd=os.open(artifacts,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
-            try:
-                fd=os.open(path.name,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600,dir_fd=directory_fd)
+            if os.open in os.supports_dir_fd and all(hasattr(os,name) for name in ('O_DIRECTORY','O_NOFOLLOW')):
+                directory_fd=os.open(artifacts,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
+                try:
+                    fd=os.open(path.name,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600,dir_fd=directory_fd)
+                    with os.fdopen(fd,'w',encoding='utf-8') as stream:stream.write(encoded)
+                finally:os.close(directory_fd)
+            else:  # pragma: no cover - Windows
+                # O_EXCL exclusive create refuses existing files and hardlinks; the
+                # path was already containment-checked against artifacts above.
+                fd=os.open(path,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
                 with os.fdopen(fd,'w',encoding='utf-8') as stream:stream.write(encoded)
-            finally:os.close(directory_fd)
         except OSError as exc:
             # The subprocess already ran: do NOT label this a pre-task refusal.
             raise ValueError('ENGINEERING_ARTIFACT_PUBLICATION_REFUSED') from exc
@@ -205,7 +216,7 @@ def read_source_bound_frontier(context,*,profile_ref,guard):
     def source(ref):
         path=(root/ref).resolve();require(path.is_relative_to(root),'ENGINEERING_FRONTIER_PATH_ESCAPE')
         data=path.read_bytes()
-        require(data==subprocess.check_output(['git','-C',str(root),'show',head+':'+ref]),'ENGINEERING_FRONTIER_SOURCE_DRIFT')
+        require(data.replace(b"\r\n", b"\n")==subprocess.check_output(['git','-C',str(root),'show',head+':'+ref]),'ENGINEERING_FRONTIER_SOURCE_DRIFT')
         return data
     policy_raw=source(profile_ref);policy=json.loads(policy_raw);policy_sha256=hashlib.sha256(policy_raw).hexdigest();items=[]
     require(policy.get('runtime_plan_ref',context['run']['runtime_plan_ref'])==context['run']['runtime_plan_ref'],'ENGINEERING_FRONTIER_PLAN_DRIFT')
@@ -227,18 +238,19 @@ def read_source_bound_frontier(context,*,profile_ref,guard):
         items.append(item)
     cp=Path(context['workflow']['checkpoint_ref']);verified=[]
     if cp.is_file():
-        with sqlite3.connect(cp.as_uri()+'?mode=ro',uri=True) as db:
-            if db.execute("SELECT 1 FROM sqlite_master WHERE name='engineering_work'").fetchone():
-                records=db.execute('SELECT fingerprint,result FROM engineering_work WHERE run=? AND status=?',(context['run']['id'],'VERIFIED')).fetchall()
-                verified=[r[0] for r in records]
-                current_keys={digest(i) for i in items}
-                for _,raw in records:
-                    receipt=json.loads(raw) if raw else {}
-                    alias=receipt.get('completion_fingerprint')
-                    if alias in current_keys and receipt.get('evidence_class')=='HOST_AGENT_EFFECT_READBACK_NOT_GATE_AUTHORITY' and receipt.get('authority_granted') is False:
-                        ancestor=subprocess.run(['git','-C',str(root),'merge-base','--is-ancestor',receipt['result_head'],head],capture_output=True)
-                        require(ancestor.returncode==0,'ENGINEERING_COMPLETION_SOURCE_DRIFT')
-                        verified.append(alias)
+        with closing(sqlite3.connect(cp.as_uri()+'?mode=ro',uri=True)) as db:
+            with db:
+                if db.execute("SELECT 1 FROM sqlite_master WHERE name='engineering_work'").fetchone():
+                    records=db.execute('SELECT fingerprint,result FROM engineering_work WHERE run=? AND status=?',(context['run']['id'],'VERIFIED')).fetchall()
+                    verified=[r[0] for r in records]
+                    current_keys={digest(i) for i in items}
+                    for _,raw in records:
+                        receipt=json.loads(raw) if raw else {}
+                        alias=receipt.get('completion_fingerprint')
+                        if alias in current_keys and receipt.get('evidence_class')=='HOST_AGENT_EFFECT_READBACK_NOT_GATE_AUTHORITY' and receipt.get('authority_granted') is False:
+                            ancestor=subprocess.run(['git','-C',str(root),'merge-base','--is-ancestor',receipt['result_head'],head],capture_output=True)
+                            require(ancestor.returncode==0,'ENGINEERING_COMPLETION_SOURCE_DRIFT')
+                            verified.append(alias)
     require(guard() is True,'ENGINEERING_HOST_OWNER_UNVERIFIED')
     result=project_frontier(context,items,verified_fingerprints=verified)
     for item in context.get('engineering',{}).get('work_items',[]):
@@ -264,7 +276,7 @@ def _validate_agent_request(context,request,guard,*,before_effect):
     require(git('branch','--show-current')==context['repository']['branch'],'AGENT_BRANCH_DRIFT')
     if before_effect:require(git('rev-parse','HEAD')==request['source_head'],'AGENT_SOURCE_DRIFT')
     ref=context['run']['runtime_plan_ref'];raw=(root/ref).read_bytes()
-    require(raw==subprocess.check_output(['git','-C',str(root),'show',request['source_head']+':'+ref]) and
+    require(raw.replace(b"\r\n", b"\n")==subprocess.check_output(['git','-C',str(root),'show',request['source_head']+':'+ref]) and
             'sha256:'+hashlib.sha256(raw).hexdigest()==request['runtime_plan_digest']==context['run']['runtime_plan_digest'],'AGENT_PLAN_DRIFT')
     plan=json.loads(raw)
     require(plan['run_id']==context['run']['id'] and plan['branch']==context['repository']['branch'] and
@@ -277,29 +289,32 @@ def _validate_agent_request(context,request,guard,*,before_effect):
             'AGENT_CONDITIONAL_REPAIR_UNPROVEN')
     for ref in work['write_paths']:
         require((root/ref).resolve().is_relative_to(root),'AGENT_WRITE_PATH_ESCAPE')
-    with sqlite3.connect(context['workflow']['checkpoint_ref']) as db:
-        rows=db.execute('SELECT result FROM engineering_invocations WHERE run=? AND result IS NOT NULL',(context['run']['id'],)).fetchall()
-        require(any(json.loads(row[0]).get('host_action_request')==request for row in rows),'AGENT_DISPATCH_NOT_FOUND')
+    with closing(sqlite3.connect(context['workflow']['checkpoint_ref'])) as db:
+        with db:
+            rows=db.execute('SELECT result FROM engineering_invocations WHERE run=? AND result IS NOT NULL',(context['run']['id'],)).fetchall()
+            require(any(json.loads(row[0]).get('host_action_request')==request for row in rows),'AGENT_DISPATCH_NOT_FOUND')
     return root
 
 
 def _agent_transition(context,request,expected,status,payload):
     import sqlite3
     run=context['run']['id'];key=request['work_fingerprint']
-    with sqlite3.connect(context['workflow']['checkpoint_ref']) as db:
-        db.execute('BEGIN IMMEDIATE')
-        row=db.execute('SELECT status,result FROM engineering_work WHERE run=? AND fingerprint=?',(run,key)).fetchone()
-        require((row is None if expected is None else row is not None and row[0]==expected),'AGENT_WORK_STATE_CONFLICT')
-        if row:
-            prior=json.loads(row[1]);require(prior.get('request_digest')==request['request_digest'],'AGENT_CLAIM_BINDING_MISMATCH')
-        db.execute('CREATE TABLE IF NOT EXISTS engineering_agent_work_history (run TEXT, fingerprint TEXT, seq INTEGER, event TEXT, PRIMARY KEY(run,fingerprint,seq))')
-        if row:db.execute('UPDATE engineering_work SET status=?,result=? WHERE run=? AND fingerprint=?',(status,json.dumps(payload,sort_keys=True),run,key))
-        else:db.execute('INSERT INTO engineering_work VALUES (?,?,?,?)',(run,key,status,json.dumps(payload,sort_keys=True)))
-        seq=db.execute('SELECT COALESCE(MAX(seq),0)+1 FROM engineering_agent_work_history WHERE run=? AND fingerprint=?',(run,key)).fetchone()[0]
-        db.execute('INSERT INTO engineering_agent_work_history VALUES (?,?,?,?)',(run,key,seq,json.dumps({'status':status,**payload},sort_keys=True)))
-    with sqlite3.connect(context['workflow']['checkpoint_ref']) as db:
-        actual=db.execute('SELECT status,result FROM engineering_work WHERE run=? AND fingerprint=?',(run,key)).fetchone()
-        require(actual[0]==status and json.loads(actual[1])==payload,'AGENT_DURABLE_READBACK_FAILED')
+    with closing(sqlite3.connect(context['workflow']['checkpoint_ref'])) as db:
+        with db:
+            db.execute('BEGIN IMMEDIATE')
+            row=db.execute('SELECT status,result FROM engineering_work WHERE run=? AND fingerprint=?',(run,key)).fetchone()
+            require((row is None if expected is None else row is not None and row[0]==expected),'AGENT_WORK_STATE_CONFLICT')
+            if row:
+                prior=json.loads(row[1]);require(prior.get('request_digest')==request['request_digest'],'AGENT_CLAIM_BINDING_MISMATCH')
+            db.execute('CREATE TABLE IF NOT EXISTS engineering_agent_work_history (run TEXT, fingerprint TEXT, seq INTEGER, event TEXT, PRIMARY KEY(run,fingerprint,seq))')
+            if row:db.execute('UPDATE engineering_work SET status=?,result=? WHERE run=? AND fingerprint=?',(status,json.dumps(payload,sort_keys=True),run,key))
+            else:db.execute('INSERT INTO engineering_work VALUES (?,?,?,?)',(run,key,status,json.dumps(payload,sort_keys=True)))
+            seq=db.execute('SELECT COALESCE(MAX(seq),0)+1 FROM engineering_agent_work_history WHERE run=? AND fingerprint=?',(run,key)).fetchone()[0]
+            db.execute('INSERT INTO engineering_agent_work_history VALUES (?,?,?,?)',(run,key,seq,json.dumps({'status':status,**payload},sort_keys=True)))
+    with closing(sqlite3.connect(context['workflow']['checkpoint_ref'])) as db:
+        with db:
+            actual=db.execute('SELECT status,result FROM engineering_work WHERE run=? AND fingerprint=?',(run,key)).fetchone()
+            require(actual[0]==status and json.loads(actual[1])==payload,'AGENT_DURABLE_READBACK_FAILED')
     return payload
 
 
@@ -363,8 +378,9 @@ def record_agent_execution(context,request,*,artifact_ref,guard,profile_ref=None
 def verify_agent_execution(context,request,*,artifact_ref,guard,profile_ref=None):
     import sqlite3
     receipt=_read_agent_execution(context,request,artifact_ref,guard,profile_ref)
-    with sqlite3.connect(context['workflow']['checkpoint_ref']) as db:
-        row=db.execute('SELECT status,result FROM engineering_work WHERE run=? AND fingerprint=?',(context['run']['id'],request['work_fingerprint'])).fetchone()
-        require(row is not None and row[0]=='EXECUTED','AGENT_WORK_STATE_CONFLICT')
-        require(json.loads(row[1])==receipt,'AGENT_EXECUTION_RECEIPT_DRIFT')
+    with closing(sqlite3.connect(context['workflow']['checkpoint_ref'])) as db:
+        with db:
+            row=db.execute('SELECT status,result FROM engineering_work WHERE run=? AND fingerprint=?',(context['run']['id'],request['work_fingerprint'])).fetchone()
+            require(row is not None and row[0]=='EXECUTED','AGENT_WORK_STATE_CONFLICT')
+            require(json.loads(row[1])==receipt,'AGENT_EXECUTION_RECEIPT_DRIFT')
     return _agent_transition(context,request,'EXECUTED','VERIFIED',receipt)

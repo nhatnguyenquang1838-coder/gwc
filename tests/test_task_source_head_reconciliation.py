@@ -1,4 +1,5 @@
 """CR-03: explicit additive source reconciliation, never silent context reuse."""
+from contextlib import closing
 from copy import deepcopy
 import sqlite3,json
 import pytest
@@ -32,9 +33,10 @@ def test_reconciliation_reuses_checkpoint_after_real_additive_commits(tmp_path):
     new=deepcopy(c);new['repository']['head_sha']=git('rev-parse','HEAD')
     r=reconcile_source_head(c,new,repository_root=tmp_path,reason='fixture additive commit')
     assert r['checkpoint_readback']=='PASS' and r['native_state_modified'] is False
-    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
-        assert db.execute('SELECT context_digest FROM workflow').fetchone()[0]==digest(new)
-        assert db.execute('SELECT count(*) FROM source_reconciliations').fetchone()[0]==1
+    with closing(sqlite3.connect(c['workflow']['checkpoint_ref'])) as db:
+        with db:
+            assert db.execute('SELECT context_digest FROM workflow').fetchone()[0]==digest(new)
+            assert db.execute('SELECT count(*) FROM source_reconciliations').fetchone()[0]==1
 
 
 def test_reconciliation_requires_real_additive_git_ancestry(tmp_path):

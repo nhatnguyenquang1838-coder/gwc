@@ -3,13 +3,18 @@
 from __future__ import annotations
 
 import argparse
-import fcntl
 import hashlib
 import json
 import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
+
+try:
+    import fcntl
+except ImportError:  # pragma: no cover - Windows
+    fcntl = None
+    import msvcrt
 
 RECORD_SEQUENCE = {
     "node-start": 1,
@@ -143,16 +148,28 @@ class NodeEvidenceLedger:
 
     @staticmethod
     def _locked_write(path: Path, data: str) -> None:
-        """Write data to file with exclusive file locking."""
+        """Write data to file with exclusive file locking (POSIX fcntl or Windows msvcrt)."""
         path.parent.mkdir(parents=True, exist_ok=True)
         with open(path, "a") as f:
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-            try:
-                f.write(data + "\n")
-                f.flush()
-                os.fsync(f.fileno())
-            finally:
-                fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            if fcntl is not None:
+                fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+                try:
+                    f.write(data + "\n")
+                    f.flush()
+                    os.fsync(f.fileno())
+                finally:
+                    fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            else:  # pragma: no cover - Windows
+                f.seek(0, os.SEEK_END)
+                lock_pos = f.tell()
+                msvcrt.locking(f.fileno(), msvcrt.LK_LOCK, 1)
+                try:
+                    f.write(data + "\n")
+                    f.flush()
+                    os.fsync(f.fileno())
+                finally:
+                    f.seek(lock_pos)
+                    msvcrt.locking(f.fileno(), msvcrt.LK_UNLCK, 1)
 
     @staticmethod
     def _write_json_idempotent(path: Path, payload: Mapping[str, Any]) -> None:

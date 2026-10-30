@@ -16,7 +16,7 @@ authority flags are fixed false.
 """
 from __future__ import annotations
 
-from contextlib import closing
+from contextlib import closing, contextmanager
 import hashlib
 import json
 import math
@@ -154,6 +154,24 @@ def _connect(path: Path, *, read_only: bool = False) -> sqlite3.Connection:
     return conn
 
 
+@contextmanager
+def _session(path: Path, *, read_only: bool = False):
+    """Run a unit of work with commit-on-success, rollback-on-error, then close.
+
+    ``sqlite3.Connection`` as a context manager commits or rolls back but never
+    closes the underlying handle, which leaks file locks (Windows raises
+    ``WinError 32`` on temp cleanup). ``closing()`` closes the handle but
+    silently discards pending writes, because ``Connection.close()`` rolls back
+    any open transaction. This combines both.
+    """
+    conn = _connect(path, read_only=read_only)
+    try:
+        with conn:
+            yield conn
+    finally:
+        conn.close()
+
+
 def _now() -> float:
     return time.time()
 
@@ -190,7 +208,7 @@ def init_store(path: Path) -> None:
     """Create schema if absent (idempotent). Fail-closed on store error."""
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
-        with _connect(path) as conn:
+        with _session(path) as conn:
             conn.executescript(_SCHEMA_SQL)
     except sqlite3.Error as exc:
         raise OutboxStoreUnavailable(OUTBOX_STORE_UNAVAILABLE) from exc
@@ -208,7 +226,7 @@ def _readback_digest(conn: sqlite3.Connection, path: Path) -> str:
 
 def _readback_after_write(path: Path, expected: str) -> None:
     try:
-        with closing(_connect(path, read_only=True)) as conn:
+        with _session(path, read_only=True) as conn:
             actual = _readback_digest(conn, path)
     except sqlite3.Error as exc:
         raise OutboxStoreUnavailable(OUTBOX_STORE_UNAVAILABLE) from exc
@@ -272,7 +290,7 @@ def enqueue(
         "production_authority_granted": False,
     }
     try:
-        with _connect(path) as conn:
+        with _session(path) as conn:
             try:
                 conn.execute(
                     "INSERT INTO delivery_outbox (projection_target, event_source, event_id, "
@@ -312,7 +330,7 @@ def acquire_lease(
     when another worker holds an unexpired lease.
     """
     try:
-        with _connect(path) as conn:
+        with _session(path) as conn:
             conn.execute("BEGIN IMMEDIATE")
             key = (projection_target, event_source, event_id, canonical_state_digest, delivery_generation)
             row = conn.execute(
@@ -352,7 +370,7 @@ def acquire_lease(
 
 def _verify_lease(path: Path, *, key: tuple, worker_id: str) -> sqlite3.Row:
     """Fence: re-verify the worker still holds the lease before any send/transition."""
-    with closing(_connect(path, read_only=True)) as conn:
+    with _session(path, read_only=True) as conn:
         row = conn.execute(
             "SELECT * FROM delivery_outbox WHERE projection_target=? AND event_source IS ? "
             "AND event_id=? AND canonical_state_digest=? AND delivery_generation=?",
@@ -399,7 +417,7 @@ def transition(
             next_attempt = now + (row["backoff_ms"] / 1000.0) * (2 ** (attempt_no - 1)) + (row["jitter_ms"] / 1000.0)
         else:
             next_attempt = None
-        with _connect(path) as conn:
+        with _session(path) as conn:
             conn.execute("BEGIN IMMEDIATE")
             if to_state == ACK_CONFIRMED:
                 _verify_lease(path, key=key, worker_id=worker_id)
@@ -437,7 +455,7 @@ def record_attempt(
 ) -> None:
     """Append an attempt row (immutable transport evidence)."""
     try:
-        with _connect(path) as conn:
+        with _session(path) as conn:
             conn.execute(
                 "INSERT INTO delivery_outbox_attempts (attempt_id, semantic_event_id, "
                 "delivery_generation, destination_id, attempt_no, request_digest, started_at, "
@@ -473,7 +491,7 @@ def verify_ack(path: Path, *, ack: dict[str, Any], worker_id: str) -> tuple[bool
     if not isinstance(ack, dict) or not required.issubset(ack):
         return False, "ACK_BINDING_INCOMPLETE"
     try:
-        with closing(_connect(path, read_only=True)) as conn:
+        with _session(path, read_only=True) as conn:
             row = conn.execute(
                 "SELECT * FROM delivery_outbox WHERE event_id=? ORDER BY delivery_generation DESC LIMIT 1",
                 (ack.get("event_id"),),
@@ -503,7 +521,7 @@ def verify_ack(path: Path, *, ack: dict[str, Any], worker_id: str) -> tuple[bool
         return False, "ACK_NOT_AUTHENTICATED"
     semantic_id = _semantic_event_id(row["projection_target"], row["event_source"],
                                      row["event_id"], row["canonical_state_digest"])
-    with closing(_connect(path, read_only=True)) as conn:
+    with _session(path, read_only=True) as conn:
         attempt = conn.execute(
             "SELECT request_digest FROM delivery_outbox_attempts WHERE semantic_event_id=? "
             "AND delivery_generation=? AND destination_id=? ORDER BY attempt_no DESC LIMIT 1",
@@ -522,7 +540,7 @@ def verify_ack(path: Path, *, ack: dict[str, Any], worker_id: str) -> tuple[bool
 def discover_restart(path: Path) -> list[dict[str, Any]]:
     """SCRUM-533 L3.2: scan non-terminal states after restart."""
     try:
-        with closing(_connect(path, read_only=True)) as conn:
+        with _session(path, read_only=True) as conn:
             rows = conn.execute(
                 "SELECT * FROM delivery_outbox WHERE state IN "
                 "('PENDING','IN_FLIGHT','ACK_UNKNOWN','RETRY_SCHEDULED')"
@@ -543,7 +561,7 @@ def quarantine(
     """Route a row to QUARANTINE (SCRUM-533 v3.1 V3.1.3 / L3.9 corruption or
     ACK_UNKNOWN exhaustion boundary)."""
     try:
-        with _connect(path) as conn:
+        with _session(path) as conn:
             conn.execute(
                 "INSERT OR IGNORE INTO delivery_outbox_dlq (dlq_id, semantic_event_id, "
                 "destination_id, state, lineage_json, quarantined_at, trust_revalidation_json, reason_code) "
