@@ -1,0 +1,45 @@
+name: Q0 portability regression
+
+on:
+  pull_request:
+    paths:
+      - 'tools/node_architect/**'
+      - 'scripts/scrum781_q0_replay_fixture.py'
+      - 'tests/**'
+      - 'requirements.txt'
+      - 'workflows/q0-loop-agent/requirements.txt'
+      - '.github/workflows/q0-portability-regression.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  q0-portability-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install source-pinned test dependencies
+        run: python -m pip install -r requirements.txt -r workflows/q0-loop-agent/requirements.txt
+      - name: Exercise supported POSIX readers and host plus portable safety regressions
+        env:
+          PYTHONPATH: .
+        run: |
+          python -m pytest -q --tb=short \
+            tests/test_q0_windows_portability_regressions.py \
+            tests/test_engineering_frontier_host.py \
+            tests/test_scrum781_q0_replay_fixture.py \
+            tests/test_task_context_binding.py \
+            tests/test_node_evidence_ledger.py \
+            tests/test_node_evidence_ledger_m1_m7.py \
+            --junitxml=q0-portability-results.xml
+      - name: Retain exact-run test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-portability-results-${{ github.run_id }}
+          path: q0-portability-results.xml
+          if-no-files-found: warn

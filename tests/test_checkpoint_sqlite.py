@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Tests for SQLite checkpoint store (SCRUM-396, AC11 durable commit)."""
 from __future__ import annotations
+from contextlib import closing
 
 import tempfile
 import sqlite3
@@ -123,23 +124,26 @@ class SQLiteCheckpointTests(unittest.TestCase):
 
     def test_existing_uninitialized_store_is_not_modified_by_reads(self) -> None:
         p = self._tmp()
-        with sqlite3.connect(p) as conn:
-            conn.execute("CREATE TABLE sentinel(value TEXT)")
+        with closing(sqlite3.connect(p)) as conn:
+            with conn:
+                conn.execute("CREATE TABLE sentinel(value TEXT)")
         before = p.read_bytes()
         before_files = sorted(x.name for x in p.parent.iterdir())
         self.assertIsNone(read_checkpoint(p, task_id="X", run_id="Y", node_id="Z"))
         self.assertIsNone(store_meta_get(p, "missing"))
         self.assertEqual(p.read_bytes(), before)
         self.assertEqual(sorted(x.name for x in p.parent.iterdir()), before_files)
-        with sqlite3.connect(p) as conn:
-            self.assertEqual(conn.execute("PRAGMA journal_mode").fetchone()[0], "delete")
-            self.assertEqual(conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall(),
-                             [("sentinel",)])
+        with closing(sqlite3.connect(p)) as conn:
+            with conn:
+                self.assertEqual(conn.execute("PRAGMA journal_mode").fetchone()[0], "delete")
+                self.assertEqual(conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall(),
+                                 [("sentinel",)])
 
     def test_denied_write_preserves_existing_store_and_parent(self) -> None:
         p = self._tmp()
-        with sqlite3.connect(p) as conn:
-            conn.execute("CREATE TABLE sentinel(value TEXT)")
+        with closing(sqlite3.connect(p)) as conn:
+            with conn:
+                conn.execute("CREATE TABLE sentinel(value TEXT)")
         before = p.read_bytes()
         with self.assertRaises(SQLiteCheckpointConflict):
             write_checkpoint(p, task_id="T", run_id="R", node_id="N",

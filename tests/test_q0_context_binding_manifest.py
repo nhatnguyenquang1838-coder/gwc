@@ -1,5 +1,6 @@
 """Regression coverage for source-bound Q0 context history and head deltas."""
 from __future__ import annotations
+from contextlib import closing
 
 import copy
 import hashlib
@@ -48,8 +49,9 @@ def _file_sha(path):
 
 
 def _tables(path):
-    with sqlite3.connect(path) as db:
-        return db.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name").fetchall()
+    with closing(sqlite3.connect(path)) as db:
+        with db:
+            return db.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name").fetchall()
 
 
 @pytest.mark.parametrize("reader", ["manifests", "recovery", "prior_context", "legacy_audit"])
@@ -80,10 +82,13 @@ def test_checkpoint_observers_do_not_create_missing_database(tmp_path, reader):
 def test_read_checkpoint_has_no_write_capability_and_closes_connection(tmp_path):
     from tools.node_architect.task_context_binding import read_checkpoint
 
-    checkpoint = tmp_path / "checkpoint?#.sqlite"
-    with sqlite3.connect(checkpoint) as writer:
-        writer.execute("CREATE TABLE sentinel(value TEXT)")
-        writer.execute("INSERT INTO sentinel VALUES ('preserved')")
+    # `?` cannot exist in a Windows filename, but `#` is still a URI fragment
+    # delimiter, so it keeps the quoting assertion meaningful on both platforms.
+    checkpoint = tmp_path / ("checkpoint#name.sqlite" if os.name == "nt" else "checkpoint?#.sqlite")
+    with closing(sqlite3.connect(checkpoint)) as writer:
+        with writer:
+            writer.execute("CREATE TABLE sentinel(value TEXT)")
+            writer.execute("INSERT INTO sentinel VALUES ('preserved')")
     before_sha, before_tables = _file_sha(checkpoint), _tables(checkpoint)
     with read_checkpoint(checkpoint) as reader:
         assert reader.execute("PRAGMA query_only").fetchone()[0] == 1
@@ -107,8 +112,9 @@ def test_checkpoint_observers_use_read_only_connection(tmp_path, monkeypatch, re
     from tools.node_architect.task_context_binding import load_context_manifests
 
     checkpoint = tmp_path / "existing.sqlite"
-    with sqlite3.connect(checkpoint) as writer:
-        writer.execute("CREATE TABLE sentinel(value TEXT)")
+    with closing(sqlite3.connect(checkpoint)) as writer:
+        with writer:
+            writer.execute("CREATE TABLE sentinel(value TEXT)")
     before_sha, before_tables = _file_sha(checkpoint), _tables(checkpoint)
     real_connect, calls = sqlite3.connect, []
 
@@ -207,14 +213,15 @@ def test_unprovable_historical_context_is_typed_and_read_only(tmp_path):
     stored = copy.deepcopy(value)
     stored["task"]["objective"] = "different historical binding"
     stored_digest = digest(stored)
-    with sqlite3.connect(checkpoint) as db:
-        db.execute("CREATE TABLE engineering_workflow (run TEXT PRIMARY KEY, context_digest TEXT, state TEXT)")
-        db.execute("INSERT INTO engineering_workflow VALUES (?,?,?)", (value["run"]["id"], stored_digest, "{}"))
-        db.execute("CREATE TABLE engineering_firing_telemetry (run TEXT, source_head TEXT)")
-        db.execute("INSERT INTO engineering_firing_telemetry VALUES (?,?)", (value["run"]["id"], "e" * 40))
-        db.execute("CREATE TABLE engineering_invocations (run TEXT, key TEXT, binding TEXT, result TEXT)")
-        db.execute("INSERT INTO engineering_invocations VALUES (?,?,?,NULL)",
-                    (value["run"]["id"], "attempt-1", stored_digest))
+    with closing(sqlite3.connect(checkpoint)) as db:
+        with db:
+            db.execute("CREATE TABLE engineering_workflow (run TEXT PRIMARY KEY, context_digest TEXT, state TEXT)")
+            db.execute("INSERT INTO engineering_workflow VALUES (?,?,?)", (value["run"]["id"], stored_digest, "{}"))
+            db.execute("CREATE TABLE engineering_firing_telemetry (run TEXT, source_head TEXT)")
+            db.execute("INSERT INTO engineering_firing_telemetry VALUES (?,?)", (value["run"]["id"], "e" * 40))
+            db.execute("CREATE TABLE engineering_invocations (run TEXT, key TEXT, binding TEXT, result TEXT)")
+            db.execute("INSERT INTO engineering_invocations VALUES (?,?,?,NULL)",
+                        (value["run"]["id"], "attempt-1", stored_digest))
     before = _file_sha(Path(checkpoint))
     with pytest.raises(ValueError, match="HISTORICAL_CONTEXT_NOT_PROVABLE") as caught:
         resolve_prior_context(checkpoint, value["run"]["id"], candidate_old=value,
@@ -256,9 +263,10 @@ def test_head_reconcile_dry_run_is_byte_identical(tmp_path):
     assert result["receipt"]["old_head"] == old["repository"]["head_sha"]
     assert _file_sha(checkpoint) == before
     assert _file_sha(target_copy) != copy_before
-    with sqlite3.connect(target_copy) as db:
-        assert db.execute("SELECT context_digest FROM engineering_workflow WHERE run=?",
-                          (old["run"]["id"],)).fetchone()[0] == result["would_apply"]["new_context_digest"]
+    with closing(sqlite3.connect(target_copy)) as db:
+        with db:
+            assert db.execute("SELECT context_digest FROM engineering_workflow WHERE run=?",
+                              (old["run"]["id"],)).fetchone()[0] == result["would_apply"]["new_context_digest"]
 
 
 def test_head_reconcile_still_rejects_non_head_drift(tmp_path):
@@ -298,9 +306,10 @@ def test_unvalidated_manifest_seal_is_byte_identical(tmp_path):
     from test_engineering_m1_m7_workflow import binding
 
     checkpoint = tmp_path / "checkpoint.sqlite"
-    with sqlite3.connect(checkpoint) as db:
-        db.execute("CREATE TABLE sentinel(value TEXT)")
-        db.execute("INSERT INTO sentinel VALUES ('unchanged')")
+    with closing(sqlite3.connect(checkpoint)) as db:
+        with db:
+            db.execute("CREATE TABLE sentinel(value TEXT)")
+            db.execute("INSERT INTO sentinel VALUES ('unchanged')")
     before = _file_sha(checkpoint)
     with pytest.raises(ValueError, match="MANIFEST_SEAL_NOT_AUTHORIZED"):
         seal_context_manifest(checkpoint, build_context_manifest(binding(tmp_path)))
@@ -358,9 +367,10 @@ def test_dry_run_changes_only_a_genuine_isolated_copy(tmp_path):
     assert result["would_apply"]["new_context_digest"]
     assert _file_sha(Path(live)) == live_before
     assert _file_sha(target_copy) != copy_before
-    with sqlite3.connect(target_copy) as db:
-        assert db.execute("SELECT context_digest FROM engineering_workflow WHERE run=?",
-                          (old["run"]["id"],)).fetchone()[0] == result["would_apply"]["new_context_digest"]
+    with closing(sqlite3.connect(target_copy)) as db:
+        with db:
+            assert db.execute("SELECT context_digest FROM engineering_workflow WHERE run=?",
+                              (old["run"]["id"],)).fetchone()[0] == result["would_apply"]["new_context_digest"]
 
 
 @pytest.mark.parametrize(("kwargs", "code"), [

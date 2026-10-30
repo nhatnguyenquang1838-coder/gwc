@@ -1,0 +1,48 @@
+{
+  "base_sha": "adee2f95206b037386d9e9ba1cfe14dc07bbeb7e",
+  "generated_at": "2026-10-30T08:58:20Z",
+  "implementation_head_sha": "835585af5eb7dc5374f5ad2de49c0b98a15468e1",
+  "limitations": [
+    "Windows replay and engineering-host publication fail closed without required POSIX primitives; equivalent Win32 backend not implemented",
+    "Activation readback fixtures do not qualify live activation",
+    "No Q0 L3 recertification for this implementation SHA",
+    "Stale UA graph; no graph-derived low-impact assertion"
+  ],
+  "linux_ci": {
+    "errors": 0,
+    "failed": 0,
+    "head_sha": "835585af5eb7dc5374f5ad2de49c0b98a15468e1",
+    "junit_sha256": "3cb58f0f1e35df93c4332a1d577ef4f451e5573775909983c7e176355bc25ee4",
+    "junit_suite_tests_including_subtests": 244,
+    "junit_testcase_count": 242,
+    "passed": 241,
+    "run_id": 41028882408,
+    "skipped": 1,
+    "subtests_passed": 2,
+    "summary": "241 passed, 1 skipped, 2 subtests passed in 14.01s",
+    "url": "https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/41028882408"
+  },
+  "pr": 614,
+  "preserved_path": ".gwc/tmp/review-e2e.html",
+  "review": {
+    "actual_model": "gpt-6-luna-900k",
+    "authority_granted": false,
+    "child_id": "sa-0-98e05b0f",
+    "delegation_id": "deleg_2d216f43",
+    "findings": [],
+    "model_exception": "Explicit user permission in clarify for one read-only review of PR614",
+    "reviewed_head": "835585af5eb7dc5374f5ad2de49c0b98a15468e1",
+    "scope": "origin/main...835585af full implementation diff, 32 paths",
+    "verdict": "PASS"
+  },
+  "task_id": "SCRUM-781",
+  "windows": {
+    "focused_failed": 0,
+    "focused_passed": 177,
+    "full_suite_pass": false,
+    "native_fixed_lock_hold_release": "PASS",
+    "posix_host_capability_failures": 13,
+    "unittest_safety_passed": 4,
+    "unittest_safety_skipped_posix_only": 2
+  }
+}

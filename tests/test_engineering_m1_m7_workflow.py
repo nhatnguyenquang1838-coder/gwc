@@ -1,4 +1,5 @@
 """CORRECTION43: engineering route is not protected typed C/E admission."""
+from contextlib import closing
 import pytest
 from test_task_context_binding import context
 from tools.node_architect.task_m1_m7_runner import run_task_workflow
@@ -78,14 +79,16 @@ def test_ten_firings_one_blocker_one_reservation(tmp_path):
     results=[run_task_workflow(c,host_capabilities=caps,
                                invocation_key=f"{c['executor']['session_id']}:native:{n}") for n in range(10)]
     assert sum(len(result['graph_requests']) for result in results)==1
-    with sqlite3.connect(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite') as db:
-        assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==1
-    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
-        assert db.execute('SELECT count(*) FROM engineering_firing_telemetry').fetchone()[0]==10
-        dispatch=db.execute('SELECT first_firing,last_firing FROM engineering_terminal_dispatches').fetchone()
-        assert dispatch==(f"{c['executor']['session_id']}:native:0",f"{c['executor']['session_id']}:native:9")
-        markers=db.execute('SELECT exchange_marker FROM engineering_firing_telemetry ORDER BY rowid').fetchall()
-        assert all(row[0]==results[0]['terminal_exchange_request']['marker'] for row in markers)
+    with closing(sqlite3.connect(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite')) as db:
+        with db:
+            assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==1
+    with closing(sqlite3.connect(c['workflow']['checkpoint_ref'])) as db:
+        with db:
+            assert db.execute('SELECT count(*) FROM engineering_firing_telemetry').fetchone()[0]==10
+            dispatch=db.execute('SELECT first_firing,last_firing FROM engineering_terminal_dispatches').fetchone()
+            assert dispatch==(f"{c['executor']['session_id']}:native:0",f"{c['executor']['session_id']}:native:9")
+            markers=db.execute('SELECT exchange_marker FROM engineering_firing_telemetry ORDER BY rowid').fetchall()
+            assert all(row[0]==results[0]['terminal_exchange_request']['marker'] for row in markers)
 
 
 def test_restart_replay_creates_no_new_reservation(tmp_path):
@@ -96,8 +99,9 @@ def test_restart_replay_creates_no_new_reservation(tmp_path):
     replay=run_task_workflow(c,host_capabilities=caps,invocation_key='restart-replay')
     assert first['graph_requests']==replay['graph_requests']
     assert replay['invocation_replayed'] is True
-    with sqlite3.connect(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite') as db:
-        assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==1
+    with closing(sqlite3.connect(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite')) as db:
+        with db:
+            assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==1
 
 
 def test_head_only_advance_keeps_blocker_key(tmp_path):
@@ -118,8 +122,9 @@ def test_head_only_advance_keeps_blocker_key(tmp_path):
     second=run_task_workflow(newer,host_capabilities=caps,invocation_key='head-two')
     assert second['terminal']['blocker_identity']==identity
     assert second['graph_requests']==[]
-    with sqlite3.connect(newer['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite') as db:
-        assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==1
+    with closing(sqlite3.connect(newer['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite')) as db:
+        with db:
+            assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==1
 
 
 def test_different_blocker_revision_creates_new_request(tmp_path):
@@ -132,8 +137,9 @@ def test_different_blocker_revision_creates_new_request(tmp_path):
     second=run_task_workflow(c,host_capabilities=caps,invocation_key='blocker-two')
     assert first['terminal']['blocker_identity']!=second['terminal']['blocker_identity']
     assert len(second['graph_requests'])==1
-    with sqlite3.connect(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite') as db:
-        assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==2
+    with closing(sqlite3.connect(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite')) as db:
+        with db:
+            assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==2
 
 
 def test_existing_pending_backlog_preserved(tmp_path):
@@ -144,16 +150,18 @@ def test_existing_pending_backlog_preserved(tmp_path):
             'conversation_url':c['controller']['conversation_url'],'capability':{},'lane':'HOST_COORDINATION',
             'report':'legacy unresolved request','authority_granted':False,'typed_ce_admitted':False,
             'request_digest':'sha256:'+'e'*64,'marker':'DWA-REVIEW-LEGACY'}
-    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
-        db.execute('CREATE TABLE engineering_terminal_dispatches (blocker_identity TEXT PRIMARY KEY, request TEXT NOT NULL, request_source_head TEXT NOT NULL, response_observation TEXT)')
-        db.execute('INSERT INTO engineering_terminal_dispatches VALUES (?,?,?,NULL)',
-                   ('sha256:'+'d'*64,json.dumps(legacy,sort_keys=True),'a'*40))
+    with closing(sqlite3.connect(c['workflow']['checkpoint_ref'])) as db:
+        with db:
+            db.execute('CREATE TABLE engineering_terminal_dispatches (blocker_identity TEXT PRIMARY KEY, request TEXT NOT NULL, request_source_head TEXT NOT NULL, response_observation TEXT)')
+            db.execute('INSERT INTO engineering_terminal_dispatches VALUES (?,?,?,NULL)',
+                       ('sha256:'+'d'*64,json.dumps(legacy,sort_keys=True),'a'*40))
     caps=capabilities(c,{'read':0,'execute':0});caps['engineering.work_frontier']=lambda ctx:_blocked_frontier(c)
     run_task_workflow(c,host_capabilities=caps,invocation_key='preserve-legacy')
-    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
-        row=db.execute('SELECT blocker_identity,request,request_source_head,response_observation FROM engineering_terminal_dispatches WHERE blocker_identity=?',
-                       ('sha256:'+'d'*64,)).fetchone()
-        assert row==('sha256:'+'d'*64,json.dumps(legacy,sort_keys=True),'a'*40,None)
+    with closing(sqlite3.connect(c['workflow']['checkpoint_ref'])) as db:
+        with db:
+            row=db.execute('SELECT blocker_identity,request,request_source_head,response_observation FROM engineering_terminal_dispatches WHERE blocker_identity=?',
+                           ('sha256:'+'d'*64,)).fetchone()
+            assert row==('sha256:'+'d'*64,json.dumps(legacy,sort_keys=True),'a'*40,None)
 
 
 def test_legacy_dispatch_reconciliation_is_audit_only(tmp_path):
@@ -162,11 +170,12 @@ def test_legacy_dispatch_reconciliation_is_audit_only(tmp_path):
     path=tmp_path/'checkpoint.sqlite';report='blocker_identity (sha256:'+'a'*64+')'
     request={'run_id':'legacy-run','report':report,'marker':'DWA-REVIEW-LEGACY',
              'request_digest':'sha256:'+'b'*64}
-    with sqlite3.connect(path) as db:
-        db.execute('CREATE TABLE engineering_terminal_dispatches '
-                   '(blocker_identity TEXT PRIMARY KEY,request TEXT,request_source_head TEXT,response_observation TEXT)')
-        db.execute('INSERT INTO engineering_terminal_dispatches VALUES (?,?,?,NULL)',
-                   ('sha256:'+'c'*64,json.dumps(request),'d'*40))
+    with closing(sqlite3.connect(path)) as db:
+        with db:
+            db.execute('CREATE TABLE engineering_terminal_dispatches '
+                       '(blocker_identity TEXT PRIMARY KEY,request TEXT,request_source_head TEXT,response_observation TEXT)')
+            db.execute('INSERT INTO engineering_terminal_dispatches VALUES (?,?,?,NULL)',
+                       ('sha256:'+'c'*64,json.dumps(request),'d'*40))
     with sqlite3.connect(path) as db:before=db.execute('SELECT * FROM engineering_terminal_dispatches').fetchall()
     result=reconcile_legacy_terminal_dispatches(path,'legacy-run')
     with sqlite3.connect(path) as db:after=db.execute('SELECT * FROM engineering_terminal_dispatches').fetchall()
@@ -248,8 +257,9 @@ def test_approval_request_deduped_by_scope_hash(tmp_path):
     assert all('approval_request' not in result['terminal'] and
                result['terminal']['blocked_by_pending_approval_scope']==results[0]['terminal']['approval_request']['scope_hash']
                for result in results[1:])
-    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
-        assert db.execute('SELECT count(*) FROM engineering_approval_requests').fetchone()[0]==1
+    with closing(sqlite3.connect(c['workflow']['checkpoint_ref'])) as db:
+        with db:
+            assert db.execute('SELECT count(*) FROM engineering_approval_requests').fetchone()[0]==1
 
 
 def test_stale_source_bound_verification_does_not_suppress_current_frontier_item(tmp_path):
@@ -261,11 +271,12 @@ def test_stale_source_bound_verification_does_not_suppress_current_frontier_item
           'action':'run_sandboxed_validation','input_digest':'sha256:'+'c'*64,
           '_stable_fingerprint':stable,'_source_policy_ref':'frontier.json',
           '_source_head':c['repository']['head_sha']}
-    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
-        db.execute('CREATE TABLE engineering_work (run TEXT,fingerprint TEXT,status TEXT,result TEXT)')
-        db.execute('INSERT INTO engineering_work VALUES (?,?,?,?)',
-                   (c['run']['id'],stable,'VERIFIED',json.dumps({'execution':{
-                       'result':'OLD_RESULT','source_head':'a'*40}})))
+    with closing(sqlite3.connect(c['workflow']['checkpoint_ref'])) as db:
+        with db:
+            db.execute('CREATE TABLE engineering_work (run TEXT,fingerprint TEXT,status TEXT,result TEXT)')
+            db.execute('INSERT INTO engineering_work VALUES (?,?,?,?)',
+                       (c['run']['id'],stable,'VERIFIED',json.dumps({'execution':{
+                           'result':'OLD_RESULT','source_head':'a'*40}})))
     def frontier(ctx):
         return {'source_head':ctx['repository']['head_sha'],
                 'runtime_plan_digest':ctx['run']['runtime_plan_digest'],
@@ -309,8 +320,9 @@ def test_absent_callable_admission_cannot_execute_or_claim_work(tmp_path,admissi
     r=run_task_workflow(c,host_capabilities=caps,invocation_key='unadmitted-source-check')
     assert r['verdict']['reason_code']=='ENGINEERING_GENUINE_FIRING_REQUIRED'
     assert counts=={'read':1,'execute':0}
-    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
-        assert db.execute('SELECT count(*) FROM engineering_work').fetchone()[0]==0
+    with closing(sqlite3.connect(c['workflow']['checkpoint_ref'])) as db:
+        with db:
+            assert db.execute('SELECT count(*) FROM engineering_work').fetchone()[0]==0
 
 
 def test_head_change_requires_explicit_same_checkpoint_reconciliation(tmp_path):
@@ -331,8 +343,9 @@ def test_head_change_requires_explicit_same_checkpoint_reconciliation(tmp_path):
     r=run_task_workflow(new,host_capabilities=caps,invocation_key='two')
     assert r['verdict']['reason_code']=='NO_MATERIAL_CHANGE'
     assert counts=={'read':2,'execute':1}
-    with sqlite3.connect(new['workflow']['checkpoint_ref']) as db:
-        assert db.execute('SELECT count(*) FROM engineering_invocations').fetchone()[0]==2
+    with closing(sqlite3.connect(new['workflow']['checkpoint_ref'])) as db:
+        with db:
+            assert db.execute('SELECT count(*) FROM engineering_invocations').fetchone()[0]==2
 
 
 def test_additive_route_metadata_requires_explicit_route_reconciliation(tmp_path):
@@ -382,10 +395,11 @@ def test_additive_route_metadata_requires_explicit_route_reconciliation(tmp_path
     assert receipt['new_route_policy_digest']==ctx_digest(new_route)
     r=run_task_workflow(newer,host_capabilities=caps,invocation_key='route-two')
     assert r['verdict']['reason_code']=='NO_MATERIAL_CHANGE'
-    with sqlite3.connect(newer['workflow']['checkpoint_ref']) as db:
-        assert db.execute('SELECT count(*) FROM engineering_invocations').fetchone()[0]==2
-        assert db.execute('SELECT count(*) FROM engineering_work').fetchone()[0]==1
-        assert db.execute('SELECT count(*) FROM engineering_source_reconciliations').fetchone()[0]>=1
+    with closing(sqlite3.connect(newer['workflow']['checkpoint_ref'])) as db:
+        with db:
+            assert db.execute('SELECT count(*) FROM engineering_invocations').fetchone()[0]==2
+            assert db.execute('SELECT count(*) FROM engineering_work').fetchone()[0]==1
+            assert db.execute('SELECT count(*) FROM engineering_source_reconciliations').fetchone()[0]>=1
 
 
 def test_worktree_relocation_requires_explicit_reconciliation(tmp_path):
@@ -439,9 +453,10 @@ def test_worktree_relocation_requires_explicit_reconciliation(tmp_path):
     assert receipt['head_unchanged'] is True
     r=run_task_workflow(newer,host_capabilities=caps,invocation_key='reloc-two')
     assert r['verdict']['reason_code']=='NO_MATERIAL_CHANGE'
-    with sqlite3.connect(newer['workflow']['checkpoint_ref']) as db:
-        assert db.execute('SELECT count(*) FROM engineering_invocations').fetchone()[0]==2
-        assert db.execute('SELECT count(*) FROM engineering_work').fetchone()[0]==1
+    with closing(sqlite3.connect(newer['workflow']['checkpoint_ref'])) as db:
+        with db:
+            assert db.execute('SELECT count(*) FROM engineering_invocations').fetchone()[0]==2
+            assert db.execute('SELECT count(*) FROM engineering_work').fetchone()[0]==1
 
 
 def test_worktree_relocation_accepts_standalone_clone_of_same_repository(tmp_path):
@@ -505,9 +520,10 @@ def test_false_verification_can_be_invalidated_and_reselected(tmp_path):
     receipt=invalidate_engineering_work(c['workflow']['checkpoint_ref'],c['run']['id'],fp,
                                         reason='fixture: relabelled green suite is not a RED')
     assert receipt['prior_status']=='VERIFIED' and receipt['new_status']=='INVALID'
-    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
-        assert db.execute('SELECT status FROM engineering_work WHERE run=? AND fingerprint=?',
-                          (c['run']['id'],fp)).fetchone()[0]=='INVALID'
+    with closing(sqlite3.connect(c['workflow']['checkpoint_ref'])) as db:
+        with db:
+            assert db.execute('SELECT status FROM engineering_work WHERE run=? AND fingerprint=?',
+                              (c['run']['id'],fp)).fetchone()[0]=='INVALID'
     again=run_task_workflow(c,host_capabilities=caps,invocation_key='invalidate-two')
     assert again['work']['fingerprint']==fp  # re-selected, not trusted
 
@@ -558,8 +574,9 @@ def test_executor_crash_is_not_retried_on_another_invocation(tmp_path):
     r=run_task_workflow(c,host_capabilities=caps,invocation_key='after-crash')
     assert counts['execute']==1
     assert r['verdict']['reason_code']=='ENGINEERING_EXECUTION_RECONCILIATION_REQUIRED'
-    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
-        assert db.execute('SELECT status FROM engineering_work WHERE run=?',(c['run']['id'],)).fetchone()[0]=='UNKNOWN'
+    with closing(sqlite3.connect(c['workflow']['checkpoint_ref'])) as db:
+        with db:
+            assert db.execute('SELECT status FROM engineering_work WHERE run=?',(c['run']['id'],)).fetchone()[0]=='UNKNOWN'
 
 
 def test_preflight_failure_is_recorded_as_no_effect_and_retryable_on_same_fingerprint(tmp_path):
@@ -573,8 +590,9 @@ def test_preflight_failure_is_recorded_as_no_effect_and_retryable_on_same_finger
     first=run_task_workflow(c,host_capabilities=caps,invocation_key='preflight-failure')
     assert first['activity_results']['M5']['reason_code']=='ENGINEERING_PRE_EFFECT_VALIDATION_FAILED'
     assert counts=={'read':1,'execute':0,'preflight':1}
-    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
-        status,result=db.execute('SELECT status,result FROM engineering_work WHERE run=?',(c['run']['id'],)).fetchone()
+    with closing(sqlite3.connect(c['workflow']['checkpoint_ref'])) as db:
+        with db:
+            status,result=db.execute('SELECT status,result FROM engineering_work WHERE run=?',(c['run']['id'],)).fetchone()
     detail=json.loads(result)
     assert status=='PRE_EFFECT_VALIDATION_FAILED'
     assert detail['effect_started'] is False and detail['reason_code']=='ENGINEERING_INPUT_DIGEST_DRIFT'
@@ -589,8 +607,9 @@ def test_preflight_failure_is_recorded_as_no_effect_and_retryable_on_same_finger
     assert retry['activity_results']['M5']['status']=='PASS'
     assert retry['activity_results']['M6']['status']=='PASS'
     assert counts=={'read':2,'execute':1,'preflight':2}
-    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
-        status,result=db.execute('SELECT status,result FROM engineering_work WHERE run=?',(c['run']['id'],)).fetchone()
+    with closing(sqlite3.connect(c['workflow']['checkpoint_ref'])) as db:
+        with db:
+            status,result=db.execute('SELECT status,result FROM engineering_work WHERE run=?',(c['run']['id'],)).fetchone()
     record=json.loads(result);history=record['attempt_history']
     assert status=='VERIFIED'
     assert history[0]['status']=='PRE_EFFECT_VALIDATION_FAILED'
@@ -632,8 +651,9 @@ def test_same_fingerprint_pre_effect_recovery_claim_is_atomic(tmp_path):
     assert counts['execute']==1
     assert sorted(r['activity_results']['M5']['reason_code'] for r in results.values())==[
         'ACTUAL_HOST_VALIDATION_EXECUTED','ENGINEERING_EXECUTION_RECONCILIATION_REQUIRED']
-    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
-        status,result=db.execute('SELECT status,result FROM engineering_work WHERE run=?',(c['run']['id'],)).fetchone()
+    with closing(sqlite3.connect(c['workflow']['checkpoint_ref'])) as db:
+        with db:
+            status,result=db.execute('SELECT status,result FROM engineering_work WHERE run=?',(c['run']['id'],)).fetchone()
     record=json.loads(result);history=record['attempt_history']
     assert status=='VERIFIED'
     assert [item['status'] for item in history]==['PRE_EFFECT_VALIDATION_FAILED','PREFLIGHT_PASSED','EXECUTED']
@@ -692,14 +712,16 @@ def test_m8_reserves_a_host_coordination_request_per_blocker(tmp_path):
     box=ExchangeOutbox(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite')
     assert box.read(req)['status']=='EXCHANGE_REQUESTED'
     assert first['terminal_exchange_status']=='EXCHANGE_REQUESTED'
-    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
-        rows=db.execute('SELECT state FROM engineering_workflow WHERE run=?',(c['run']['id'],)).fetchone()
-        state=json.loads(rows[0])
-        assert state['terminal']['kind']=='ENGINEERING_TERMINAL_RESULT'
-        assert state['terminal_exchange_request']==req
-        assert state['terminal_exchange_status']=='EXCHANGE_REQUESTED'
-    with sqlite3.connect(box.path) as outbox_db:
-        assert outbox_db.execute('SELECT count(*) FROM exchange').fetchone()[0]==1
+    with closing(sqlite3.connect(c['workflow']['checkpoint_ref'])) as db:
+        with db:
+            rows=db.execute('SELECT state FROM engineering_workflow WHERE run=?',(c['run']['id'],)).fetchone()
+            state=json.loads(rows[0])
+            assert state['terminal']['kind']=='ENGINEERING_TERMINAL_RESULT'
+            assert state['terminal_exchange_request']==req
+            assert state['terminal_exchange_status']=='EXCHANGE_REQUESTED'
+    with closing(sqlite3.connect(box.path)) as outbox_db:
+        with outbox_db:
+            assert outbox_db.execute('SELECT count(*) FROM exchange').fetchone()[0]==1
     second=run_task_workflow(c,host_capabilities=caps,invocation_key='terminal-two')
     # Same unresolved blocker, later firing: preserve the canonical request.
     assert second['graph_requests']==[]
@@ -765,10 +787,12 @@ def test_m8_records_telemetry_without_a_second_request_while_exchange_pending(tm
     assert second['terminal_exchange_request'] is None
     box=ExchangeOutbox(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite')
     assert box.read(original)['status']=='EXCHANGE_REQUESTED'
-    with sqlite3.connect(box.path) as db:
-        assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==1
-    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
-        rows=db.execute('SELECT firing,request_created FROM engineering_firing_telemetry ORDER BY firing').fetchall()
+    with closing(sqlite3.connect(box.path)) as db:
+        with db:
+            assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==1
+    with closing(sqlite3.connect(c['workflow']['checkpoint_ref'])) as db:
+        with db:
+            rows=db.execute('SELECT firing,request_created FROM engineering_firing_telemetry ORDER BY firing').fetchall()
     assert ('m3-after-m7',0) in rows
 
 
@@ -848,15 +872,17 @@ def test_terminal_blocker_identity_dedupes_across_firings_and_head_only_advance(
     assert second['terminal']['blocked_by_pending_exchange_marker']==original['marker']
     assert second['terminal']['controller_dispatch_required'] is False
     box=ExchangeOutbox(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite')
-    with sqlite3.connect(box.path) as db:
-        rows=db.execute('SELECT request FROM exchange ORDER BY rowid').fetchall()
-        assert len(rows)==1 and json.loads(rows[0][0])==original
-    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
-        rows=db.execute('SELECT request,last_firing FROM engineering_terminal_dispatches WHERE blocker_identity=?',
-                        (identity,)).fetchall()
-        assert len(rows)==1 and json.loads(rows[0][0])==original
-        assert rows[0][1]=='terminal-head-three'
-        telemetry=db.execute('SELECT firing,exchange_marker FROM engineering_firing_telemetry ORDER BY firing').fetchall()
-        assert telemetry==[('terminal-head-one',original['marker']),
-                           ('terminal-head-three',original['marker']),
-                           ('terminal-head-two',original['marker'])]
+    with closing(sqlite3.connect(box.path)) as db:
+        with db:
+            rows=db.execute('SELECT request FROM exchange ORDER BY rowid').fetchall()
+            assert len(rows)==1 and json.loads(rows[0][0])==original
+    with closing(sqlite3.connect(c['workflow']['checkpoint_ref'])) as db:
+        with db:
+            rows=db.execute('SELECT request,last_firing FROM engineering_terminal_dispatches WHERE blocker_identity=?',
+                            (identity,)).fetchall()
+            assert len(rows)==1 and json.loads(rows[0][0])==original
+            assert rows[0][1]=='terminal-head-three'
+            telemetry=db.execute('SELECT firing,exchange_marker FROM engineering_firing_telemetry ORDER BY firing').fetchall()
+            assert telemetry==[('terminal-head-one',original['marker']),
+                               ('terminal-head-three',original['marker']),
+                               ('terminal-head-two',original['marker'])]

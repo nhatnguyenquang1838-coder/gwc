@@ -8,6 +8,7 @@ from __future__ import annotations
 import datetime
 import json
 import sqlite3
+from contextlib import contextmanager
 from pathlib import Path
 from .task_context_binding import validate_task_context, digest, require
 from .exchange_deadlock import detect_exchange_stall, DEFAULT_THRESHOLD
@@ -156,8 +157,20 @@ class ExchangeOutbox:
                            (request['request_digest'],new_context_digest)).fetchone()
         return row is not None
 
+    @contextmanager
     def _db(self):
-        return sqlite3.connect(str(self.path), timeout=10)
+        """Commit-on-success, rollback-on-error, then always release the handle.
+
+        A bare ``sqlite3.Connection`` context manager commits but does not close,
+        so the file stays locked and Windows fails to remove temp stores
+        (``WinError 32``). Callers keep using ``with self._db() as db:``.
+        """
+        conn = sqlite3.connect(str(self.path), timeout=10)
+        try:
+            with conn:
+                yield conn
+        finally:
+            conn.close()
 
     def note_attempt(self, request, status=None):
         """Record one host attempt for this request (append-only, no authority)."""

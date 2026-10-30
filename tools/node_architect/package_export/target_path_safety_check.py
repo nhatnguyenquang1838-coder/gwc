@@ -124,9 +124,15 @@ def _is_traversal(normalized: str) -> bool:
 
 
 def _escapes_root(normalized: str, approved_prefix: str) -> bool:
-    """True if the normalized path escapes the approved prefix root."""
-    norm = os.path.normpath("/" + normalized)
-    prefix = os.path.normpath("/" + approved_prefix)
+    """True if the normalized path escapes the approved prefix root.
+
+    Uses posixpath so the comparison is platform-independent: the normalized
+    target is already a POSIX relative path, and os.path.normpath would return
+    backslash separators on Windows and break the prefix check.
+    """
+    import posixpath
+    norm = posixpath.normpath("/" + normalized)
+    prefix = posixpath.normpath("/" + approved_prefix)
     return not (norm == prefix or norm.startswith(prefix + "/"))
 
 

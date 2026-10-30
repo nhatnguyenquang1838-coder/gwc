@@ -3,13 +3,18 @@
 from __future__ import annotations
 
 import argparse
-import fcntl
 import hashlib
 import json
 import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
+
+try:
+    import fcntl
+except ImportError:  # pragma: no cover - Windows
+    fcntl = None
+    import msvcrt
 
 RECORD_SEQUENCE = {
     "node-start": 1,
@@ -143,16 +148,31 @@ class NodeEvidenceLedger:
 
     @staticmethod
     def _locked_write(path: Path, data: str) -> None:
-        """Write data to file with exclusive file locking."""
+        """Write data to file with exclusive file locking (POSIX fcntl or Windows msvcrt)."""
         path.parent.mkdir(parents=True, exist_ok=True)
-        with open(path, "a") as f:
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+        if fcntl is None:  # Windows: all appenders serialize on the same byte.
+            # Do not lock EOF of the growing data file: concurrent appenders
+            # would then acquire disjoint byte ranges after the first write.
+            with open(path.with_suffix(path.suffix + '.lock'), 'a+b') as lock:
+                lock.seek(0)
+                msvcrt.locking(lock.fileno(), msvcrt.LK_LOCK, 1)
+                try:
+                    with open(path, 'a', encoding='utf-8') as stream:
+                        stream.write(data + '\n')
+                        stream.flush()
+                        os.fsync(stream.fileno())
+                finally:
+                    lock.seek(0)
+                    msvcrt.locking(lock.fileno(), msvcrt.LK_UNLCK, 1)
+            return
+        with open(path, 'a', encoding='utf-8') as stream:
+            fcntl.flock(stream.fileno(), fcntl.LOCK_EX)
             try:
-                f.write(data + "\n")
-                f.flush()
-                os.fsync(f.fileno())
+                stream.write(data + '\n')
+                stream.flush()
+                os.fsync(stream.fileno())
             finally:
-                fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+                fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
 
     @staticmethod
     def _write_json_idempotent(path: Path, payload: Mapping[str, Any]) -> None:

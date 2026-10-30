@@ -69,7 +69,7 @@ def validate_suite(suite: Dict[str, Any], root: Path = ROOT) -> None:
         manifest.get('dwo_projection_mode') == 'READ_ONLY',
         binding.get('repository') == 'nhatnguyenquang1838-coder/gwc',
         binding.get('branch') == BRANCH,
-        binding.get('runtimeplan_path') == str(PLAN.relative_to(ROOT)),
+        binding.get('runtimeplan_path') == PLAN.relative_to(ROOT).as_posix(),
         binding.get('runtimeplan_sha256') == PLAN_DIGEST,
         incident.get('original_trace_status') == 'MISSING',
         incident.get('provenance_class') == 'RECONSTRUCTED_REQUIREMENTS_BOUND',

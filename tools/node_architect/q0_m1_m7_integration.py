@@ -6,12 +6,15 @@ No scheduler, mailbox, browser, lease or authority writes. Execution Binding is
 identity, NOT an approval. Native qualification remains a separate admission.
 """
 from __future__ import annotations
+from contextlib import closing
+import os
 import hashlib
 import json
 from pathlib import Path
 from pathlib import PurePosixPath, PureWindowsPath
 import subprocess
 from typing import Any, Mapping
+import re
 
 PLAN_REF = 'core/node-architect/scrum781-q0-fresh-execution-plan-r2.json'
 ROUTE_REF = 'core/node-architect/q0-engineering-coordination-route-r1.json'
@@ -324,7 +327,7 @@ def _executor_validate(authority, predecessor, successor_plan, successor_plan_re
     if not isinstance(run_id, str) or not isinstance(context, str):
         raise ValueError('PREDECESSOR_CHECKPOINT_UNBOUND')
     try:
-        with sqlite3.connect(Path(checkpoint).resolve().as_uri() + '?mode=ro', uri=True) as db:
+        with closing(sqlite3.connect(Path(checkpoint).resolve().as_uri() + '?mode=ro', uri=True)) as db:
             row = db.execute('SELECT context_digest FROM engineering_workflow WHERE run=?', (run_id,)).fetchone()
     except (sqlite3.Error, OSError) as exc:
         raise ValueError('PREDECESSOR_CHECKPOINT_UNBOUND') from exc
@@ -479,10 +482,14 @@ def execute_live_activation(*, authority, predecessor, successor_plan, successor
         cursor = {'plan_ref': successor_plan_ref, 'generation': generation}
         with tempfile.TemporaryDirectory(prefix='q0-live-activation-') as tmp:
             db_tmp = Path(tmp) / 'activation.sqlite3'
-            with sqlite3.connect(db_tmp) as db:
-                db.execute('CREATE TABLE engineering_plan_activation (plan_ref TEXT PRIMARY KEY, plan_digest TEXT, context_digest TEXT, generation INTEGER, activated_at TEXT)')
-                db.execute('INSERT INTO engineering_plan_activation VALUES (?,?,?,?,?)',
-                           (successor_plan_ref, file_digest, checkpoint_digest, generation, stamp))
+            connection = sqlite3.connect(db_tmp)
+            try:
+                with connection:
+                    connection.execute('CREATE TABLE engineering_plan_activation (plan_ref TEXT PRIMARY KEY, plan_digest TEXT, context_digest TEXT, generation INTEGER, activated_at TEXT)')
+                    connection.execute('INSERT INTO engineering_plan_activation VALUES (?,?,?,?,?)',
+                               (successor_plan_ref, file_digest, checkpoint_digest, generation, stamp))
+            finally:
+                connection.close()
             after = {
                 'selector_write': {paths['selector']: json.dumps(selector, sort_keys=True, indent=2).encode() + b'\n'},
                 'checkpoint_write': {paths['checkpoint']: json.dumps(checkpoint, sort_keys=True, indent=2).encode() + b'\n',
@@ -558,7 +565,7 @@ def _live_db_generation(db_path: Path, plan_ref: str) -> int:
     import sqlite3
     if not db_path.exists():
         return 0
-    with sqlite3.connect(f'file:{db_path}?mode=ro', uri=True) as db:
+    with closing(sqlite3.connect(f'file:{db_path}?mode=ro', uri=True)) as db:
         try:
             row = db.execute('SELECT generation FROM engineering_plan_activation WHERE plan_ref=?',
                              (plan_ref,)).fetchone()
@@ -589,12 +596,13 @@ def _reconcile_legacy_live_activation_journal(isolated_root: Path | str) -> dict
     import sqlite3
     db_path = paths['database']
     db_path.parent.mkdir(parents=True, exist_ok=True)
-    with sqlite3.connect(db_path) as db:
-        db.execute('CREATE TABLE IF NOT EXISTS engineering_plan_activation '
-                   '(plan_ref TEXT PRIMARY KEY, plan_digest TEXT, context_digest TEXT, generation INTEGER, activated_at TEXT)')
-        db.execute('INSERT OR IGNORE INTO engineering_plan_activation VALUES (?,?,?,?,?)',
-                   (pending['plan_ref'], pending['plan_digest'], pending['receipt']['checkpoint_receipt_digest'],
-                    pending['generation'], pending['activated_at']))
+    with closing(sqlite3.connect(db_path)) as db:
+        with db:
+            db.execute('CREATE TABLE IF NOT EXISTS engineering_plan_activation '
+                       '(plan_ref TEXT PRIMARY KEY, plan_digest TEXT, context_digest TEXT, generation INTEGER, activated_at TEXT)')
+            db.execute('INSERT OR IGNORE INTO engineering_plan_activation VALUES (?,?,?,?,?)',
+                       (pending['plan_ref'], pending['plan_digest'], pending['receipt']['checkpoint_receipt_digest'],
+                        pending['generation'], pending['activated_at']))
     rows.append({'phase': 'COMMIT', 'key': pending['key'], 'generation': pending['generation']})
     _write_json_atomic(journal_path, rows)
     return {'reconciled': True, 'status': 'COMPLETED'}
@@ -699,7 +707,7 @@ def verify_live_activation_isolated(isolated_root: Path | str) -> dict[str, Any]
     receipt = json.loads((root / ACTIVATION_RECEIPT_REF).read_text('utf-8'))
     import sqlite3
     db_path = Path(receipt['checkpoint_ref'])
-    with sqlite3.connect(f'file:{db_path}?mode=ro', uri=True) as db:
+    with closing(sqlite3.connect(f'file:{db_path}?mode=ro', uri=True)) as db:
         row = db.execute('SELECT generation FROM engineering_plan_activation WHERE plan_ref=?',
                          (resolved,)).fetchone()
     if row is None:
@@ -1003,6 +1011,72 @@ def _sha256_file(path: Path) -> str:
     return 'sha256:' + hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+_CHECKPOINT_HOST_DIR = 'q0-m1-m7-host'
+_POSIX_ABSOLUTE = re.compile(r'^/')
+_WINDOWS_ABSOLUTE = re.compile(r'^(?:[A-Za-z]:[\\/]|\\\\|/\\)')
+
+
+def _local_hermes_scratch() -> Path:
+    """This host's Hermes scratch root (HERMES_HOME-aware; no hardcoded home)."""
+    home = os.environ.get('HERMES_HOME') or str(Path.home() / '.hermes')
+    return Path(home).expanduser() / 'cache' / 'scratch'
+
+
+def is_external_absolute(ref: str) -> bool:
+    """True for a rooted reference, whichever platform's syntax it uses.
+
+    ``Path('/Users/x').is_absolute()`` is False on Windows because there is no
+    drive, so the textual form must decide. Without this, a recorded POSIX path is
+    wrongly treated as repo-relative.
+    """
+    return bool(_POSIX_ABSOLUTE.match(ref) or _WINDOWS_ABSOLUTE.match(ref))
+
+
+def _reroot_candidates(recorded: Path):
+    """Yield local candidates for a recorded checkpoint, most recent first."""
+    parts = recorded.parts
+    for index, part in enumerate(parts):
+        if part != _CHECKPOINT_HOST_DIR:
+            continue
+        tail = parts[index + 1:]
+        if not tail:
+            break
+        base = _local_hermes_scratch() / _CHECKPOINT_HOST_DIR
+        direct = base.joinpath(*tail)
+        if direct.exists():
+            yield direct
+        parent = direct.parent
+        if parent.is_dir():
+            siblings = [item for item in parent.iterdir()
+                        if item.is_file() and item.name == direct.name]
+            for item in sorted(siblings, key=lambda item: item.stat().st_mtime, reverse=True):
+                yield item
+        yield direct
+        return
+
+
+def resolve_activation_checkpoint_path(checkpoint_ref: str, root: Path) -> Path:
+    """Resolve a recorded activation checkpoint reference against this host.
+
+    The activation receipt stores the absolute path that was live on the machine
+    where the activation ran, so it is a hint, not a portable location. The
+    scratch tail below ``q0-m1-m7-host`` is stable across hosts, so it is re-rooted
+    under this host's scratch root, preferring the most recent match. Content
+    integrity is unchanged: the plan digest and activation row are verified by the
+    caller. An unresolvable reference is returned unchanged so the caller still
+    fails closed.
+    """
+    if not is_external_absolute(checkpoint_ref):
+        return (root / checkpoint_ref).resolve()
+    recorded = Path(checkpoint_ref)
+    if recorded.exists():
+        return recorded
+    for candidate in _reroot_candidates(recorded):
+        if candidate.exists():
+            return candidate
+    return recorded
+
+
 def resolve_active_plan(root: Path | str) -> str:
     """Resolve the active RuntimePlan with fail-closed activation semantics.
 
@@ -1042,13 +1116,11 @@ def resolve_active_plan(root: Path | str) -> str:
     checkpoint_ref = receipt.get('checkpoint_ref')
     if not checkpoint_ref:
         raise ValueError('Q0_PLAN_ACTIVATION_INVALID')
-    checkpoint_path = Path(checkpoint_ref)
-    if not checkpoint_path.is_absolute():
-        checkpoint_path = root / checkpoint_ref
+    checkpoint_path = resolve_activation_checkpoint_path(checkpoint_ref, root)
     if not checkpoint_path.exists():
         raise ValueError('Q0_PLAN_ACTIVATION_INVALID')
     import sqlite3
-    with sqlite3.connect('file:' + str(checkpoint_path) + '?mode=ro', uri=True) as db:
+    with closing(sqlite3.connect('file:' + str(checkpoint_path) + '?mode=ro', uri=True)) as db:
         row = db.execute('SELECT plan_digest,generation FROM engineering_plan_activation WHERE plan_ref=?',
                          (ref,)).fetchone()
     if row is None or row[0] != receipt['plan_digest'] or int(row[1]) < 1:

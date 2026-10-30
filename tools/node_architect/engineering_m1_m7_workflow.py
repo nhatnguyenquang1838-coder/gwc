@@ -4,6 +4,7 @@ Host capabilities perform I/O; this graph owns orchestration only. Human
 communication, engineering execution and protected typed authority are distinct.
 """
 from __future__ import annotations
+from contextlib import closing
 import json
 import os
 import sqlite3
@@ -179,12 +180,13 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
     # checkpoint. This read-only preflight makes context drift a zero-write exit.
     if path.is_file():
         checkpoint_uri=path.resolve().as_uri()+'?mode=ro'
-        with sqlite3.connect(checkpoint_uri,uri=True,timeout=30) as reader:
-            reader.execute('PRAGMA query_only=ON')
-            has_workflow=reader.execute(
-                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='engineering_workflow'").fetchone()
-            prior_binding=(reader.execute('SELECT context_digest FROM engineering_workflow WHERE run=?',
-                                          (run,)).fetchone() if has_workflow else None)
+        with closing(sqlite3.connect(checkpoint_uri,uri=True,timeout=30)) as reader:
+            with reader:
+                reader.execute('PRAGMA query_only=ON')
+                has_workflow=reader.execute(
+                    "SELECT 1 FROM sqlite_master WHERE type='table' AND name='engineering_workflow'").fetchone()
+                prior_binding=(reader.execute('SELECT context_digest FROM engineering_workflow WHERE run=?',
+                                              (run,)).fetchone() if has_workflow else None)
         require(prior_binding is None or prior_binding[0]==binding,
                 'ENGINEERING_CHECKPOINT_CONTEXT_DRIFT')
     with _connect(path) as db:
@@ -838,44 +840,47 @@ def reconcile_engineering_source_head(old_context,new_context,*,repository_root,
         live_path=old['workflow']['checkpoint_ref']
         assert_isolated_copy(live_path,target_copy)
         live_uri=Path(live_path).resolve().as_uri()+'?mode=ro'
-        with sqlite3.connect(live_uri,uri=True,timeout=30) as reader:
-            reader.execute('PRAGMA query_only=ON')
-            live_table=reader.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='engineering_workflow'").fetchone()
-            live_row=(reader.execute('SELECT context_digest FROM engineering_workflow WHERE run=?',
-                                     (old['run']['id'],)).fetchone() if live_table else None)
-            require(live_row is not None and live_row[0]==digest(old),
-                    'ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
-        with sqlite3.connect(str(target_copy),timeout=30) as db:
-            db.execute('BEGIN IMMEDIATE')
-            table=db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='engineering_workflow'").fetchone()
-            row=(db.execute('SELECT context_digest,state FROM engineering_workflow WHERE run=?',
-                            (old['run']['id'],)).fetchone() if table else None)
-            require(row is not None and row[0]==digest(old),
-                    'ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
-            db.execute('CREATE TABLE IF NOT EXISTS engineering_source_reconciliations '
-                       '(key TEXT PRIMARY KEY, receipt TEXT, prior_state TEXT)')
-            db.execute('INSERT INTO engineering_source_reconciliations VALUES (?,?,?)',
-                       (digest(receipt),json.dumps(receipt,sort_keys=True),row[1]))
-            updated=db.execute('UPDATE engineering_workflow SET context_digest=? WHERE run=? AND context_digest=?',
-                               (digest(new),old['run']['id'],digest(old)))
-            require(updated.rowcount==1,'ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
-            db.commit()
+        with closing(sqlite3.connect(live_uri,uri=True,timeout=30)) as reader:
+            with reader:
+                reader.execute('PRAGMA query_only=ON')
+                live_table=reader.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='engineering_workflow'").fetchone()
+                live_row=(reader.execute('SELECT context_digest FROM engineering_workflow WHERE run=?',
+                                         (old['run']['id'],)).fetchone() if live_table else None)
+                require(live_row is not None and live_row[0]==digest(old),
+                        'ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
+        with closing(sqlite3.connect(str(target_copy),timeout=30)) as db:
+            with db:
+                db.execute('BEGIN IMMEDIATE')
+                table=db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='engineering_workflow'").fetchone()
+                row=(db.execute('SELECT context_digest,state FROM engineering_workflow WHERE run=?',
+                                (old['run']['id'],)).fetchone() if table else None)
+                require(row is not None and row[0]==digest(old),
+                        'ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
+                db.execute('CREATE TABLE IF NOT EXISTS engineering_source_reconciliations '
+                           '(key TEXT PRIMARY KEY, receipt TEXT, prior_state TEXT)')
+                db.execute('INSERT INTO engineering_source_reconciliations VALUES (?,?,?)',
+                           (digest(receipt),json.dumps(receipt,sort_keys=True),row[1]))
+                updated=db.execute('UPDATE engineering_workflow SET context_digest=? WHERE run=? AND context_digest=?',
+                                   (digest(new),old['run']['id'],digest(old)))
+                require(updated.rowcount==1,'ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
+                db.commit()
         would_apply={'run':old['run']['id'],'old_context_digest':digest(old),
                      'new_context_digest':digest(new),'receipt_digest':digest(receipt)}
         return {'dry_run':True,'would_apply':would_apply,'receipt':receipt}
 
-    with sqlite3.connect(str(old['workflow']['checkpoint_ref']),timeout=30) as db:
-        db.execute('BEGIN IMMEDIATE')
-        table=db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='engineering_workflow'").fetchone()
-        row=(db.execute('SELECT context_digest,state FROM engineering_workflow WHERE run=?',(old['run']['id'],)).fetchone()
-             if table else None)
-        if row is None:raise ValueError('ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
-        require(row[0]==digest(old),'ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
-        db.execute('CREATE TABLE IF NOT EXISTS engineering_source_reconciliations (key TEXT PRIMARY KEY, receipt TEXT, prior_state TEXT)')
-        db.execute('INSERT INTO engineering_source_reconciliations VALUES (?,?,?)',(digest(receipt),json.dumps(receipt,sort_keys=True),row[1]))
-        updated=db.execute('UPDATE engineering_workflow SET context_digest=? WHERE run=? AND context_digest=?',(digest(new),old['run']['id'],digest(old)))
-        require(updated.rowcount==1,'ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
-        db.commit()
+    with closing(sqlite3.connect(str(old['workflow']['checkpoint_ref']),timeout=30)) as db:
+        with db:
+            db.execute('BEGIN IMMEDIATE')
+            table=db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='engineering_workflow'").fetchone()
+            row=(db.execute('SELECT context_digest,state FROM engineering_workflow WHERE run=?',(old['run']['id'],)).fetchone()
+                 if table else None)
+            if row is None:raise ValueError('ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
+            require(row[0]==digest(old),'ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
+            db.execute('CREATE TABLE IF NOT EXISTS engineering_source_reconciliations (key TEXT PRIMARY KEY, receipt TEXT, prior_state TEXT)')
+            db.execute('INSERT INTO engineering_source_reconciliations VALUES (?,?,?)',(digest(receipt),json.dumps(receipt,sort_keys=True),row[1]))
+            updated=db.execute('UPDATE engineering_workflow SET context_digest=? WHERE run=? AND context_digest=?',(digest(new),old['run']['id'],digest(old)))
+            require(updated.rowcount==1,'ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
+            db.commit()
     with _connect(old['workflow']['checkpoint_ref']) as reader:
         require(reader.execute('SELECT context_digest FROM engineering_workflow WHERE run=?',(old['run']['id'],)).fetchone()[0]==digest(new),'ENGINEERING_RECONCILE_DURABLE_READBACK_FAILED')
     return receipt

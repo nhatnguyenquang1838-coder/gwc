@@ -221,25 +221,30 @@ class Q0PythonEnvTests(unittest.TestCase):
                 os.environ['PYTHONPATH'] = old_env
 
     def test_clean_env_sets_path_and_drops_foreign_pythonpath(self):
+        import os
         from tools.node_architect.q0_python_env import clean_env
         foreign = _foreign_site_packages()
-        result = clean_env({'PATH': '/usr/bin:/bin', 'PYTHONPATH': f'{foreign}:/keep'})
+        result = clean_env({'PATH': os.pathsep.join(['/usr/bin', '/bin']),
+                            'PYTHONPATH': os.pathsep.join([foreign, '/keep'])})
         self.assertNotIn(foreign, result.get('PYTHONPATH', ''))
-        self.assertEqual(result['PATH'].split(':')[0], str(__import__('tools.node_architect.q0_python_env', fromlist=['canonical_python']).canonical_python().parent))
-        self.assertEqual(result['PATH'].count(str(__import__('tools.node_architect.q0_python_env', fromlist=['canonical_python']).canonical_python().parent)), 1)
+        py = __import__('tools.node_architect.q0_python_env', fromlist=['canonical_python']).canonical_python()
+        self.assertEqual(result['PATH'].split(os.pathsep)[0], str(py.parent))
+        self.assertEqual(result['PATH'].split(os.pathsep).count(str(py.parent)), 1)
 
     def test_canonical_python_prefers_env_var_then_venv_then_sys_executable(self):
         import os
         from pathlib import Path
         from unittest.mock import patch
         from tools.node_architect import q0_python_env as envmod
-        with patch.dict(os.environ, {'Q0_PYTHON': '/custom/python'}):
-            with patch.object(Path, 'is_file', autospec=True, side_effect=lambda self: str(self) == '/custom/python'), patch('os.access', side_effect=lambda path, mode: str(path) == '/custom/python'):
-                self.assertEqual(envmod.canonical_python(), Path('/custom/python'))
-        with patch.dict(os.environ, {}, clear=True):
-            with patch.object(Path, 'exists', autospec=True, side_effect=lambda self: str(self) == str(envmod.CANONICAL_VENV / 'bin/python')):
+        custom = Path.cwd() / ('custom-python.exe' if os.name == 'nt' else 'custom-python')
+        with patch.dict(os.environ, {'Q0_PYTHON': str(custom)}):
+            with patch.object(Path, 'is_file', autospec=True, side_effect=lambda self: self == custom), patch('os.access', side_effect=lambda path, mode: Path(path) == custom):
+                self.assertEqual(envmod.canonical_python(), custom)
+        expected_venv = envmod._canonical_venv() / ('Scripts/python.exe' if os.name == 'nt' else 'bin/python')
+        with patch.dict(os.environ, {'Q0_PYTHON': ''}):
+            with patch.object(Path, 'exists', autospec=True, side_effect=lambda self: self == expected_venv):
                 with patch.object(Path, 'is_file', return_value=True), patch('os.access', return_value=True):
-                    self.assertEqual(envmod.canonical_python(), envmod.CANONICAL_VENV / 'bin/python')
+                    self.assertEqual(envmod.canonical_python(), expected_venv)
             with patch.object(Path, 'exists', return_value=False):
                 self.assertEqual(envmod.canonical_python(), Path(__import__('sys').executable))
 

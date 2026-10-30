@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Test-only worker for Q0 persisted LangGraph checkpoint/resume regression."""
 from __future__ import annotations
+from contextlib import closing
 
 import json
 import sqlite3
@@ -27,26 +28,28 @@ NAMESPACE = ""  # LangGraph root namespace; non-empty values resolve subgraph pa
 def _effect_count(path: Path, effect_id: str) -> int:
     if not path.exists():
         return 0
-    with sqlite3.connect(str(path)) as connection:
-        row = connection.execute(
-            "SELECT calls FROM replay_invocations WHERE effect_id = ?", (effect_id,)
-        ).fetchone()
+    with closing(sqlite3.connect(str(path))) as connection:
+        with connection:
+            row = connection.execute(
+                "SELECT calls FROM replay_invocations WHERE effect_id = ?", (effect_id,)
+            ).fetchone()
     return 0 if row is None else int(row[0])
 
 
 def _tracked_executor(path: Path, effect_id: str):
     def execute(**kwargs: Any) -> dict:
-        with sqlite3.connect(str(path)) as connection:
-            connection.execute(
-                "CREATE TABLE IF NOT EXISTS replay_invocations "
-                "(effect_id TEXT PRIMARY KEY, calls INTEGER NOT NULL)"
-            )
-            connection.execute(
-                "INSERT INTO replay_invocations(effect_id, calls) VALUES (?, 1) "
-                "ON CONFLICT(effect_id) DO UPDATE SET calls = calls + 1",
-                (effect_id,),
-            )
-            connection.commit()
+        with closing(sqlite3.connect(str(path))) as connection:
+            with connection:
+                connection.execute(
+                    "CREATE TABLE IF NOT EXISTS replay_invocations "
+                    "(effect_id TEXT PRIMARY KEY, calls INTEGER NOT NULL)"
+                )
+                connection.execute(
+                    "INSERT INTO replay_invocations(effect_id, calls) VALUES (?, 1) "
+                    "ON CONFLICT(effect_id) DO UPDATE SET calls = calls + 1",
+                    (effect_id,),
+                )
+                connection.commit()
         return replay_c91_incident(**kwargs)
 
     return execute

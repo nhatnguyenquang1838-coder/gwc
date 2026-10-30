@@ -89,20 +89,31 @@ def test_newly_emitted_request_keys_are_persisted(tmp_path):
 
 
 def test_intent_write_is_fsynced_before_callback(tmp_path, monkeypatch):
-    calls = []
-    original = module.os.fsync
-    def sync(fd):
-        calls.append(fd)
-        return original(fd)
-    monkeypatch.setattr(module.os, 'fsync', sync)
+    from pathlib import Path
+    file_syncs = []
+    directory_syncs = []
+    original_file_sync = module.os.fsync
+    original_directory_sync = module.flush_directory
+    def sync_file(fd):
+        file_syncs.append(fd)
+        return original_file_sync(fd)
+    def sync_directory(path):
+        directory_syncs.append(Path(path))
+        return original_directory_sync(path)
+    monkeypatch.setattr(module.os, 'fsync', sync_file)
+    monkeypatch.setattr(module, 'flush_directory', sync_directory)
     def native(_):
-        assert len(calls) >= 2, 'intent file and containing directory must be durable before dispatch'
+        assert len(file_syncs) >= 1, 'intent file must be durable before dispatch'
+        assert len(directory_syncs) >= 1, 'containing directory must be durable before dispatch'
         return {'status': 'VERIFIED', 'settled': True}
     module.LoopSettlementReconciler(tmp_path/'durable.json').settle_exactly_once({'idempotency_key': 'durable-effect'}, native)
 
 
-def test_q0_operation_is_bound_to_actual_plan_without_minting_transport_cursor():
+def test_q0_operation_is_bound_to_actual_plan_without_minting_transport_cursor(tmp_path, monkeypatch):
     from pathlib import Path
+    monkeypatch.setenv('HERMES_HOME', str(tmp_path))
+    from q0_activation_test_support import materialize_readback_checkpoint
+    materialize_readback_checkpoint(Path(__file__).resolve().parents[1], tmp_path)
     from tools.node_architect.q0_m1_m7_integration import build_q0_operation
     operation, binding = build_q0_operation(Path(__file__).resolve().parents[1], activity_id='user-readiness')
     assert operation['task_id'] == 'SCRUM-781'
@@ -114,8 +125,11 @@ def test_q0_operation_is_bound_to_actual_plan_without_minting_transport_cursor()
     assert binding['authorized_paths'] == []
 
 
-def test_q0_readiness_executes_real_graph_and_reuses_persistent_run(tmp_path):
+def test_q0_readiness_executes_real_graph_and_reuses_persistent_run(tmp_path, monkeypatch):
     from pathlib import Path
+    monkeypatch.setenv('HERMES_HOME', str(tmp_path))
+    from q0_activation_test_support import materialize_readback_checkpoint
+    materialize_readback_checkpoint(Path(__file__).resolve().parents[1], tmp_path)
     from tools.node_architect.q0_m1_m7_integration import observe_q0
     root = Path(__file__).resolve().parents[1]
     store = tmp_path / 'graph-checkpoint.json'

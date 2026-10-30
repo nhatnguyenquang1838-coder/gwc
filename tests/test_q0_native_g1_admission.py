@@ -1,4 +1,5 @@
 from __future__ import annotations
+from contextlib import closing
 
 import copy
 import hashlib
@@ -47,10 +48,11 @@ def _predecessor(tmp_path, *, run_id="cmd162-predecessor", context_digest="sha25
     plan_path = tmp_path / "predecessor-plan.json"
     plan_path.write_bytes(plan_content)
     checkpoint_path = tmp_path / "predecessor.sqlite3"
-    with sqlite3.connect(checkpoint_path) as db:
-        db.execute("CREATE TABLE IF NOT EXISTS engineering_workflow (run TEXT PRIMARY KEY, context_digest TEXT, state TEXT)")
-        db.execute("INSERT OR REPLACE INTO engineering_workflow VALUES (?, ?, ?)",
-                   (run_id, context_digest, json.dumps({"executor": {"session_id": owner_session_id}})))
+    with closing(sqlite3.connect(checkpoint_path)) as db:
+        with db:
+            db.execute("CREATE TABLE IF NOT EXISTS engineering_workflow (run TEXT PRIMARY KEY, context_digest TEXT, state TEXT)")
+            db.execute("INSERT OR REPLACE INTO engineering_workflow VALUES (?, ?, ?)",
+                       (run_id, context_digest, json.dumps({"executor": {"session_id": owner_session_id}})))
     return {"kind": "R3_CHECKPOINT", "run_id": run_id,
             "runtime_plan_ref": str(plan_path),
             "runtime_plan_digest": "sha256:" + hashlib.sha256(plan_content).hexdigest(),
@@ -314,9 +316,10 @@ def test_genesis_materialization_is_digest_idempotent_and_sandbox_only(tmp_path)
     from tools.node_architect.q0_native_g1_admission import read_back_genesis
     assert read_back_genesis(first["db_ref"]) == first["readback"]
     import sqlite3
-    with sqlite3.connect(first["db_ref"]) as db:
-        assert db.execute("SELECT COUNT(*) FROM checkpoint_events").fetchone()[0] == 1
-        payload = json.loads(db.execute("SELECT payload_json FROM checkpoint_events").fetchone()[0])
+    with closing(sqlite3.connect(first["db_ref"])) as db:
+        with db:
+            assert db.execute("SELECT COUNT(*) FROM checkpoint_events").fetchone()[0] == 1
+            payload = json.loads(db.execute("SELECT payload_json FROM checkpoint_events").fetchone()[0])
     assert payload["run_state"]["schema_id"] == "gwc.universal-run.run-state-record.v2"
     assert payload["run_state"]["run_id"] == first["run_id"]
     transition_path = Path(first["transition_receipt_ref"])
@@ -511,8 +514,9 @@ def test_live_bridge_materializes_native_activation_idempotently_and_recovers_pr
     assert result["authority_granted"] is False and result["live_target_touched"] is False
     import sqlite3
     db_path = _live_activation_paths(root)["database"]
-    with sqlite3.connect(db_path) as db:
-        assert db.execute("SELECT COUNT(*) FROM engineering_plan_activation").fetchone()[0] == 1
+    with closing(sqlite3.connect(db_path)) as db:
+        with db:
+            assert db.execute("SELECT COUNT(*) FROM engineering_plan_activation").fetchone()[0] == 1
     before = (root / "live-activation-journal.json").read_bytes()
     second = apply_live_activation_isolated(**kwargs)
     assert second["already_applied"] is True
@@ -756,7 +760,7 @@ def _real_r2_activation_fixture(tmp_path):
         if source_path.is_file():
             (source / Path(ref).parent).mkdir(parents=True, exist_ok=True)
             shutil.copy2(source_path, source / ref)
-    grant_ref = f"authority/grants/authority:test:177.json"
+    grant_ref = "authority/grants/authority-test-177.json"
     grant_path = source / grant_ref
     grant_path.parent.mkdir(parents=True, exist_ok=True)
     grant_path.write_text(json.dumps({**authority, "issuer_ref": grant_ref}), encoding="utf-8")

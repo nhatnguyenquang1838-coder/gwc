@@ -157,7 +157,7 @@ def test_producer_fails_closed_when_compiled_route_semantics_missing():
     real_exists = pathlib.Path.exists
 
     def _fake_exists(self):
-        if str(self).endswith("core/node-architect/flow-policy-compiled-profile.json"):
+        if self.as_posix().endswith("core/node-architect/flow-policy-compiled-profile.json"):
             return False
         return real_exists(self)
 

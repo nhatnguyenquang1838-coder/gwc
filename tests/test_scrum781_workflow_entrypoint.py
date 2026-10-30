@@ -1,4 +1,5 @@
 """Loop-to-real-graph wiring; not observer admission or browser delivery."""
+from contextlib import closing
 import argparse
 import pytest
 from scripts import scrum781_engineering_loop as cli
@@ -6,6 +7,8 @@ from scripts import scrum781_engineering_loop as cli
 
 def test_workflow_invokes_real_graph_and_reads_checkpoint(tmp_path, monkeypatch):
     monkeypatch.setenv('HERMES_HOME', str(tmp_path))
+    from q0_activation_test_support import materialize_readback_checkpoint
+    materialize_readback_checkpoint(cli.ROOT, tmp_path)
     monkeypatch.setattr(cli, 'inspect', lambda args: {
         'outcome': 'ENGINEERING_PREFLIGHT_PASS', 'run_id': 'scrum781-q0-fresh-20261010-r1',
         'code_head': cli.build_q0_operation(cli.ROOT, activity_id='test')[0]['head_sha'], 'native_loop': {'ticks_fired': 99}})
@@ -23,8 +26,9 @@ def test_existing_checkpoint_is_not_replaced_when_head_changes(tmp_path):
     root=tmp_path/'host';old=root/'old'
     old.mkdir(parents=True)
     p=old/'checkpoint.sqlite'
-    with sqlite3.connect(p) as db:
-        db.execute('CREATE TABLE workflow (run TEXT PRIMARY KEY)');db.execute('INSERT INTO workflow VALUES (?)',('run',))
+    with closing(sqlite3.connect(p)) as db:
+        with db:
+            db.execute('CREATE TABLE workflow (run TEXT PRIMARY KEY)');db.execute('INSERT INTO workflow VALUES (?)',('run',))
     assert cli.select_workflow_checkpoint(root,'run')==p
 
 

@@ -1,0 +1,188 @@
+{
+  "schema_version": "1.1",
+  "artifact_type": "g3-delivery-record",
+  "gate": "G3_PR",
+  "task_id": "SCRUM-781",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "base_ref": "main",
+  "base_sha": "adee2f95206b037386d9e9ba1cfe14dc07bbeb7e",
+  "working_branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+  "pull_request": {
+    "number": 614,
+    "url": "https://github.com/nhatnguyenquang1838-coder/gwc/pull/614",
+    "draft": true
+  },
+  "implementation_head_sha": "835585af5eb7dc5374f5ad2de49c0b98a15468e1",
+  "scope_hash": "sha256:0db640b0063bcbd06577072f3c26d513d9999ebf992b456fcce8d8f3e664001c",
+  "changed_paths": [
+    ".github/workflows/q0-portability-regression.yml",
+    "scripts/scrum781_engineering_loop.py",
+    "scripts/scrum781_q0_login_fixture.py",
+    "scripts/scrum781_q0_replay_fixture.py",
+    "tests/q0_activation_test_support.py",
+    "tests/q0_langgraph_checkpoint_resume_worker.py",
+    "tests/test_checkpoint_sqlite.py",
+    "tests/test_delivery_outbox.py",
+    "tests/test_engineering_frontier_host.py",
+    "tests/test_engineering_m1_m7_workflow.py",
+    "tests/test_governed_blueprint_m1.py",
+    "tests/test_q0_context_binding_manifest.py",
+    "tests/test_q0_native_g1_admission.py",
+    "tests/test_q0_plan_resolution.py",
+    "tests/test_q0_windows_portability_regressions.py",
+    "tests/test_scrum781_engineering_loop_resume.py",
+    "tests/test_scrum781_m1_m7_integration_safety.py",
+    "tests/test_scrum781_workflow_entrypoint.py",
+    "tests/test_task_source_head_reconciliation.py",
+    "tools/node_architect/controller_exchange_adapter.py",
+    "tools/node_architect/delivery_outbox.py",
+    "tools/node_architect/durable_fsync.py",
+    "tools/node_architect/engineering_host_adapter.py",
+    "tools/node_architect/engineering_m1_m7_workflow.py",
+    "tools/node_architect/hermes_skill_capability_bridge.py",
+    "tools/node_architect/loop_settlement_reconciler.py",
+    "tools/node_architect/node_evidence_ledger.py",
+    "tools/node_architect/package_export/target_path_safety_check.py",
+    "tools/node_architect/q0_m1_m7_integration.py",
+    "tools/node_architect/q0_python_env.py",
+    "tools/node_architect/task_context_binding.py",
+    "tools/node_architect/universal_run_persistence.py"
+  ],
+  "validation": {
+    "implementation_head_sha": "835585af5eb7dc5374f5ad2de49c0b98a15468e1",
+    "status": "pass",
+    "commands": [
+      {
+        "command": "Q0 portability regression / pytest six focused files on Ubuntu",
+        "result": "pass",
+        "evidence": "https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/41028882408 + .gwc/tasks/SCRUM-781/g3/windows-portability-evidence.json"
+      },
+      {
+        "command": "Windows focused repair and native fixed lock hold-release",
+        "result": "pass",
+        "evidence": ".gwc/tasks/SCRUM-781/g3/windows-portability-evidence.json"
+      }
+    ]
+  },
+  "review": {
+    "implementer_id": "DWA",
+    "reviewer_id": "sa-0-98e05b0f",
+    "independence": "independent",
+    "mode": "read-only",
+    "reviewed_implementation_head_sha": "835585af5eb7dc5374f5ad2de49c0b98a15468e1",
+    "reviewed_scope_hash": "sha256:0db640b0063bcbd06577072f3c26d513d9999ebf992b456fcce8d8f3e664001c",
+    "reviewed_at": "2026-10-30T08:58:20Z",
+    "lanes": [
+      {
+        "name": "requirement",
+        "applicable": true,
+        "status": "pass",
+        "evidence": [
+          ".gwc/tasks/SCRUM-781/g3/windows-portability-evidence.json"
+        ]
+      },
+      {
+        "name": "design",
+        "applicable": true,
+        "status": "pass",
+        "evidence": [
+          ".gwc/tasks/SCRUM-781/g3/windows-portability-evidence.json"
+        ]
+      },
+      {
+        "name": "code",
+        "applicable": true,
+        "status": "pass",
+        "evidence": [
+          ".gwc/tasks/SCRUM-781/g3/windows-portability-evidence.json"
+        ]
+      },
+      {
+        "name": "test",
+        "applicable": true,
+        "status": "pass",
+        "evidence": [
+          ".gwc/tasks/SCRUM-781/g3/windows-portability-evidence.json"
+        ]
+      },
+      {
+        "name": "governance",
+        "applicable": true,
+        "status": "pass",
+        "evidence": [
+          ".gwc/tasks/SCRUM-781/g3/windows-portability-evidence.json"
+        ]
+      },
+      {
+        "name": "delivery",
+        "applicable": true,
+        "status": "pass",
+        "evidence": [
+          ".gwc/tasks/SCRUM-781/g3/windows-portability-evidence.json"
+        ]
+      },
+      {
+        "name": "ci",
+        "applicable": true,
+        "status": "pass",
+        "evidence": [
+          ".gwc/tasks/SCRUM-781/g3/windows-portability-evidence.json"
+        ]
+      }
+    ],
+    "findings": [],
+    "acceptance_criteria": [
+      {
+        "id": "AC-1",
+        "result": "pass",
+        "evidence": [
+          "Stable fixed-byte lock regression and native Windows hold-release",
+          ".gwc/tasks/SCRUM-781/g3/windows-portability-evidence.json"
+        ]
+      },
+      {
+        "id": "AC-2",
+        "result": "pass",
+        "evidence": [
+          "Unsupported read fails closed before I/O; supported POSIX reader/digest/size/symlink tests",
+          ".gwc/tasks/SCRUM-781/g3/windows-portability-evidence.json"
+        ]
+      },
+      {
+        "id": "AC-3",
+        "result": "pass",
+        "evidence": [
+          "Exact source-byte guard and LF fixture tests;32 implementation paths reviewed",
+          ".gwc/tasks/SCRUM-781/g3/windows-portability-evidence.json"
+        ]
+      }
+    ],
+    "decision": "pass",
+    "stale": false
+  },
+  "ci": {
+    "required": true,
+    "required_checks": [
+      "validate",
+      "canonical-81-qualification",
+      "semantic-runtime-regression",
+      "q0-portability-regression"
+    ]
+  },
+  "residual_risks": [
+    "Windows replay and engineering-host publication fail closed without required POSIX primitives; equivalent Win32 backend not implemented",
+    "Activation readback fixtures do not qualify live activation",
+    "No Q0 L3 recertification for this implementation SHA",
+    "Stale UA graph; no graph-derived low-impact assertion",
+    "Local full Windows suite not PASS;13 tests need unsupported POSIX host fence"
+  ],
+  "exclusions": [
+    "G4_MERGE",
+    "G5_DEPLOY",
+    "G6_PRODUCTION_DATA",
+    "LOGIN_START",
+    "PARENT_CURSOR",
+    "SCHEDULER"
+  ],
+  "outcome": "pass"
+}
