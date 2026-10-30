@@ -15,9 +15,9 @@ def agent_fixture(tmp_path,recovery=True):
     plan={'run_id':c['run']['id'],'branch':c['repository']['branch'],'scope':c['runtime_plan']['scope'],
           'recursive_plan':c['runtime_plan']['recursive_plan'],'implementation_mode':'continuous_tdd_self_remediation',
           'authority_basis':{'kind':'standing_q0_autonomous_development_policy'},'recovery_policy':'On GWC_RUNTIME_DEFECT use bounded same-branch repair.' if recovery else ''}
-    (tmp_path/'tools').mkdir();(tmp_path/'tools/repair.py').write_text('VALUE = 0\n')
-    (tmp_path/'agent-profile.json').write_text(json.dumps({'items':[{**item,'read_paths':['tools/repair.py']}]}))
-    path=tmp_path/c['run']['runtime_plan_ref'];path.parent.mkdir(parents=True,exist_ok=True);path.write_text(json.dumps(plan))
+    (tmp_path/'tools').mkdir();(tmp_path/'tools/repair.py').write_text('VALUE = 0\n', newline='\n')
+    (tmp_path/'agent-profile.json').write_text(json.dumps({'items':[{**item,'read_paths':['tools/repair.py']}]}), newline='\n')
+    path=tmp_path/c['run']['runtime_plan_ref'];path.parent.mkdir(parents=True,exist_ok=True);path.write_text(json.dumps(plan), newline='\n')
     c['run']['runtime_plan_digest']='sha256:'+hashlib.sha256(path.read_bytes()).hexdigest()
     def git(*args):return subprocess.check_output(['git','-C',str(tmp_path),*args],text=True).strip()
     git('init','-b',c['repository']['branch']);git('add','.');git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','base')
@@ -43,17 +43,17 @@ def test_agent_completion_requires_actual_git_delta_and_log_readback(tmp_path):
     import json,subprocess,hashlib,sqlite3
     from tools.node_architect.engineering_host_adapter import reserve_agent_work,start_agent_work,record_agent_execution,verify_agent_execution
     c,r,git=agent_fixture(tmp_path);reserve_agent_work(c,r,guard=lambda:True);start_agent_work(c,r,guard=lambda:True)
-    file=tmp_path/'tools/repair.py';file.write_text('VALUE = 1\n');git('add','tools/repair.py');git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','repair')
+    file=tmp_path/'tools/repair.py';file.write_text('VALUE = 1\n', newline='\n');git('add','tools/repair.py');git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','repair')
     outdir=tmp_path/'engineering-agent-results';outdir.mkdir();log=outdir/'validation.log'
-    actual=subprocess.run(['python','-c','print("unit fixture validation")'],capture_output=True,text=True);log.write_text(actual.stdout)
+    actual=subprocess.run(['python','-c','print("unit fixture validation")'],capture_output=True,text=True);log.write_text(actual.stdout, newline='\n')
     payload={'request_digest':r['request_digest'],'base_head':r['source_head'],'result_head':git('rev-parse','HEAD'),
              'verification_exit_code':actual.returncode,'verification_log_ref':str(log),'verification_log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()}
-    artifact=outdir/'execution.json';artifact.write_text(json.dumps(payload))
+    artifact=outdir/'execution.json';artifact.write_text(json.dumps(payload), newline='\n')
     record_agent_execution(c,r,artifact_ref=artifact,guard=lambda:True,profile_ref='agent-profile.json')
-    log.write_text('corrupted fixture log')
+    log.write_text('corrupted fixture log', newline='\n')
     with pytest.raises(ValueError,match='AGENT_VERIFICATION_LOG_INVALID'):
         verify_agent_execution(c,r,artifact_ref=artifact,guard=lambda:True,profile_ref='agent-profile.json')
-    log.write_text(actual.stdout)
+    log.write_text(actual.stdout, newline='\n')
     verify_agent_execution(c,r,artifact_ref=artifact,guard=lambda:True,profile_ref='agent-profile.json')
     import copy
     from tools.node_architect.engineering_host_adapter import read_source_bound_frontier
@@ -87,11 +87,11 @@ def test_source_bound_host_frontier_loads_real_policy_and_trace_status(tmp_path)
     import json,subprocess
     from tools.node_architect.engineering_host_adapter import read_source_bound_frontier
     c,items=setup_frontier(tmp_path);c['repository']['worktree']=str(tmp_path)
-    (tmp_path/'trace.json').write_text(json.dumps({'original_trace_status':'MISSING'}))
-    (tmp_path/'code.py').write_text('# source-bound repair input\n')
+    (tmp_path/'trace.json').write_text(json.dumps({'original_trace_status':'MISSING'}), newline='\n')
+    (tmp_path/'code.py').write_text('# source-bound repair input\n', newline='\n')
     profile={'items':[{**items[0],'read_paths':['code.py'],'evidence_requirements':[{'path':'trace.json','field':'original_trace_status','equals':'RECOVERED','name':'original trace'}]},
                       {**items[1],'read_paths':['code.py']}]}
-    (tmp_path/'profile.json').write_text(json.dumps(profile))
+    (tmp_path/'profile.json').write_text(json.dumps(profile), newline='\n')
     def git(*args):return subprocess.check_output(['git','-C',str(tmp_path),*args],text=True).strip()
     git('init','-b','fix/test');git('add','.');git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','bound inputs')
     c['repository']['head_sha']=git('rev-parse','HEAD')
@@ -101,12 +101,12 @@ def test_source_bound_host_frontier_loads_real_policy_and_trace_status(tmp_path)
     repair=next(i for i in r['items'] if i['id']=='repair')
     assert repair['work']['_source_head']==c['repository']['head_sha']
     prior_fingerprint=repair['fingerprint']
-    (tmp_path/'unrelated.txt').write_text('additive source revision\n')
+    (tmp_path/'unrelated.txt').write_text('additive source revision\n', newline='\n')
     git('add','unrelated.txt');git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','advance source head')
     c['repository']['head_sha']=git('rev-parse','HEAD')
     refreshed=read_source_bound_frontier(c,profile_ref='profile.json',guard=lambda:True)
     assert next(i for i in refreshed['items'] if i['id']=='repair')['fingerprint']!=prior_fingerprint
-    (tmp_path/'code.py').write_text('# drift\n')
+    (tmp_path/'code.py').write_text('# drift\n', newline='\n')
     with pytest.raises(ValueError,match='ENGINEERING_FRONTIER_SOURCE_DRIFT'):
         read_source_bound_frontier(c,profile_ref='profile.json',guard=lambda:True)
 
@@ -119,7 +119,7 @@ def test_local_verifier_accepts_only_bound_terminal_bridge_suite_artifact(tmp_pa
     c,_,git=agent_fixture(tmp_path)
     ref='tests/test_unit_only.py'
     source=tmp_path/ref;source.parent.mkdir(parents=True)
-    source.write_text('def test_unit_fixture_only():\n    assert True\n')
+    source.write_text('def test_unit_fixture_only():\n    assert True\n', newline='\n')
     git('add',ref);git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','unit fixture input')
     c['repository']['head_sha']=git('rev-parse','HEAD')
     argv=['-m','pytest',ref,'-q']
@@ -135,7 +135,7 @@ def test_local_verifier_accepts_only_bound_terminal_bridge_suite_artifact(tmp_pa
     assert result['exit_code']==0
     assert caps['engineering.verify_result'](c,item,result) is True
     artifact=Path(result['artifact_ref']);payload=json.loads(artifact.read_text())
-    bad=dict(payload);bad['argv']=['-c','print("not tests")'];artifact.write_text(json.dumps(bad,sort_keys=True))
+    bad=dict(payload);bad['argv']=['-c','print("not tests")'];artifact.write_text(json.dumps(bad,sort_keys=True), newline='\n')
     bad_result={**result,'artifact_digest':digest(bad)}
     assert caps['engineering.verify_result'](c,item,bad_result) is False
 
@@ -165,7 +165,7 @@ def test_host_verifier_cannot_skip_preflight_or_artifact_binding(tmp_path, gap):
                'input_policy_ref':None,'input_policy_sha256':None,'task_context_digest':digest(c)}
     if gap == 'input_hashes':payload['input_hashes'] = {ref:'0'*64}
     if gap == 'policy_digest':payload['input_policy_sha256'] = 'unbound-policy'
-    artifact.write_text(json.dumps(payload))
+    artifact.write_text(json.dumps(payload), newline='\n')
     before = artifact.read_bytes()
     result = {'artifact_ref':str(artifact),'artifact_digest':digest(payload),'stdout_digest':digest(stdout),
               'exit_code':0,'source_head':c['repository']['head_sha'],
@@ -182,7 +182,7 @@ def _terminal_unit_host(tmp_path):
     from tools.node_architect.task_context_binding import digest
     c,_,git=agent_fixture(tmp_path)
     ref='tests/test_unit_bound.py';source=tmp_path/ref;source.parent.mkdir(parents=True)
-    source.write_text('def test_unit_only():\n    assert True\n')
+    source.write_text('def test_unit_only():\n    assert True\n', newline='\n')
     git('add',ref);git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','unit input')
     c['repository']['head_sha']=git('rev-parse','HEAD')
     argv=['-m','pytest',ref,'-q']
@@ -215,7 +215,7 @@ def test_post_preflight_drift_refused_before_task_subprocess(tmp_path, monkeypat
     c,item,caps,source,directory,_=_terminal_unit_host(tmp_path)
     prepared=caps['engineering.preflight'](c,item)
     sentinel=tmp_path/'outside-sentinel';sentinel.write_bytes(b'PRESERVE')
-    if gap=='input':source.write_text('changed after preflight\n')
+    if gap=='input':source.write_text('changed after preflight\n', newline='\n')
     else:
         directory.mkdir();(directory/(item['fingerprint'].split(':')[-1]+'.json')).symlink_to(sentinel)
     run=host.subprocess.run;calls=[]
@@ -239,7 +239,7 @@ def test_post_command_input_drift_cannot_publish_completion(tmp_path, monkeypatc
         result=run(argv,*args,**kwargs)
         if argv[0]==sys.executable:
             calls.append(argv)
-            if drift=='input':source.write_text('changed while task ran\n')
+            if drift=='input':source.write_text('changed while task ran\n', newline='\n')
             else:c['run']['id']+='-changed-during-task'
         return result
     monkeypatch.setattr(host.subprocess,'run',changed)
@@ -325,7 +325,7 @@ def test_host_executes_exact_terminal_bridge_suite_and_verifies_artifact(tmp_pat
            'tests/test_exchange_outbox_transitions.py']
     for path in files:
         target=tmp_path/path;target.parent.mkdir(parents=True,exist_ok=True)
-        target.write_text('def test_fixture_passes():\n    assert True\n')
+        target.write_text('def test_fixture_passes():\n    assert True\n', newline='\n')
     git('add','tests');git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','validation suite inputs')
     c['repository']['head_sha']=git('rev-parse','HEAD')
     argv=['-m','pytest',*files,'-q']
@@ -356,7 +356,7 @@ def test_host_rejects_unbound_artifact_fingerprint_before_subprocess(tmp_path, f
     if fingerprint is not None:
         item['fingerprint'] = fingerprint
     victim = tmp_path/'victim.json'
-    victim.write_text('preserve this sentinel')
+    victim.write_text('preserve this sentinel', newline='\n')
     artifacts = tmp_path/'validation-results'
     caps = local_engineering_capabilities(c, guard=lambda:True,
                                          artifact_directory=artifacts, allowed_commands=[argv])
@@ -377,7 +377,7 @@ def test_host_rejects_preexisting_artifact_symlink_outside_store(tmp_path):
             'read_paths':[ref], 'input_digest':digest({ref:hashlib.sha256((tmp_path/ref).read_bytes()).hexdigest()})}
     item['fingerprint'] = digest(item)
     victim = tmp_path/'outside.json'
-    victim.write_text('preserve')
+    victim.write_text('preserve', newline='\n')
     artifacts = tmp_path/'validation-results'
     artifacts.mkdir()
     (artifacts/(item['fingerprint'].split(':')[-1]+'.json')).symlink_to(victim)
@@ -425,7 +425,7 @@ def test_source_bound_frontier_input_digest_is_accepted_by_host_executor(tmp_pat
            'tests/test_exchange_outbox_transitions.py']
     for path in files:
         target=tmp_path/path;target.parent.mkdir(parents=True,exist_ok=True)
-        target.write_text('def test_fixture_passes():\n    assert True\n')
+        target.write_text('def test_fixture_passes():\n    assert True\n', newline='\n')
     argv=['-m','pytest',*files,'-q']
     item={'id':'bridge-validation','priority':2,'plan_node_id':'ROOT',
           'action':'run_sandboxed_validation','objective':'Validate terminal result path',
@@ -433,7 +433,7 @@ def test_source_bound_frontier_input_digest_is_accepted_by_host_executor(tmp_pat
           'verification_profile':'Q0_TERMINAL_RESULT_SUITE','minimum_tests_passed':5,
           'required_test_files':files,'read_paths':files,'write_paths':[]}
     profile={'runtime_plan_ref':c['run']['runtime_plan_ref'],'items':[item]}
-    (tmp_path/'validation-profile.json').write_text(json.dumps(profile))
+    (tmp_path/'validation-profile.json').write_text(json.dumps(profile), newline='\n')
     git('add','tests','validation-profile.json')
     git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','bind terminal validation profile')
     c['repository']['head_sha']=git('rev-parse','HEAD')

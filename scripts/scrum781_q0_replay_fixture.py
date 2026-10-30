@@ -129,9 +129,8 @@ def _ref(ref: Any, *, seam: bool = False) -> None:
 def _read_artifact(ref: dict, root: Path) -> bytes:
     _ref(ref)
     # Directory-relative O_NOFOLLOW reads prohibit symlink races at every level.
-    # On platforms without dir_fd/O_DIRECTORY/O_NOFOLLOW (e.g. Windows) fall back
-    # to a plain bounded read; the path is already allowlisted and escape-checked
-    # by _ref, and the digest is verified below.
+    # Missing primitives are a capability boundary, not permission to fall back
+    # to pathname checks followed by an unprotected open.
     if os.open in os.supports_dir_fd and all(hasattr(os, name) for name in ('O_DIRECTORY', 'O_NOFOLLOW')):
         fd = None
         try:
@@ -155,29 +154,11 @@ def _read_artifact(ref: dict, root: Path) -> bytes:
         finally:
             if fd is not None:
                 os.close(fd)
-    else:  # pragma: no cover - Windows
-        # Windows lacks dir_fd/O_NOFOLLOW. Fail closed on symlinks and any other
-        # reparse-point component, then verify canonical containment before the
-        # bounded read. This prevents a pre-existing junction/symlink from
-        # escaping the fixture root; strict race-free publication remains owned
-        # by the host's stronger atomic artifact fence.
-        try:
-            root_path = root.resolve(strict=True)
-            candidate = root_path
-            for part in ref['path'].split('/'):
-                candidate = candidate / part
-                info = candidate.lstat()
-                attrs = getattr(info, 'st_file_attributes', 0)
-                if stat.S_ISLNK(info.st_mode) or attrs & 0x400:  # FILE_ATTRIBUTE_REPARSE_POINT
-                    raise ReplayFixtureError('ARTIFACT_UNREADABLE')
-            resolved = candidate.resolve(strict=True)
-            _require(resolved.is_relative_to(root_path), 'ARTIFACT_PATH_ESCAPE')
-            raw = resolved.read_bytes()
-        except ReplayFixtureError:
-            raise
-        except (OSError, RuntimeError, ValueError) as exc:
-            raise ReplayFixtureError('ARTIFACT_UNREADABLE') from exc
-        _require(len(raw) <= MAX_BYTES, 'ARTIFACT_TOO_LARGE')
+    else:
+        # A pathname lstat/resolve/open fallback cannot prevent a parent from
+        # being replaced by a junction between validation and the actual read.
+        # Until an equivalent native handle backend exists, refuse before I/O.
+        raise ReplayFixtureError('ARTIFACT_RACE_SAFE_READ_UNAVAILABLE')
     _require(digest(raw) == ref.get('sha256'), 'ARTIFACT_DIGEST_MISMATCH')
     try:
         _nonsecret(raw.decode('utf-8'))
@@ -519,25 +500,8 @@ def _read_cli_json(path: str) -> Any:
                 fd = None
                 raw = stream.read(MAX_BYTES + 1)
             _require(len(raw) <= MAX_BYTES, 'CLI_INPUT_TOO_LARGE')
-        else:  # pragma: no cover - Windows
-            # Windows lacks O_NOFOLLOW. Fail closed on a symlink or any reparse
-            # point in the supplied path, then verify bounded regular-file status.
-            # The CLI input path is caller-selected; we do not require it to live
-            # under the fixture root, only that it is a plain local file.
-            candidate = Path(path)
-            current = Path(candidate.anchor)
-            components = candidate.parts[1:] if candidate.anchor else candidate.parts
-            for component in components:
-                current = current / component
-                info = current.lstat()
-                attrs = getattr(info, 'st_file_attributes', 0)
-                if stat.S_ISLNK(info.st_mode) or attrs & 0x400:  # FILE_ATTRIBUTE_REPARSE_POINT
-                    raise ReplayFixtureError('CLI_INPUT_UNREADABLE')
-            resolved = candidate.resolve(strict=True)
-            info = resolved.stat()
-            _require(stat.S_ISREG(info.st_mode) and info.st_size <= MAX_BYTES, 'CLI_INPUT_NOT_BOUNDED_FILE')
-            raw = resolved.read_bytes()
-            _require(len(raw) <= MAX_BYTES, 'CLI_INPUT_TOO_LARGE')
+        else:
+            raise ReplayFixtureError('CLI_INPUT_RACE_SAFE_READ_UNAVAILABLE')
     except ReplayFixtureError:
         raise
     except OSError as exc:

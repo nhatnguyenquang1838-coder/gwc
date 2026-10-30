@@ -59,7 +59,7 @@ def local_engineering_capabilities(context,*,guard,artifact_directory,allowed_co
         branch=subprocess.check_output(['git','-C',str(root),'branch','--show-current'],text=True).strip()
         if head!=c['repository']['head_sha'] or branch!=c['repository']['branch']:return False
         ref=c['run']['runtime_plan_ref'];raw=(root/ref).read_bytes()
-        return raw.replace(b"\r\n", b"\n")==subprocess.check_output(['git','-C',str(root),'show',head+':'+ref]) and 'sha256:'+hashlib.sha256(raw).hexdigest()==c['run']['runtime_plan_digest']
+        return raw==subprocess.check_output(['git','-C',str(root),'show',head+':'+ref]) and 'sha256:'+hashlib.sha256(raw).hexdigest()==c['run']['runtime_plan_digest']
     def read_once(c):
         require(guard() is True,'ENGINEERING_HOST_OWNER_UNVERIFIED')
         match=re.fullmatch(r'github://([^/]+/[^/]+)/issues/([1-9][0-9]*)',c['communication']['issue_ref'])
@@ -84,14 +84,14 @@ def local_engineering_capabilities(context,*,guard,artifact_directory,allowed_co
             for ref in item['read_paths']:
                 path=(root/ref).resolve();require(path.is_relative_to(root),'ENGINEERING_SOURCE_PATH_ESCAPE')
                 data=path.read_bytes()
-                require(data.replace(b"\r\n", b"\n")==subprocess.check_output(['git','-C',str(root),'show',c['repository']['head_sha']+':'+ref]),'ENGINEERING_INPUT_SOURCE_DRIFT')
+                require(data==subprocess.check_output(['git','-C',str(root),'show',c['repository']['head_sha']+':'+ref]),'ENGINEERING_INPUT_SOURCE_DRIFT')
                 hashes[ref]=hashlib.sha256(data).hexdigest()
             policy_ref=item.get('_source_policy_ref')
             policy_sha256=None
             if policy_ref:
                 policy_path=(root/policy_ref).resolve();require(policy_path.is_relative_to(root),'ENGINEERING_POLICY_PATH_ESCAPE')
                 policy_raw=policy_path.read_bytes()
-                require(policy_raw.replace(b"\r\n", b"\n")==subprocess.check_output(['git','-C',str(root),'show',c['repository']['head_sha']+':'+policy_ref]),'ENGINEERING_POLICY_SOURCE_DRIFT')
+                require(policy_raw==subprocess.check_output(['git','-C',str(root),'show',c['repository']['head_sha']+':'+policy_ref]),'ENGINEERING_POLICY_SOURCE_DRIFT')
                 policy_sha256=hashlib.sha256(policy_raw).hexdigest()
                 require(policy_sha256==item.get('_source_policy_sha256') and hashes==item.get('_source_input_hashes'),
                         'ENGINEERING_INPUT_BINDINGS_DRIFT')
@@ -152,11 +152,8 @@ def local_engineering_capabilities(context,*,guard,artifact_directory,allowed_co
                     fd=os.open(path.name,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600,dir_fd=directory_fd)
                     with os.fdopen(fd,'w',encoding='utf-8') as stream:stream.write(encoded)
                 finally:os.close(directory_fd)
-            else:  # pragma: no cover - Windows
-                # O_EXCL exclusive create refuses existing files and hardlinks; the
-                # path was already containment-checked against artifacts above.
-                fd=os.open(path,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
-                with os.fdopen(fd,'w',encoding='utf-8') as stream:stream.write(encoded)
+            else:
+                raise ValueError('ENGINEERING_ARTIFACT_PUBLICATION_REFUSED')
         except OSError as exc:
             # The subprocess already ran: do NOT label this a pre-task refusal.
             raise ValueError('ENGINEERING_ARTIFACT_PUBLICATION_REFUSED') from exc
@@ -216,7 +213,7 @@ def read_source_bound_frontier(context,*,profile_ref,guard):
     def source(ref):
         path=(root/ref).resolve();require(path.is_relative_to(root),'ENGINEERING_FRONTIER_PATH_ESCAPE')
         data=path.read_bytes()
-        require(data.replace(b"\r\n", b"\n")==subprocess.check_output(['git','-C',str(root),'show',head+':'+ref]),'ENGINEERING_FRONTIER_SOURCE_DRIFT')
+        require(data==subprocess.check_output(['git','-C',str(root),'show',head+':'+ref]),'ENGINEERING_FRONTIER_SOURCE_DRIFT')
         return data
     policy_raw=source(profile_ref);policy=json.loads(policy_raw);policy_sha256=hashlib.sha256(policy_raw).hexdigest();items=[]
     require(policy.get('runtime_plan_ref',context['run']['runtime_plan_ref'])==context['run']['runtime_plan_ref'],'ENGINEERING_FRONTIER_PLAN_DRIFT')
@@ -276,7 +273,7 @@ def _validate_agent_request(context,request,guard,*,before_effect):
     require(git('branch','--show-current')==context['repository']['branch'],'AGENT_BRANCH_DRIFT')
     if before_effect:require(git('rev-parse','HEAD')==request['source_head'],'AGENT_SOURCE_DRIFT')
     ref=context['run']['runtime_plan_ref'];raw=(root/ref).read_bytes()
-    require(raw.replace(b"\r\n", b"\n")==subprocess.check_output(['git','-C',str(root),'show',request['source_head']+':'+ref]) and
+    require(raw==subprocess.check_output(['git','-C',str(root),'show',request['source_head']+':'+ref]) and
             'sha256:'+hashlib.sha256(raw).hexdigest()==request['runtime_plan_digest']==context['run']['runtime_plan_digest'],'AGENT_PLAN_DRIFT')
     plan=json.loads(raw)
     require(plan['run_id']==context['run']['id'] and plan['branch']==context['repository']['branch'] and
