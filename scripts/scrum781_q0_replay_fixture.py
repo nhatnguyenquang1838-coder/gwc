@@ -133,6 +133,26 @@ def _ref(ref: Any, *, seam: bool = False) -> None:
                  ref['symbol'].isidentifier(), 'EXECUTABLE_SEAM_MISSING')
 
 
+def _windows_native_available() -> bool:
+    from scripts import _windows_safe_read
+    return _windows_safe_read.available()
+
+
+def _windows_read_bounded(path: Path, *, cli: bool = False) -> bytes:
+    from scripts import _windows_safe_read
+    try:
+        return _windows_safe_read.read_bounded(path, MAX_BYTES)
+    except _windows_safe_read.WindowsUnsafePath as exc:
+        if str(exc) == 'FILE_TOO_LARGE':
+            reason = 'CLI_INPUT_NOT_BOUNDED_FILE' if cli else 'ARTIFACT_NOT_BOUNDED_FILE'
+        else:
+            reason = 'CLI_INPUT_UNREADABLE' if cli else 'ARTIFACT_UNREADABLE'
+        raise ReplayFixtureError(reason) from exc
+    except (OSError, ValueError) as exc:
+        reason = 'CLI_INPUT_UNREADABLE' if cli else 'ARTIFACT_UNREADABLE'
+        raise ReplayFixtureError(reason) from exc
+
+
 def _read_artifact(ref: dict, root: Path) -> bytes:
     _ref(ref)
     # Directory-relative O_NOFOLLOW reads prohibit symlink races at every level.
@@ -161,10 +181,10 @@ def _read_artifact(ref: dict, root: Path) -> bytes:
         finally:
             if fd is not None:
                 os.close(fd)
+    elif _windows_native_available():
+        raw = _windows_read_bounded(root / Path(ref['path']))
     else:
-        # A pathname lstat/resolve/open fallback cannot prevent a parent from
-        # being replaced by a junction between validation and the actual read.
-        # Until an equivalent native handle backend exists, refuse before I/O.
+        # Fail closed: no pathname validation/reopen fallback.
         raise ReplayFixtureError('ARTIFACT_RACE_SAFE_READ_UNAVAILABLE')
     _require(digest(raw) == ref.get('sha256'), 'ARTIFACT_DIGEST_MISMATCH')
     try:
@@ -510,6 +530,8 @@ def _read_cli_json(path: str) -> Any:
                 fd = None
                 raw = stream.read(MAX_BYTES + 1)
             _require(len(raw) <= MAX_BYTES, 'CLI_INPUT_TOO_LARGE')
+        elif _windows_native_available():
+            raw = _windows_read_bounded(Path(path), cli=True)
         else:
             raise ReplayFixtureError('CLI_INPUT_RACE_SAFE_READ_UNAVAILABLE')
     except ReplayFixtureError:
