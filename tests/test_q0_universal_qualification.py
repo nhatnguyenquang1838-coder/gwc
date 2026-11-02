@@ -17,6 +17,13 @@ def _m():
     return importlib.import_module(MOD)
 
 
+@pytest.fixture(autouse=True)
+def _stub_native_load_proof_verifier_for_unit_receipts(monkeypatch):
+    # These tests use synthetic load-proof shapes to exercise certification rules;
+    # native process/Git proof validation is a separate boundary.
+    monkeypatch.setattr(_m(), "verify_native_load_proof", lambda evidence, **bindings: bool(evidence.get("activation_id")))
+
+
 def _sha(ch):
     return ch * 40
 

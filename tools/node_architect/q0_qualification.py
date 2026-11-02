@@ -873,9 +873,11 @@ def certify_q0_runtime(
              "LOAD_PROOF_PROCESS_IDENTITY_REQUIRED")
     _require(load_proof_evidence.get("loaded_profile_digest") == qualification_profile_digest,
              "LOAD_PROOF_PROFILE_IDENTITY_MISMATCH")
-    module_identities = load_proof_evidence.get("loaded_module_identities")
+    module_identities = load_proof_evidence.get("module_identities")
     if not isinstance(module_identities, Mapping) or not module_identities:
         raise Q0QualificationError("LOAD_PROOF_MODULE_IDENTITIES_REQUIRED")
+    _require(load_proof_evidence.get("loaded_module_identities") == module_identities,
+             "LOAD_PROOF_MODULE_IDENTITIES_INVALID")
     _require(all(isinstance(path, str) and path and _valid_digest(digest)
                  for path, digest in module_identities.items()),
              "LOAD_PROOF_MODULE_IDENTITIES_INVALID")
