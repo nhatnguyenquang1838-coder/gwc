@@ -136,6 +136,13 @@ def _cert_inputs(**overrides):
         "active_unresolved_defects": [],
     }
     matrix = {"digest": _digest(matrix_body), **matrix_body}
+    # Genuine live-source identities: candidate equals the worktree git HEAD,
+    # source_root is the worktree, process id is real, modules are imported.
+    import os
+    import subprocess
+    head = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD"],
+                          check=True, capture_output=True, text=True).stdout.strip()
+    identity = head
     d = {
         "run_id": "scrum781-q0-native-verify-1",
         "task_id": "SCRUM-781",
@@ -143,16 +150,18 @@ def _cert_inputs(**overrides):
         "qualification_profile": "q0_live_qualification",
         "qualification_profile_digest": m.q0_qualification_profile()["profile_digest"],
         "qualification_matrix": matrix,
-        "candidate_sha": _sha("a"),
-        "loaded_runtime_identity": _sha("a"),
+        "candidate_sha": identity,
+        "loaded_runtime_identity": identity,
         "load_proof_ref": "load-proof:1",
         "load_proof_evidence": {
-            "activation_id": "act-1", "candidate_sha": _sha("a"),
-            "loaded_source_sha": _sha("a"), "source_root": "worktree:q0",
+            "activation_id": "act-1", "candidate_sha": identity,
+            "loaded_source_sha": identity, "head_sha": identity,
+            "source_root": str(ROOT),
             "runtime_session_id": "20260923_175734_bea63d",
-            "runtime_process_id": "runtime:test-1",
+            "runtime_process_id": str(os.getpid()),
             "loaded_profile_digest": m.q0_qualification_profile()["profile_digest"],
-            "loaded_module_identities": {"tools/node_architect/q0_qualification.py": "sha256:" + "e" * 64},
+            "proof_type": "NATIVE_LOAD_PROOF",
+            "load_proof_ref": "load-proof:1",
         },
         "incident_replay_refs": ["replay:1"],
         "replay_result": "PASS",
@@ -167,6 +176,22 @@ def _cert_inputs(**overrides):
         "created_at": "2026-10-02T14:00:00Z",
         "created_by": {"type": "agent", "id": "dwa"},
     }
+    module_identities = {}
+    for rel in ("tools/node_architect/q0_qualification.py",
+                "tools/node_architect/q0_python_env.py"):
+        blob = subprocess.run(["git", "-C", str(ROOT), "show", f"{identity}:{rel}"],
+                              check=True, capture_output=True).stdout
+        module_identities[rel] = "sha256:" + hashlib.sha256(blob).hexdigest()
+    d["load_proof_evidence"]["module_identities"] = module_identities
+    d["load_proof_evidence"]["loaded_module_identities"] = dict(module_identities)
+    d["load_proof_evidence"]["committed_module_sha256"] = module_identities[
+        "tools/node_architect/q0_qualification.py"].split(":", 1)[1]
+    d["load_proof_evidence"]["files"] = [
+        {"path": rel, "disk_sha256": digest.split(":", 1)[1],
+         "head_sha256": digest.split(":", 1)[1],
+         "committed_module_sha256": digest.split(":", 1)[1], "match": True}
+        for rel, digest in module_identities.items()
+    ]
     d.update(overrides)
     return d
 
