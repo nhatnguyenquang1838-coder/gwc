@@ -1,0 +1,95 @@
+{
+  "schema_version": "gwc.pr-source-identity-audit/1",
+  "subject": {
+    "repository": "nhatnguyenquang1838-coder/DW-SuperApps",
+    "pull_request": 130,
+    "requested_head": "52e6cc2b7cfba3b99c3fcf0a670b564e6c520505",
+    "base": "0f78638a9db7644c0b4e4f6fcd1b1c9ae0b760d0",
+    "state_at_audit": "OPEN_DRAFT",
+    "observed_current_head_at_audit": "27be80874c34087ead4f98bc3afa6ee86274493a",
+    "observed_branch": "integration/SCRUM-820-dwo-v2",
+    "note": "The requested 52e6 commit remains retrievable and the supplied check runs bind to it, but PR #130's live head had advanced to 27be8087 when queried. Do not describe 52e6 as the live head without this qualification."
+  },
+  "universal_source": {
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "pr_614": 614,
+    "pr_614_head": "c29df011dc72ebc262367dfc5f3642a8c1967d8c",
+    "pr_614_merged": true,
+    "merge_commit_and_current_main": "c93b722b2a611d805ada803920b92e205ec8cabc",
+    "pr_130_gwc_gitlink_at_requested_head": "f560db71705d89d0ded2a5efbcaeb4c7c4dafab8",
+    "gitlink_matches_current_main": false,
+    "source_drift": "PR #130's projects/gwc gitlink is f560db71, not the post-PR614 current Universal source c93b722b. It is an ancestor snapshot, not a binding to the current source."
+  },
+  "identity_comparison": {
+    "universal_profile": {
+      "at_pr130_gwc_gitlink": "ABSENT",
+      "at_current_gwc_main": {
+        "file": "core/node-architect/universal-runtime-default-profile.json",
+        "blob": "1c1482cc014a94171cad7b66f9c404b5e6f1c386",
+        "schema_id": "gwc.universal-runtime.default-profile.v2",
+        "runtime_family": "UNIVERSAL_V2",
+        "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+        "lifecycle_profile": "gwc.universal-run.v2"
+      },
+      "match": false
+    },
+    "q0_profile": {
+      "at_pr130_gwc_gitlink": "ABSENT",
+      "at_current_gwc_main": {
+        "file": "core/node-architect/q0-live-qualification-profile.json",
+        "blob": "a2f82a069f90629298d48b2d87c70284a5e1a90c",
+        "profile_id": "gwc.q0-live-qualification.v2",
+        "runtime_profile": "gwc.universal-run.v2 / version 2",
+        "schema_id": "gwc.q0-live-qualification-profile.v2"
+      },
+      "match": false
+    },
+    "universal_runtime_source": {
+      "file": "tools/node_architect/universal_run_kernel.py",
+      "pr130_gitlink_blob": "ecbc3f221f0eb19b673c63ce32be6583a59bde9e",
+      "current_main_blob": "d69cab0b2d148bd0e32a5a0aaef171780af8d39a",
+      "match": false,
+      "additional_source_evidence": "universal_runtime_profile.py is absent at f560db71 and present at c93b722b (blob edb560f6e3bd30cb8382228a35b5a45a722c055b). universal_run_state.py and universal_run_plan.py also have different blobs at those revisions."
+    },
+    "dwo_reducer_identity": {
+      "current_source_identity_at_pr130_head": "dwo.reducer/2 (schema dwo.reducer-identity/1)",
+      "fixture_receipt_reducer_version": "dwo.reducer/1",
+      "match": false,
+      "interpretation": "The PR's source-owned DWO reducer identity is newer than the historical fixture receipt identity. This is expected source drift, not proof that old receipts were requalified; they must remain DRIFTED/UNKNOWN unless independently rebound."
+    },
+    "projection_identity": {
+      "dwo_fixture_projection_contract": "dwo.projection-contract/2",
+      "current_gwc_universal_profile": "gwc.universal-run.v2",
+      "match": "NOT_COMPARABLE_DIFFERENT_NAMESPACES",
+      "interpretation": "DWO projection-contract and GWC Universal lifecycle-profile identifiers are distinct contracts; do not treat equal version numbers or labels as identity equality. The PR's DWO projection identity does not repair the stale GWC gitlink."
+    },
+    "historical_receipt_source": {
+      "fixture_source_repository": "nhatnguyenquang1838-coder/DW-SuperApps",
+      "fixture_source_sha": "9a7b2ac7669c428da8fda34bc608f79df00f40ae",
+      "interpretation": "This historical receipt source SHA is not the PR head and not the current GWC main SHA. It cannot establish current Universal source identity."
+    }
+  },
+  "ci": [
+    {
+      "run_id": 41145255810,
+      "observed_check_name": "validate",
+      "conclusion": "success",
+      "head_sha": "52e6cc2b7cfba3b99c3fcf0a670b564e6c520505"
+    },
+    {
+      "run_id": 41145255733,
+      "observed_check_name": "validate-worktree-policy",
+      "conclusion": "success",
+      "head_sha": "52e6cc2b7cfba3b99c3fcf0a670b564e6c520505"
+    },
+    {
+      "run_id": 41145255850,
+      "observed_check_name": "typecheck-tests",
+      "conclusion": "success",
+      "head_sha": "52e6cc2b7cfba3b99c3fcf0a670b564e6c520505"
+    }
+  ],
+  "verdict": "CI_GREEN_FOR_REQUESTED_52E6_HEAD_BUT_SOURCE_BINDING_STALE; profile and Universal source identities do not match current GWC main. PR #130 live head has also advanced to 27be8087.",
+  "authority_granted": false,
+  "scope": "Read-only source and CI identity verification; no DW-SuperApps gitlink, PR #130 state, runtime qualification, production configuration, or production data changed."
+}
