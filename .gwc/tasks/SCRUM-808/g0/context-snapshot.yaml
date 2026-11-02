@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "g0-context-snapshot",
+  "generated_at": "2026-09-23T19:00:00Z",
+  "project": {
+    "id": "gwc",
+    "name": "GWC",
+    "profile_path": "projects/gwc/project-profile.yaml"
+  },
+  "repository": {
+    "full_name": "nhatnguyenquang1838-coder/gwc",
+    "base_ref": "main",
+    "base_sha": "bb5a870bd2066a38bef75262aad1a87e2d08cba2",
+    "protected_branches": [
+      "main"
+    ],
+    "connector": "github",
+    "write_enabled": true
+  },
+  "constraints": [
+    "No merge to protected main without Human G4",
+    "Canonical docs edits require G2 authority"
+  ],
+  "applicable_policies": [
+    {
+      "id": "GATE_LIFECYCLE_CONTRACT_v1.0",
+      "path": "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+      "ref": "main",
+      "source_sha": "ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48"
+    }
+  ],
+  "sources": [
+    {
+      "path": "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+      "required": true,
+      "status": "AVAILABLE",
+      "source_sha": "bcb4a3911eab481c8c88523f87dc4e2e81c892764c5a0cc52c12f3fee61cecda"
+    },
+    {
+      "path": "core/Agent_Operating_Runtime_Contract_v1.0.md",
+      "required": true,
+      "status": "AVAILABLE",
+      "source_sha": "bea4e477396533354ae5bab0ada3ddc17ad1a8937041b5b724b3de449422fee8"
+    },
+    {
+      "path": "AGENTS.md",
+      "required": true,
+      "status": "AVAILABLE",
+      "source_sha": "18922cbcb844af1aae94d9b138984725610165717e0df58ee88ef5af8e56a03c"
+    }
+  ],
+  "status": "READY",
+  "blockers": [],
+  "runtime_context": {
+    "agent_runtime_id": "dwa",
+    "execution_mode": "local_agent",
+    "selected_profile": {
+      "id": "default",
+      "path": "~/.hermes/profiles/default/"
+    },
+    "selected_connector": "github",
+    "required_behavior_contracts": [
+      "M1-M7_POLICY",
+      "DEADLOCK_CHECK",
+      "A2A_PROTOCOL"
+    ],
+    "connector_priority": [
+      "github"
+    ]
+  }
+}
