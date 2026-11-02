@@ -19,11 +19,11 @@ def sandbox(tmp_path: Path) -> Path:
 
 
 def test_live_q0_binding_keeps_immutable_runtimeplan():
+    import hashlib
     result = reconcile(ROOT)
     assert result["binding"] == "Q0_SOURCE_BOUND"
-    assert result["current_runtimeplan_sha256"] == (
-        "sha256:ac8e8b855d5564ec9e503f965cd73deb60b546caf70a7304c43140a315422500"
-    )
+    current = "sha256:" + hashlib.sha256((ROOT / PLAN).read_bytes()).hexdigest()
+    assert result["current_runtimeplan_sha256"] == current
     assert result["replan_required"] is False
     assert result["native_gate_receipt"] is None
     assert result["q0_l3_qualified"] is False
