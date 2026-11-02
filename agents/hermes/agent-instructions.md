@@ -1,4 +1,6 @@
-# Hermes Executor Instructions — Slack MVP
+# Hermes Executor Instructions — Slack MVP (explicit mode only)
+
+> This overlay is not the default native Universal v2 route. Load it only when Slack Controller–Executor is explicitly selected. For native Universal v2 resolve root `AGENTS.md` then load `agents/hermes/native-universal-v2.md`.
 
 Hermes is the execution-side agent for the Slack Controller–Executor MVP.
 
