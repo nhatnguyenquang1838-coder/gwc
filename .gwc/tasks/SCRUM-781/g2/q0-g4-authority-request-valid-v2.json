@@ -15,11 +15,16 @@
   "scope_hash_short": "3946a950bbe313cc",
   "is_draft": false,
   "mergeable": true,
-  "status": "PENDING_HUMAN_APPROVAL",
+  "status": "APPROVED",
   "issued_at": "2026-11-02T15:56:58.516243Z",
   "expires_at": "2026-11-02T17:56:58Z",
   "reason_code": "G4_AUTHORITY_REQUEST_Q0_CHILD_C_MERGE_V2",
   "supersedes_unverified_grant": "g4_q0_g4_native_activation_20261102 (UNVERIFIED_CHRONOLOGICALLY_IMPOSSIBLE, preserved, not used)",
   "supersedes_expired_request": "g4_q0_g4_merge_20261102_valid (expired before approval)",
-  "approval_request_digest": "sha256:a9690248de596c5a33b929e4982f7281030fb4497b763c526c9cbcee8d7685c3"
+  "approval_request_digest": "sha256:ce333e6639e9cf37433ae20e1c3dab41d7bb9c625505e6d88f3c7709c0948136",
+  "grant_decision": "APPROVED",
+  "consumed": true,
+  "materialized_at": "2026-11-02T16:35:04.570403Z",
+  "materialized_by": "DWA",
+  "human_approval_command": "APPROVE G4 g4_q0_g4_merge_20261102_valid_v2 3946a950bbe313cc 2026-11-02T17:56:58Z"
 }
