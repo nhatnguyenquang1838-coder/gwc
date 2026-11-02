@@ -202,8 +202,11 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
         db.execute('INSERT INTO engineering_invocations VALUES (?,?,?,NULL)',(run,invocation_key,binding));db.commit()
 
     def outcome(s,name,status,reason,**data):
+        activity_record={'status':status,'reason_code':reason}
+        if 'parent_g1_recovery' in data:
+            activity_record['parent_g1_recovery']=data['parent_g1_recovery']
         return {'current_activity':name,'status':status,'reason_code':reason,
-                'activity_results':{**s.get('activity_results',{}),name:{'status':status,'reason_code':reason}},**data}
+                'activity_results':{**s.get('activity_results',{}),name:activity_record},**data}
     def _telemetry(activity,reason,status,result_digest,request_created,exchange_marker=None):
         with _connect(path) as db:
             db.execute('CREATE TABLE IF NOT EXISTS engineering_firing_telemetry '
@@ -276,14 +279,34 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
                        (run,body_sha,s['communication'].get('comment_url')))
         return True
     def m2(s):
+        recovery=None
+        recovery_input=c.get('engineering',{}).get('parent_g1_recovery')
+        if isinstance(recovery_input,dict):
+            parent=recovery_input.get('parent')
+            children=recovery_input.get('children')
+            if isinstance(parent,dict) and parent.get('exists') is True and parent.get('goal_contract') is None and parent.get('runtime_plan') is None:
+                from .q0_qualification import recover_child_before_parent_g1
+                try:
+                    recovery=recover_child_before_parent_g1(
+                        parent=parent,children=children or [],
+                        canonical_planner=host_capabilities.get('q0.parent_g1.canonical_planner'),
+                        materializer=host_capabilities.get('q0.parent_g1.materializer'),
+                        readback=host_capabilities.get('q0.parent_g1.readback'),
+                        reconcile_children=host_capabilities.get('q0.parent_g1.reconcile_children'),
+                        m2_status=recovery_input.get('m2_status','CHANGES_REQUIRED'),
+                        g2_is_execution_predecessor=recovery_input.get('g2_is_execution_predecessor') is True)
+                except ValueError as exc:
+                    return outcome(s,'M2','WAIT',getattr(exc,'code',str(exc)),parent_g1_recovery={'status':'BLOCKED','reason_code':getattr(exc,'code',str(exc))})
         if c.get('engineering',{}).get('intent_body_sha256') not in (None,s['communication']['body_sha256']):
             if _successor_intent_approved(s,s['communication']['body_sha256']):
-                return outcome(s,'M2','PASS','ENGINEERING_INTENT_BOUND_TO_HUMAN_APPROVED_SUCCESSOR')
-            return outcome(s,'M2','WAIT','ENGINEERING_NEW_INTENT_RECONCILIATION_REQUIRED')
+                return outcome(s,'M2','PASS','ENGINEERING_INTENT_BOUND_TO_HUMAN_APPROVED_SUCCESSOR',parent_g1_recovery=recovery)
+            return outcome(s,'M2','WAIT','ENGINEERING_NEW_INTENT_RECONCILIATION_REQUIRED',parent_g1_recovery=recovery)
         validator=host_capabilities.get('engineering.validate_context')
         if not callable(validator) or validator(c) is not True:
-            return outcome(s,'M2','WAIT','ENGINEERING_CONTEXT_SOURCE_VALIDATION_REQUIRED')
-        return outcome(s,'M2','PASS','TASK_PLAN_SOURCE_AND_COMMUNICATION_BOUND')
+            return outcome(s,'M2','WAIT','ENGINEERING_CONTEXT_SOURCE_VALIDATION_REQUIRED',parent_g1_recovery=recovery)
+        if recovery is not None and recovery['m2_status']=='CHANGES_REQUIRED':
+            return outcome(s,'M2','WAIT','M2_EXACT_HEAD_ACCEPTANCE_REQUIRED',parent_g1_recovery=recovery)
+        return outcome(s,'M2','PASS','TASK_PLAN_SOURCE_AND_COMMUNICATION_BOUND',parent_g1_recovery=recovery)
     def m3(s):
         items=sorted(c.get('engineering',{}).get('work_items',[]),key=lambda item:item['priority'])
         with _connect(path) as db:

@@ -288,7 +288,9 @@ def workflow(args: argparse.Namespace, *, host_capabilities=None) -> dict:
         result = run_task_workflow(context, host_capabilities=host_capabilities,
                                    invocation_key=f'{args.session}:native:{args.tick}' if args.tick is not None else None)
         seal_context_manifest(path,manifest,authorized=True)
-    return {**preflight, 'workflow': result, 'workflow_checkpoint': str(path),
+    return {**preflight, 'workflow': result,
+            'parent_g1_recovery': (result.get('activity_results',{}).get('M2',{}).get('parent_g1_recovery')),
+            'workflow_checkpoint': str(path),
             'capability_binding':host_capabilities.get('capability_binding',{'status':'HOST_INJECTED'}),
             'trigger': 'NATIVE_OWNER_FIRING' if args.tick is not None else 'EXPLICIT_USER_REQUEST_NOT_NATIVE_TICK'}
 

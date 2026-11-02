@@ -144,6 +144,28 @@ def _cert():
     return _m().certify_q0_runtime(**_cert_inputs())
 
 
+def test_l3_certification_claims_authority_only_for_exact_loaded_candidate_and_profile():
+    m = _m()
+    inputs = _cert_inputs()
+    receipt = m.certify_q0_runtime(**inputs)
+
+    assert receipt["certification_level"] == "L3"
+    assert receipt["certification_claimed"] is True
+    assert receipt["authority_granted"] is True
+    assert receipt["certified_q0_sha"] == inputs["loaded_runtime_identity"]
+    assert receipt["load_proof_evidence"]["candidate_sha"] == receipt["certified_q0_sha"]
+    assert receipt["load_proof_evidence"]["loaded_profile_digest"] == receipt["qualification_profile_digest"]
+    assert m.verify_q0_certification(receipt) is True
+
+
+def test_l3_certification_rejects_mismatched_load_proof_profile():
+    inputs = _cert_inputs()
+    evidence = dict(inputs["load_proof_evidence"])
+    evidence["loaded_profile_digest"] = "sha256:" + "f" * 64
+    with pytest.raises(_m().Q0QualificationError, match="LOAD_PROOF_PROFILE_IDENTITY_MISMATCH"):
+        _m().certify_q0_runtime(**_cert_inputs(load_proof_evidence=evidence))
+
+
 def _acceptance(cert=None, **kwargs):
     m = _m()
     cert = cert or _cert()
@@ -181,10 +203,158 @@ def test_q0_real_workload_starts_only_after_campaign_ready_l3():
         m.can_start_login_r00(certification=incomplete, acceptance=accepted)
 
 
+def _release_rebinding_evidence():
+    dev_sha = _sha("d")
+    released_sha = _sha("e")
+    requalification = {
+        "schema_id": "gwc.q0.affected-scope-requalification.v1",
+        "artifact_type": "affected-scope-requalification-receipt",
+        "status": "PASS",
+        "repository": "nhatnguyenquang1838-coder/gwc",
+        "prior_qualified_development_sha": dev_sha,
+        "released_gwc_main_sha": released_sha,
+        "scope_ref": "evidence:affected-scope",
+        "evidence_refs": ["evidence:tests", "evidence:impact"],
+    }
+    requalification["receipt_digest"] = _digest(requalification)
+    release = {
+        "schema_id": "gwc.q0.release-merge-receipt.v1",
+        "artifact_type": "release-merge-receipt",
+        "repository": "nhatnguyenquang1838-coder/gwc",
+        "released_gwc_main_sha": released_sha,
+        "durable_ref": "releases/receipts/release-123.json",
+        "merged_at": "2026-11-01T10:00:00Z",
+        "merged_by": {"type": "github_user", "id": "release-manager"},
+        "authority_ref": "approval:release-123",
+    }
+    release["receipt_digest"] = _digest(release)
+    binding = {
+        "schema_id": "gwc.q0.release-rebinding.v1",
+        "schema_version": 1,
+        "artifact_type": "q0-release-rebinding-record",
+        "task_id": "SCRUM-781",
+        "repository": "nhatnguyenquang1838-coder/gwc",
+        "prior_qualified_development_sha": dev_sha,
+        "historical_development_source_sha": dev_sha,
+        "released_gwc_main_sha": released_sha,
+        "affected_scope_requalification_ref": "evidence:affected-scope",
+        "release_merge_receipt_ref": release["durable_ref"],
+        "release_merge_receipt_digest": release["receipt_digest"],
+        "attribution": {"actor": "release-manager", "authority_ref": "approval:release-123"},
+        "created_at": "2026-11-01T10:01:00Z",
+    }
+    binding["record_digest"] = _digest(binding)
+    return binding, requalification, release, dev_sha, released_sha
+
+
+def test_scrum831_plan_receipt_is_not_release_rebinding_qualification():
+    native_receipt = json.loads((ROOT / ".gwc/tasks/SCRUM-781/native-q0-c287/native-plan-receipt.json").read_text())
+    assert native_receipt["qualification_results"] == {}
+    assert set(native_receipt["plan_coverage"].values()) == {"PLANNED"}
+    assert native_receipt["source_head"] == "5e40763b63b27873ac2cff30ac10f0eeef5a5469"
+    assert native_receipt["decision_ref"] == "core/node-architect/q0-native-successor-runtime-plan-r2.json"
+    with pytest.raises(_m().Q0QualificationError, match="RELEASE_REBINDING_RECORD_REQUIRED"):
+        _m().validate_q0_release_rebinding_evidence(
+            None, affected_scope_requalification=None, release_merge_receipt=None,
+            expected_prior_qualified_dev_sha=native_receipt["source_head"],
+            expected_released_gwc_main_sha="c93b722b2a611d805ada803920b92e205ec8cabc",
+        )
+
+
+def test_release_rebinding_requires_distinct_development_and_released_shas_and_durable_receipts():
+    binding, requalification, release, dev_sha, released_sha = _release_rebinding_evidence()
+    result = _m().validate_q0_release_rebinding_evidence(
+        binding, affected_scope_requalification=requalification,
+        release_merge_receipt=release,
+        expected_prior_qualified_dev_sha=dev_sha,
+        expected_released_gwc_main_sha=released_sha,
+    )
+    assert result["valid"] is True
+    assert result["prior_qualified_development_sha"] == dev_sha
+    assert result["historical_development_source_sha"] == dev_sha
+    assert result["released_gwc_main_sha"] == released_sha
+    assert result["authority_granted"] is False
+
+
+def test_release_rebinding_rejects_missing_requalification_or_release_receipt():
+    binding, requalification, release, dev_sha, released_sha = _release_rebinding_evidence()
+    with pytest.raises(_m().Q0QualificationError, match="AFFECTED_SCOPE_REQUALIFICATION_REQUIRED"):
+        _m().validate_q0_release_rebinding_evidence(
+            binding, affected_scope_requalification=None, release_merge_receipt=release,
+            expected_prior_qualified_dev_sha=dev_sha, expected_released_gwc_main_sha=released_sha)
+    with pytest.raises(_m().Q0QualificationError, match="RELEASE_MERGE_RECEIPT_REQUIRED"):
+        _m().validate_q0_release_rebinding_evidence(
+            binding, affected_scope_requalification=requalification, release_merge_receipt=None,
+            expected_prior_qualified_dev_sha=dev_sha, expected_released_gwc_main_sha=released_sha)
+
+
+def test_release_rebinding_rejects_sha_collapse_and_unattributed_or_non_durable_receipt():
+    binding, requalification, release, dev_sha, released_sha = _release_rebinding_evidence()
+    with pytest.raises(_m().Q0QualificationError, match="RELEASE_REBINDING_SHA_COLLAPSE"):
+        _m().validate_q0_release_rebinding_evidence(
+            binding, affected_scope_requalification=requalification, release_merge_receipt=release,
+            expected_prior_qualified_dev_sha=dev_sha, expected_released_gwc_main_sha=dev_sha)
+    release["merged_by"] = {}
+    release["receipt_digest"] = _digest({k: v for k, v in release.items() if k != "receipt_digest"})
+    binding["release_merge_receipt_digest"] = release["receipt_digest"]
+    binding["record_digest"] = _digest({k: v for k, v in binding.items() if k != "record_digest"})
+    with pytest.raises(_m().Q0QualificationError, match="RELEASE_MERGE_ATTRIBUTION_REQUIRED"):
+        _m().validate_q0_release_rebinding_evidence(
+            binding, affected_scope_requalification=requalification, release_merge_receipt=release,
+            expected_prior_qualified_dev_sha=dev_sha, expected_released_gwc_main_sha=released_sha)
+
+
 def test_q0_acceptance_is_ur_g6_not_ur_g4():
     m = _m()
     assert m.Q0_ACCEPTANCE_GATE == "UR.G6"
     assert m.Q0_INTEGRATION_GATE == "UR.G4"
+
+
+def test_accepted_handoff_binds_consumed_decision_and_completes_g6():
+    m = _m()
+    cert = _cert()
+    acceptance = _acceptance(cert)["acceptance"]
+
+    bundle = m.create_q0_accepted_handoff(
+        certification=cert, acceptance=acceptance, created_at="2026-10-02T14:03:00Z",
+    )
+
+    assert bundle["acceptance"] == acceptance
+    assert bundle["acceptance"]["consumed"] is True
+    assert bundle["acceptance"]["effect_authority_granted"] is False
+    assert bundle["closure"]["acceptance_receipt_ref"] == acceptance["receipt_digest"]
+    assert bundle["handoff"]["acceptance_receipt_ref"] == acceptance["receipt_digest"]
+    assert bundle["handoff"]["certified_q0_sha"] == cert["certified_q0_sha"]
+    assert bundle["closure"]["artifact_type"] == "closure-receipt"
+    assert bundle["closure"]["gate"] == "UR.G6"
+    assert bundle["closure"]["closure_outcome"] == "ACCEPTED"
+    assert bundle["handoff"]["artifact_type"] == "handoff-receipt"
+    assert bundle["handoff"]["target"] == "LOGIN_R00_PLUS"
+    assert bundle["handoff"]["status"] == "Q0_ACCEPTED_AUTONOMOUS_HANDOFF"
+    result = m.complete_q0_gate(
+        gate="UR.G6",
+        evidence={
+            "Q0_ACCEPTANCE_RECEIPT": bundle["acceptance"],
+            "CLOSURE_RECEIPT": bundle["closure"],
+            "HANDOFF_RECEIPT": bundle["handoff"],
+        },
+    )
+    assert result["gate_state"] == "PASSED"
+
+
+def test_unconsumed_acceptance_cannot_be_promoted_by_handoff():
+    m = _m()
+    cert = _cert()
+    acceptance = dict(_acceptance(cert)["acceptance"])
+    acceptance["consumed"] = False
+    acceptance = m._sealed(acceptance)
+
+    with pytest.raises(m.Q0QualificationError, match="Q0_ACCEPTANCE_NOT_CONSUMED"):
+        m.create_q0_accepted_handoff(
+            certification=cert,
+            acceptance=acceptance,
+            created_at="2026-10-02T14:03:00Z",
+        )
 
 
 def test_ur_g2_completion_requires_execution_receipt_with_bound_digest():

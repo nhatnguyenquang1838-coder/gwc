@@ -140,6 +140,10 @@ def test_q0_readiness_executes_real_graph_and_reuses_persistent_run(tmp_path, mo
     assert first['operation']['run_id'] == second['operation']['run_id']
     assert first['operation']['task_id'] == 'SCRUM-781'
     assert second['checkpoint_readback']['revision'] == 2
+    assert second['final_live_replay_equality'] is True
+    assert second['final_output_digest'].startswith('sha256:')
+    assert second['replay_evidence']['checkpoint_state_digest'] == second['final_output_digest']
+    assert second['replay_evidence']['checkpoint_ref'] == str(store.resolve())
     assert second['native_activation_permitted'] is False
     assert second['executed_effects'] == []
 

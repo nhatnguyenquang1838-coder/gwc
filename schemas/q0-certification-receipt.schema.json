@@ -4,7 +4,7 @@
   "title": "Q0CertificationReceipt",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "artifact_type", "run_id", "task_id", "runtime_epoch", "qualification_profile", "qualification_profile_digest", "qualification_matrix_digest", "candidate_sha", "loaded_runtime_identity", "load_proof_ref", "load_proof_evidence", "incident_replay_refs", "replay_result", "replay_exact_readback", "previous_failure_state", "first_state_beyond_failure", "forward_progress_refs", "broader_regression_refs", "broader_regression_result", "stale_dependent_state", "certified_q0_sha", "certification_level", "campaign_state", "created_at", "created_by", "receipt_digest"],
+  "required": ["schema_version", "artifact_type", "run_id", "task_id", "runtime_epoch", "qualification_profile", "qualification_profile_digest", "qualification_matrix_digest", "candidate_sha", "loaded_runtime_identity", "load_proof_ref", "load_proof_evidence", "incident_replay_refs", "replay_result", "replay_exact_readback", "previous_failure_state", "first_state_beyond_failure", "forward_progress_refs", "broader_regression_refs", "broader_regression_result", "stale_dependent_state", "certified_q0_sha", "certification_level", "certification_claimed", "authority_granted", "campaign_state", "created_at", "created_by", "receipt_digest"],
   "allOf": [{"if": {"properties": {"schema_version": {"const": "1.1"}}, "required": ["schema_version"]}, "then": {"required": ["replay_provenance"]}}],
   "properties": {
     "schema_version": {"enum": ["1.0", "1.1"]}, "artifact_type": {"const": "q0-certification-receipt"},
@@ -23,6 +23,7 @@
     "broader_regression_refs": {"$ref": "#/$defs/refs"}, "broader_regression_result": {"const": "PASS"},
     "stale_dependent_state": {"type": "array", "items": {"type": "string"}},
     "certified_q0_sha": {"$ref": "#/$defs/sha"}, "certification_level": {"const": "L3"},
+    "certification_claimed": {"const": true}, "authority_granted": {"const": true},
     "campaign_state": {"const": "CAMPAIGN_READY_RUNTIME"}, "created_at": {"type": "string", "format": "date-time"},
     "created_by": {"type": "object", "required": ["id"], "properties": {"type": {"type": "string"}, "id": {"type": "string", "minLength": 1}}, "additionalProperties": true},
     "receipt_digest": {"$ref": "#/$defs/digest"}
