@@ -1,0 +1,22 @@
+{
+  "artifact_type": "q0-acceptance-request",
+  "captured_via": {
+    "note": "DWA chat to Nhat",
+    "type": "direct_chat"
+  },
+  "certified_q0_sha": "d2e659cebabfa49700745a4fd8168c773f1a5b25",
+  "decision_authority": {
+    "id": "NHAT",
+    "type": "human"
+  },
+  "effect_authority_granted": false,
+  "expires_at": "2026-11-03T12:00:00Z",
+  "issued_at": "2026-11-03T03:00:00Z",
+  "q0_certification_receipt_ref": "sha256:8612fae1b5bc5d97e8d177176727bd723d806a75ac5badbf374cd56af3f8c121",
+  "qualification_matrix_digest": "sha256:04e61164f91820d0815ed387131c8cbe9e2aefc2a1817eb82767f7805d44c429",
+  "request_digest": "sha256:57cb6d6ed17804977f95ea6a065a637d0fca2fa5f07c04db16ef008c0e4edfd0",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "schema_version": "1.0",
+  "target_handoff": "LOGIN_R00_PLUS",
+  "task_id": "SCRUM-781"
+}

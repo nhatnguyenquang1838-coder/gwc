@@ -1,0 +1,96 @@
+{
+  "artifact_type": "q0-certification-receipt",
+  "authority_granted": true,
+  "broader_regression_refs": [
+    "python -m pytest tests/ -q --tb=no -> 4401 passed / 13 env-only / 591 subtests",
+    "PR #620 critical CI (canonical-81, semantic-runtime, q0-portability, validate, build, g4-receipt-required) success"
+  ],
+  "broader_regression_result": "PASS",
+  "campaign_state": "CAMPAIGN_READY_RUNTIME",
+  "candidate_sha": "d2e659cebabfa49700745a4fd8168c773f1a5b25",
+  "certification_claimed": true,
+  "certification_level": "L3",
+  "certified_q0_sha": "d2e659cebabfa49700745a4fd8168c773f1a5b25",
+  "created_at": "2026-11-03T02:58:00Z",
+  "created_by": {
+    "id": "DWA",
+    "role": "hermes-executor"
+  },
+  "first_state_beyond_failure": "",
+  "forward_progress_refs": [
+    ".gwc/tasks/SCRUM-781/r4-native-c287/sf-load-proof.json",
+    ".gwc/tasks/SCRUM-781/r4-native-c287/sf-qualify-matrix.json",
+    ".gwc/tasks/SCRUM-781/r4-native-c287/sf-validate-receipt.json"
+  ],
+  "incident_replay_refs": [],
+  "load_proof_evidence": {
+    "activation_id": "sf-load:r4:activation-final",
+    "candidate_sha": "d2e659cebabfa49700745a4fd8168c773f1a5b25",
+    "committed_module_sha256": "957abddaba437b01d4b9df997bceebe0db0a6a00867215358e6e10b0f4fe6f1c",
+    "files": [
+      {
+        "committed_module_sha256": "957abddaba437b01d4b9df997bceebe0db0a6a00867215358e6e10b0f4fe6f1c",
+        "disk_sha256": "957abddaba437b01d4b9df997bceebe0db0a6a00867215358e6e10b0f4fe6f1c",
+        "head_sha256": "957abddaba437b01d4b9df997bceebe0db0a6a00867215358e6e10b0f4fe6f1c",
+        "match": true,
+        "path": "tools/node_architect/q0_qualification.py"
+      },
+      {
+        "committed_module_sha256": "e0a768ea48716f207a935536f78ead6b4af8ae279c10901ddcdb2462d0def758",
+        "disk_sha256": "e0a768ea48716f207a935536f78ead6b4af8ae279c10901ddcdb2462d0def758",
+        "head_sha256": "e0a768ea48716f207a935536f78ead6b4af8ae279c10901ddcdb2462d0def758",
+        "match": true,
+        "path": "tools/node_architect/q0_python_env.py"
+      },
+      {
+        "committed_module_sha256": "5adde437967ee88bb2939c8b206867db396a6b4e2825ad8f25b01eae312ae1b6",
+        "disk_sha256": "5adde437967ee88bb2939c8b206867db396a6b4e2825ad8f25b01eae312ae1b6",
+        "head_sha256": "5adde437967ee88bb2939c8b206867db396a6b4e2825ad8f25b01eae312ae1b6",
+        "match": true,
+        "path": "tools/node_architect/q0_work_evidence.py"
+      }
+    ],
+    "head_sha": "d2e659cebabfa49700745a4fd8168c773f1a5b25",
+    "load_proof_ref": "evidence:native-load/sf-r4-final-20261103",
+    "loaded_at_ns": 1793648242069491000,
+    "loaded_module_identities": {
+      "tools/node_architect/q0_python_env.py": "sha256:e0a768ea48716f207a935536f78ead6b4af8ae279c10901ddcdb2462d0def758",
+      "tools/node_architect/q0_qualification.py": "sha256:957abddaba437b01d4b9df997bceebe0db0a6a00867215358e6e10b0f4fe6f1c",
+      "tools/node_architect/q0_work_evidence.py": "sha256:5adde437967ee88bb2939c8b206867db396a6b4e2825ad8f25b01eae312ae1b6"
+    },
+    "loaded_profile_digest": "sha256:2a37d580c26305b74f742f45d25f4caeafae35da043a3b1307b2aedeac34932c",
+    "loaded_source_sha": "d2e659cebabfa49700745a4fd8168c773f1a5b25",
+    "module_identities": {
+      "tools/node_architect/q0_python_env.py": "sha256:e0a768ea48716f207a935536f78ead6b4af8ae279c10901ddcdb2462d0def758",
+      "tools/node_architect/q0_qualification.py": "sha256:957abddaba437b01d4b9df997bceebe0db0a6a00867215358e6e10b0f4fe6f1c",
+      "tools/node_architect/q0_work_evidence.py": "sha256:5adde437967ee88bb2939c8b206867db396a6b4e2825ad8f25b01eae312ae1b6"
+    },
+    "proof_type": "NATIVE_LOAD_PROOF",
+    "runtime_process_id": "3760",
+    "runtime_session_id": "local-b4b8b1d8cddeb20e46765a478156c2a1904962d6b32239f16f2140dbdbbc6de2",
+    "source_root": "D:\\Projects\\DW-SuperApps.worktrees\\gwc\\SCRUM-781-q0-fresh-20261010-r1"
+  },
+  "load_proof_ref": "evidence:native-load/sf-r4-final-20261103",
+  "loaded_runtime_identity": "d2e659cebabfa49700745a4fd8168c773f1a5b25",
+  "previous_failure_state": "",
+  "qualification_matrix_digest": "sha256:04e61164f91820d0815ed387131c8cbe9e2aefc2a1817eb82767f7805d44c429",
+  "qualification_profile": "q0_live_qualification",
+  "qualification_profile_digest": "sha256:2a37d580c26305b74f742f45d25f4caeafae35da043a3b1307b2aedeac34932c",
+  "receipt_digest": "sha256:8612fae1b5bc5d97e8d177176727bd723d806a75ac5badbf374cd56af3f8c121",
+  "replay_exact_readback": false,
+  "replay_provenance": {
+    "defect_class": "NO_ACTIVE_RUNTIME_DEFECT",
+    "observed_error_ref": "none-observed",
+    "observed_prestate_ref": "evidence:native-load/sf-r4-final-20261103",
+    "original_incident_replayed": false,
+    "provenance_digest": "sha256:ee1855f004d8be3641eafbe164a619d8a8c51fdbf05abc15245d3b6696d46bbd",
+    "scenario_id": "sf-r4-no-incident-20261103",
+    "subject": "SAFE_FORWARD_NO_INCIDENT"
+  },
+  "replay_result": "NOT_APPLICABLE",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+  "schema_version": "1.2",
+  "stale_dependent_state": [],
+  "task_id": "SCRUM-781"
+}

@@ -4,7 +4,7 @@
   "artifact_type": "TARGET_VALIDATION_RECEIPT",
   "run_id": "scrum781-q0-fresh-20261010-r1",
   "gate": "UR.G5",
-  "candidate_sha": "1b732705",
+  "candidate_sha": "d2e659cebabfa49700745a4fd8168c773f1a5b25",
   "qualified_source_sha": "170b76735f85f77fd941a8772d332d8beb29aade",
   "runtime_plan_digest": "sha256:8f270c40829b168644fa51a9d7a7035f5339c1b8b8daeb254c5df7aae501d2c7",
   "load_proof_ref": "evidence:native-load/sf-r4-20261103a",
@@ -25,5 +25,5 @@
   "target_validated": true,
   "certification_claimed": false,
   "effect_authority_granted": false,
-  "note": "SF-VALIDATE: exact target validation bound to qualified identity. UR.G5 completion does NOT claim L3 certification or effect authority; legacy G5_STATUS_VERIFY (PR #619) is history and neither satisfies nor blocks this Universal UR.G5."
+  "note": "SF-VALIDATE: exact target validation bound to qualified identity. UR.G5 completion does NOT claim L3 certification or effect authority; legacy G5_STATUS_VERIFY (PR #619) is history and neither satisfies nor blocks this Universal UR.G5. | candidate_sha bound to LOAD_PROOF identity."
 }

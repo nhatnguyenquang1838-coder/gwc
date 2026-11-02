@@ -4,7 +4,7 @@
   "artifact_type": "q0-sf-qualify-matrix",
   "run_id": "scrum781-q0-fresh-20261010-r1",
   "gate": "SF-QUALIFY",
-  "candidate_sha": "1b732705",
+  "candidate_sha": "d2e659cebabfa49700745a4fd8168c773f1a5b25",
   "source_logic_sha": "170b76735f85f77fd941a8772d332d8beb29aade",
   "contract_mode": "SAFE_FORWARD_QUALIFICATION",
   "observed_at": "2026-11-03T02:40:00Z",
@@ -36,19 +36,58 @@
   },
   "mandatory_matrix": {
     "results": {
-      "fresh_boot": {"status": "PASS", "evidence_ref": ".gwc/tasks/SCRUM-781/r4-native-c287/fresh-boot-evidence.json"},
-      "default_route": {"status": "PASS", "evidence_ref": "tests/test_scrum781_q0_mandatory_matrix_coverage.py::test_mandatory_default_route_resolves_to_universal_v2_route"},
-      "runtime_plan": {"status": "PASS", "evidence_ref": "core/node-architect/scrum781-q0-safe-forward-runtime-plan-r4-v2.json"},
-      "node_allocation": {"status": "PASS", "evidence_ref": ".gwc/tasks/SCRUM-781/r4-native-c287/node-allocation.json"},
-      "node_architect_seam": {"status": "PASS", "evidence_ref": "tests/test_scrum781_q0_mandatory_matrix_coverage.py (node resolution tests)"},
-      "effect_authority": {"status": "PASS", "evidence_ref": ".gwc/tasks/SCRUM-781/r4-native-c287/g1-plan-receipt.json (authority_granted=false)"},
-      "exact_readback": {"status": "PASS", "evidence_ref": ".gwc/tasks/SCRUM-781/r4-native-c287/sf-load-proof.json"},
-      "typed_continuation": {"status": "PASS", "evidence_ref": "tests/test_q0_replay_provenance_semantics.py"},
-      "restart_recovery": {"status": "PASS", "evidence_ref": "tests/test_scrum781_engineering_loop_resume.py"},
-      "self_fix_replay": {"status": "PASS", "evidence_ref": "certification subject=SAFE_FORWARD_NO_INCIDENT, replay_result=NOT_APPLICABLE"},
-      "stale_state_fail_closed": {"status": "PASS", "evidence_ref": "tests/test_engineering_frontier_host.py (stale/task-context fence tests) + ENGINEERING_ARTIFACT_FENCE_UNAVAILABLE fail-closed"},
-      "deterministic_replay": {"status": "PASS", "evidence_ref": "tests/test_scrum781_q0_fixture_replay.py + tests/test_q0_replay_provenance_semantics.py"},
-      "recursive_plan_dag_complete": {"status": "PASS", "evidence_ref": "core/node-architect/scrum781-q0-safe-forward-runtime-plan-r4-v2.json (dag SF-PRECHECK..SF-CERTIFY + W1..W6 topo-validated)"}
+      "fresh_boot": {
+        "status": "PASS",
+        "evidence_ref": ".gwc/tasks/SCRUM-781/r4-native-c287/fresh-boot-evidence.json"
+      },
+      "default_route": {
+        "status": "PASS",
+        "evidence_ref": "tests/test_scrum781_q0_mandatory_matrix_coverage.py::test_mandatory_default_route_resolves_to_universal_v2_route"
+      },
+      "runtime_plan": {
+        "status": "PASS",
+        "evidence_ref": "core/node-architect/scrum781-q0-safe-forward-runtime-plan-r4-v2.json"
+      },
+      "node_allocation": {
+        "status": "PASS",
+        "evidence_ref": ".gwc/tasks/SCRUM-781/r4-native-c287/node-allocation.json"
+      },
+      "node_architect_seam": {
+        "status": "PASS",
+        "evidence_ref": "tests/test_scrum781_q0_mandatory_matrix_coverage.py (node resolution tests)"
+      },
+      "effect_authority": {
+        "status": "PASS",
+        "evidence_ref": ".gwc/tasks/SCRUM-781/r4-native-c287/g1-plan-receipt.json (authority_granted=false)"
+      },
+      "exact_readback": {
+        "status": "PASS",
+        "evidence_ref": ".gwc/tasks/SCRUM-781/r4-native-c287/sf-load-proof.json"
+      },
+      "typed_continuation": {
+        "status": "PASS",
+        "evidence_ref": "tests/test_q0_replay_provenance_semantics.py"
+      },
+      "restart_recovery": {
+        "status": "PASS",
+        "evidence_ref": "tests/test_scrum781_engineering_loop_resume.py"
+      },
+      "self_fix_replay": {
+        "status": "PASS",
+        "evidence_ref": "certification subject=SAFE_FORWARD_NO_INCIDENT, replay_result=NOT_APPLICABLE"
+      },
+      "stale_state_fail_closed": {
+        "status": "PASS",
+        "evidence_ref": "tests/test_engineering_frontier_host.py (stale/task-context fence tests) + ENGINEERING_ARTIFACT_FENCE_UNAVAILABLE fail-closed"
+      },
+      "deterministic_replay": {
+        "status": "PASS",
+        "evidence_ref": "tests/test_scrum781_q0_fixture_replay.py + tests/test_q0_replay_provenance_semantics.py"
+      },
+      "recursive_plan_dag_complete": {
+        "status": "PASS",
+        "evidence_ref": "core/node-architect/scrum781-q0-safe-forward-runtime-plan-r4-v2.json (dag SF-PRECHECK..SF-CERTIFY + W1..W6 topo-validated)"
+      }
     },
     "active_unresolved_defects": []
   },
@@ -61,5 +100,5 @@
     "previous_failure_state": null,
     "first_state_beyond_failure": null
   },
-  "note": "13 local failures are Windows-only environment capability fence (POSIX primitives absent); same contract PASSES on Linux CI (PR #620 critical CI). No active runtime defect, no fabricated incident."
+  "note": "13 local failures are Windows-only environment capability fence (POSIX primitives absent); same contract PASSES on Linux CI (PR #620 critical CI). No active runtime defect, no fabricated incident. | candidate_sha bound to final certification HEAD d2e659ce (source logic == 170b7673; evidence additive commits after load do not change source)."
 }
