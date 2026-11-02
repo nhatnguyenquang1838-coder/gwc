@@ -868,7 +868,9 @@ def certify_q0_runtime(
     _require(bool(load_proof_ref), "LOAD_PROOF_REQUIRED")
     if not isinstance(load_proof_evidence, Mapping):
         raise Q0QualificationError("LOAD_PROOF_REQUIRED")
-    _require(bool(load_proof_evidence.get("activation_id")), "LOAD_PROOF_REQUIRED")
+    activation_id = load_proof_evidence.get("activation_id")
+    _require(isinstance(activation_id, str) and bool(activation_id.strip()),
+             "LOAD_PROOF_REQUIRED")
     _require(bool(load_proof_evidence.get("runtime_session_id"))
              and bool(load_proof_evidence.get("runtime_process_id")),
              "LOAD_PROOF_PROCESS_IDENTITY_REQUIRED")
