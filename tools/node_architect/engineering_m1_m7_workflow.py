@@ -146,6 +146,8 @@ class EngineeringState(TypedDict,total=False):
     reason_code:str
     activity_results:dict
     communication:dict
+    terminal_disposition:dict
+    parent_ready_event:dict
     work:dict
     execution:dict
     controller_exchange_requests:list
@@ -165,8 +167,121 @@ def _connect(path):
     db.execute('CREATE TABLE IF NOT EXISTS engineering_workflow (run TEXT PRIMARY KEY, context_digest TEXT, state TEXT)')
     db.execute('CREATE TABLE IF NOT EXISTS engineering_invocations (run TEXT, key TEXT, binding TEXT, result TEXT, PRIMARY KEY(run,key))')
     db.execute('CREATE TABLE IF NOT EXISTS engineering_work (run TEXT, fingerprint TEXT, status TEXT, result TEXT, PRIMARY KEY(run,fingerprint))')
+    db.execute('CREATE TABLE IF NOT EXISTS engineering_child_terminal (child_run TEXT PRIMARY KEY, receipt TEXT NOT NULL)')
+    db.execute('CREATE TABLE IF NOT EXISTS engineering_parent_ready_events (event_key TEXT PRIMARY KEY, payload TEXT NOT NULL)')
     db.commit()
     return db
+
+
+def _terminal_disposition_receipt(context,disposition):
+    """Bind an advisory Controller acceptance to this child without closing its parent."""
+    issue_ref=context.get('communication',{}).get('issue_ref','')
+    issue_url='https://github.com/'+issue_ref.removeprefix('github://')
+    authors=context.get('communication',{}).get('allowed_authors',
+        [context['repository']['name'].split('/')[0]])
+    comment_id=disposition.get('comment_id') if isinstance(disposition,dict) else None
+    body_digest=disposition.get('body_sha256') if isinstance(disposition,dict) else None
+    require(isinstance(disposition,dict) and disposition.get('child_terminal_accepted') is True,
+            'ENGINEERING_TERMINAL_DISPOSITION_INVALID')
+    require(disposition.get('run_id')==context['run']['id'] and
+            disposition.get('evidence_class')=='CONTROLLER_DISPOSITION_ADVISORY' and
+            disposition.get('kind')=='CONTROLLER_DISPOSITION' and
+            disposition.get('from') in {'GPT Controller','Controller'} and
+            disposition.get('to') in {'Hermes Mac / DWA','Hermes Mac','DWA'} and
+            disposition.get('source_ref')==issue_ref and
+            isinstance(disposition.get('reply_to'),str) and
+            disposition['reply_to'].startswith(issue_url+'#issuecomment-') and
+            disposition.get('author') in authors and
+            isinstance(comment_id,(int,str)) and str(comment_id).isdigit() and
+            disposition.get('comment_url')==issue_url+'#issuecomment-'+str(comment_id) and
+            type(disposition.get('seq')) is int and disposition['seq']>=disposition.get('command_seq',0)>0 and
+            isinstance(body_digest,str) and len(body_digest)==64 and
+            all(char in '0123456789abcdef' for char in body_digest),
+            'ENGINEERING_TERMINAL_DISPOSITION_BINDING_INVALID')
+    return {
+        'schema_id':'gwc.q0.child-terminal-handoff/v1',
+        'child_run':context['run']['id'],
+        'child_state':'TERMINAL_LOCAL_EVIDENCE_ACCEPTED',
+        'parent_run':context.get('engineering',{}).get('parent_run') or context['run'].get('parent_run'),
+        'parent_state':'UR.G2 / RUN_NOT_COMPLETE',
+        'parent_terminal':False,
+        'next_owner':'Controller (GPT) for the parent; human for any acceptance-target change',
+        'scheduler_directive':'PARK_IDLE_PENDING_AUTHORIZED_WORK',
+        'scheduler_owner_action_required':True,
+        'disposition':{key:disposition[key] for key in
+                       ('run_id','seq','kind','from','to','source_ref','reply_to','comment_id',
+                        'comment_url','author','body_sha256')},
+        'source_head':context['repository']['head_sha'],
+        'runtime_plan_digest':context['run']['runtime_plan_digest'],
+        'authority_granted':False,'typed_ce_admitted':False,
+        'native_certification_claimed':False,'l3_claimed':False,'load_proof_claimed':False,
+    }
+
+
+def _persist_terminal_receipt(checkpoint_path,receipt):
+    """Persist an immutable per-child handoff and return its exact stored bytes."""
+    child_run=receipt['child_run']
+    encoded=json.dumps(receipt,sort_keys=True)
+    with _connect(checkpoint_path) as db:
+        db.execute('BEGIN IMMEDIATE')
+        row=db.execute('SELECT receipt FROM engineering_child_terminal WHERE child_run=?',(child_run,)).fetchone()
+        if row is None:
+            db.execute('INSERT INTO engineering_child_terminal VALUES (?,?)',(child_run,encoded))
+            db.commit()
+            row=(encoded,)
+        else:
+            existing=json.loads(row[0])
+            require(existing['disposition']==receipt['disposition'] and
+                    existing['child_state']==receipt['child_state'],
+                    'ENGINEERING_TERMINAL_RECEIPT_CONFLICT')
+            receipt=existing
+    return receipt
+
+
+def _load_terminal_receipt(checkpoint_path,child_run):
+    with _connect(checkpoint_path) as db:
+        row=db.execute('SELECT receipt FROM engineering_child_terminal WHERE child_run=?',(child_run,)).fetchone()
+    return json.loads(row[0]) if row else None
+
+
+def _parent_ready_event(checkpoint_path,receipt,frontier):
+    """Materialize one data-only parent wake for separately authorized work."""
+    candidate=(frontier or {}).get('authorized_parent_task')
+    if not isinstance(candidate,dict):
+        return None
+    require(receipt.get('parent_run') and candidate.get('parent_run')==receipt['parent_run'] and
+            isinstance(candidate.get('task_id'),str) and candidate['task_id'] and
+            isinstance(candidate.get('run_id'),str) and candidate['run_id'] and
+            candidate.get('run_id')!=receipt['child_run'] and
+            isinstance(candidate.get('authorization_ref'),str) and candidate['authorization_ref'] and
+            isinstance(candidate.get('authorization_digest'),str) and
+            len(candidate['authorization_digest'])==71 and candidate['authorization_digest'].startswith('sha256:') and
+            all(char in '0123456789abcdef' for char in candidate['authorization_digest'][7:]) and
+            candidate.get('source_head')==frontier.get('source_head') and
+            candidate.get('eligibility')=='READY' and candidate.get('authorization_verified') is True,
+            'ENGINEERING_PARENT_READY_BINDING_INVALID')
+    key=digest({'child_run':receipt['child_run'],'parent_run':receipt['parent_run'],
+                'task_id':candidate['task_id'],'run_id':candidate['run_id'],
+                'authorization_ref':candidate['authorization_ref'],
+                'authorization_digest':candidate['authorization_digest']})
+    event={'event_type':'PARENT_NEXT_AUTHORIZED_TASK_READY','event_key':key,
+           'parent_run':receipt['parent_run'],'child_run':receipt['child_run'],
+           'task_id':candidate['task_id'],'run_id':candidate['run_id'],
+           'authorization_ref':candidate['authorization_ref'],
+           'authorization_digest':candidate['authorization_digest'],
+           'parent_state':'READY','parent_terminal':False,
+           'scheduler_owner_action_required':True,'scheduler_mutated':False,
+           'authority_granted':False}
+    encoded=json.dumps(event,sort_keys=True)
+    with _connect(checkpoint_path) as db:
+        db.execute('BEGIN IMMEDIATE')
+        row=db.execute('SELECT payload FROM engineering_parent_ready_events WHERE event_key=?',(key,)).fetchone()
+        if row is None:
+            db.execute('INSERT INTO engineering_parent_ready_events VALUES (?,?)',(key,encoded))
+            db.commit()
+            return {**event,'newly_materialized':True}
+        require(json.loads(row[0])==event,'ENGINEERING_PARENT_READY_EVENT_CONFLICT')
+    return {**event,'newly_materialized':False}
 
 
 def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invocation_key:str):
@@ -247,16 +362,32 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
         read=host_capabilities.get('engineering.communication_read_once')
         if not callable(read):return outcome(s,'M1','WAIT','ENGINEERING_COMMUNICATION_READER_REQUIRED')
         r=read(c)
+        require(isinstance(r,dict),'ENGINEERING_COMMUNICATION_RESULT_INVALID')
         require(r.get('evidence_class')=='HUMAN_COMMUNICATION_ONLY' and r.get('run_id')==run and
                 r.get('from')=='GPT' and r.get('to')=='Hermes' and r.get('kind') in {'COMMAND','CORRECTION'} and
                 r.get('issue_ref')==c.get('communication',{}).get('issue_ref') and
                 type(r.get('seq')) is int and r['seq']>0 and r.get('comment_id') and r.get('body_sha256'),
                 'ENGINEERING_COMMUNICATION_BINDING_INVALID')
+        dispositions=r.get('dispositions',[])
+        require(isinstance(dispositions,list),'ENGINEERING_DISPOSITION_LIST_INVALID')
+        accepted:list[dict[str,Any]]=[]
+        for item in dispositions:
+            require(isinstance(item,dict),'ENGINEERING_DISPOSITION_ITEM_INVALID')
+            if item.get('child_terminal_accepted') is True:
+                accepted.append(item)
+        require(all(item.get('evidence_class')=='CONTROLLER_DISPOSITION_ADVISORY' and
+                    item.get('run_id')==run and item.get('parent_terminal') is False and
+                    item.get('authority_granted') is False and item.get('typed_ce_admitted') is False
+                    for item in accepted),'ENGINEERING_TERMINAL_DISPOSITION_INVALID')
         previous=old.get('consumed_human_command',{})
         require(r['seq']>=previous.get('seq',0),'ENGINEERING_COMMUNICATION_STALE')
         if r['seq']==previous.get('seq'):
             require(r['body_sha256']==previous['body_sha256'] and r['comment_id']==previous['comment_id'],'ENGINEERING_COMMUNICATION_REVISION_DRIFT')
-        return outcome(s,'M1','PASS','HUMAN_COMMUNICATION_READ_NOT_TYPED_ADMISSION',communication=r)
+        terminal_disposition=max(accepted,key=lambda item:item['seq']) if accepted else None
+        if terminal_disposition is not None:
+            terminal_disposition={**terminal_disposition,'command_seq':r['seq']}
+        return outcome(s,'M1','PASS','HUMAN_COMMUNICATION_READ_NOT_TYPED_ADMISSION',
+                       communication=r,terminal_disposition=terminal_disposition)
     def _successor_intent_approved(s,body_sha):
         """A human-approved successor G1 binds the new intent command."""
         try:
@@ -285,6 +416,26 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
             return outcome(s,'M2','WAIT','ENGINEERING_CONTEXT_SOURCE_VALIDATION_REQUIRED')
         return outcome(s,'M2','PASS','TASK_PLAN_SOURCE_AND_COMMUNICATION_BOUND')
     def m3(s):
+        disposition=s.get('terminal_disposition')
+        if disposition is not None:
+            require(isinstance(disposition,dict),'ENGINEERING_TERMINAL_DISPOSITION_INVALID')
+            terminal_receipt=_persist_terminal_receipt(path,_terminal_disposition_receipt(c,disposition))
+        else:
+            terminal_receipt=_load_terminal_receipt(path,run)
+        if terminal_receipt is not None:
+            frontier_reader=host_capabilities.get('engineering.work_frontier')
+            projection=frontier_reader(c) if callable(frontier_reader) else None
+            if projection is not None:
+                require(projection.get('source_head')==c['repository']['head_sha'] and
+                        projection.get('runtime_plan_digest')==c['run']['runtime_plan_digest'] and
+                        projection.get('authority_granted') is False,'ENGINEERING_FRONTIER_BINDING_INVALID')
+            ready_event=_parent_ready_event(path,terminal_receipt,projection)
+            reason=('ENGINEERING_PARENT_NEXT_TASK_READY' if ready_event and ready_event['newly_materialized']
+                    else 'ENGINEERING_CHILD_PARKED_TERMINAL_ACCEPTED')
+            if ready_event is not None and ready_event.get('newly_materialized') is not True:
+                ready_event=None
+            return outcome(s,'M3','WAIT',reason,work_frontier=projection,terminal=terminal_receipt,
+                           parent_ready_event=ready_event)
         items=sorted(c.get('engineering',{}).get('work_items',[]),key=lambda item:item['priority'])
         with _connect(path) as db:
             for item in items:
@@ -535,6 +686,14 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
         else ('M7' if s['status']=='PASS' else 'M8')),{'M3':'M3','M7':'M7','M8':'M8'})
     graph.add_edge('M7',END)
     def m8(s):
+        if (s.get('reason_code') in {'ENGINEERING_CHILD_PARKED_TERMINAL_ACCEPTED','ENGINEERING_PARENT_NEXT_TASK_READY'} and
+                isinstance(s.get('terminal'),dict) and s['terminal'].get('child_run')==run):
+            terminal=s['terminal']
+            return outcome(s,'M8','WAIT','ENGINEERING_CHILD_PARKED_TERMINAL_ACCEPTED',
+                           terminal=terminal,terminal_digest=digest(terminal),
+                           parent_ready_event=s.get('parent_ready_event'),
+                           terminal_exchange_request=None,terminal_exchange_status=None,
+                           controller_exchange_requests=[])
         # Terminal engineering result for every non-PASS halt before M7.
         # M3 WAIT (no READY work) previously fell straight to END and the
         # Controller never received a structured blocker; M7 still dispatches
@@ -769,6 +928,9 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
         consumed={k:state['communication'][k] for k in ['seq','comment_id','body_sha256','comment_url']}
         newly_consumed=consumed!=old.get('consumed_human_command',{})
     state['consumed_human_command']=consumed
+    terminal=state.get('terminal')
+    loop_handoff=(terminal if isinstance(terminal,dict) and
+                  terminal.get('schema_id')=='gwc.q0.child-terminal-handoff/v1' else None)
     pending={}
     if old.get('pending_controller_exchange_requests'):
         box=ExchangeOutbox(str(path)+'.engineering-exchange.sqlite')
@@ -785,6 +947,8 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
             'work_frontier':state.get('work_frontier'),'host_action_request':state.get('host_action_request'),
             'communication_consumption':{'cursor':consumed,'newly_consumed':newly_consumed,'is_typed_cursor':False},
             'terminal':state.get('terminal'),
+            'loop_handoff':loop_handoff,
+            'parent_ready_event':state.get('parent_ready_event'),
             'terminal_exchange_request':state.get('terminal_exchange_request'),
             'terminal_exchange_status':state.get('terminal_exchange_status'),
             'terminal_digest':state.get('terminal_digest'),

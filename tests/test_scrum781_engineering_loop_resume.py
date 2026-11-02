@@ -93,6 +93,10 @@ class EngineeringResumeTests(unittest.TestCase):
         self.assertIn('C/E polling and dispatch remain BLOCKED', prompt)
         self.assertIn('Do not change M1 HOLD to PASS', prompt)
         self.assertIn('Do not auto-resume', prompt)
+        self.assertIn('child_state TERMINAL_LOCAL_EVIDENCE_ACCEPTED', prompt)
+        self.assertIn('native owner should park this child schedule immediately', prompt)
+        self.assertIn('never stop or mark the parent complete', prompt)
+        self.assertIn('consume its event_key once', prompt)
         self.assertIn('one bounded', prompt)
 
 
