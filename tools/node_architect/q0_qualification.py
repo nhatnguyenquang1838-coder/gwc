@@ -866,6 +866,23 @@ def certify_q0_runtime(
     _require(_valid_sha(loaded_runtime_identity), "RUNTIME_IDENTITY_INVALID")
     _require(loaded_runtime_identity == candidate_sha, "RUNTIME_IDENTITY_DRIFT")
     _require(bool(load_proof_ref), "LOAD_PROOF_REQUIRED")
+    _validate_matrix_digest(qualification_matrix)
+    _require(bool(incident_replay_refs), "ORIGINAL_INCIDENT_REPLAY_REQUIRED")
+    validated_replay_provenance = _validate_replay_provenance(replay_provenance)
+    _require(replay_result == "PASS" and replay_exact_readback is True, "ORIGINAL_INCIDENT_REPLAY_FAILED")
+    matrix_results = qualification_matrix.get("results")
+    _require(isinstance(matrix_results, Mapping), "QUALIFICATION_MATRIX_INCOMPLETE")
+    self_fix_result = matrix_results.get("self_fix_replay")
+    if validated_replay_provenance["defect_class"] == "INJECTED_FAULT_RESILIENCE":
+        _require(self_fix_result != "PASS", "SELF_FIX_REPLAY_REQUIRES_GENUINE_DEFECT")
+        _require(False, "INJECTED_FAULT_CANNOT_SATISFY_SELF_FIX_REPLAY")
+    _validate_matrix(qualification_matrix)
+    _require(bool(previous_failure_state) and bool(first_state_beyond_failure) and first_state_beyond_failure != previous_failure_state, "FORWARD_PROGRESS_REQUIRED")
+    _require(bool(forward_progress_refs), "FORWARD_PROGRESS_REQUIRED")
+    _require(bool(broader_regression_refs) and broader_regression_result == "PASS", "BROADER_REGRESSION_REQUIRED")
+    _require(not list(stale_dependent_state or []), "STALE_DEPENDENT_STATE_REMAINS")
+    _require(isinstance(created_by, Mapping) and bool(created_by.get("id")), "Q0_CREATOR_REQUIRED")
+    _require(_parse_utc(created_at) is not None, "Q0_CERTIFICATION_TIMESTAMP_INVALID")
     if not isinstance(load_proof_evidence, Mapping):
         raise Q0QualificationError("LOAD_PROOF_REQUIRED")
     activation_id = load_proof_evidence.get("activation_id")
@@ -890,30 +907,10 @@ def certify_q0_runtime(
     _require({"tools/node_architect/q0_qualification.py",
               "tools/node_architect/q0_python_env.py"}.issubset(module_identities),
              "LOAD_PROOF_REQUIRED_MODULE_IDENTITY")
-    _require(load_proof_evidence.get("candidate_sha") == candidate_sha
-             and load_proof_evidence.get("loaded_source_sha") == candidate_sha,
-             "LOAD_PROOF_IDENTITY_MISMATCH")
     _require(verify_native_load_proof(
         load_proof_evidence, candidate_sha=candidate_sha,
         qualification_profile_digest=qualification_profile_digest,
         load_proof_ref=load_proof_ref), "LOAD_PROOF_NATIVE_VERIFICATION_FAILED")
-    _validate_matrix_digest(qualification_matrix)
-    _require(bool(incident_replay_refs), "ORIGINAL_INCIDENT_REPLAY_REQUIRED")
-    validated_replay_provenance = _validate_replay_provenance(replay_provenance)
-    _require(replay_result == "PASS" and replay_exact_readback is True, "ORIGINAL_INCIDENT_REPLAY_FAILED")
-    matrix_results = qualification_matrix.get("results")
-    _require(isinstance(matrix_results, Mapping), "QUALIFICATION_MATRIX_INCOMPLETE")
-    self_fix_result = matrix_results.get("self_fix_replay")
-    if validated_replay_provenance["defect_class"] == "INJECTED_FAULT_RESILIENCE":
-        _require(self_fix_result != "PASS", "SELF_FIX_REPLAY_REQUIRES_GENUINE_DEFECT")
-        _require(False, "INJECTED_FAULT_CANNOT_SATISFY_SELF_FIX_REPLAY")
-    _validate_matrix(qualification_matrix)
-    _require(bool(previous_failure_state) and bool(first_state_beyond_failure) and first_state_beyond_failure != previous_failure_state, "FORWARD_PROGRESS_REQUIRED")
-    _require(bool(forward_progress_refs), "FORWARD_PROGRESS_REQUIRED")
-    _require(bool(broader_regression_refs) and broader_regression_result == "PASS", "BROADER_REGRESSION_REQUIRED")
-    _require(not list(stale_dependent_state or []), "STALE_DEPENDENT_STATE_REMAINS")
-    _require(isinstance(created_by, Mapping) and bool(created_by.get("id")), "Q0_CREATOR_REQUIRED")
-    _require(_parse_utc(created_at) is not None, "Q0_CERTIFICATION_TIMESTAMP_INVALID")
     body = {
         "schema_version": CURRENT_Q0_CERTIFICATION_SCHEMA_VERSION, "artifact_type": "q0-certification-receipt",
         "run_id": run_id, "task_id": task_id, "runtime_epoch": runtime_epoch,
