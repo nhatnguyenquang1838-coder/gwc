@@ -1,0 +1,227 @@
+{
+  "schema_id": "gwc.node-architect.workflow-base.v1",
+  "workflow_id": "hermes-loop-a2a-base-r1",
+  "intent": "Base executable orchestration BEFORE self-repair",
+  "status": "POC_DESIGN",
+  "engine": "langgraph",
+  "host": "hermes",
+  "source_binding": {
+    "run_id": "scrum781-q0-fresh-20261010-r1",
+    "parent_task": "SCRUM-781",
+    "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+    "q0_gate": "UR.G2",
+    "runtimeplan_ref": "core/node-architect/scrum781-q0-fresh-execution-plan-r2.json",
+    "plan_digest": "RESOLVE_AT_MATERIALIZATION",
+    "compiled_graph_digest": "RESOLVE_AT_MATERIALIZATION"
+  },
+  "limits": {
+    "max_parallel": 1,
+    "child_run_creation": 0,
+    "one_active_writer": true
+  },
+  "state": {
+    "keys": [
+      "run_id",
+      "plan_digest",
+      "graph_digest",
+      "thread_id",
+      "host_session_id",
+      "loop_binding",
+      "controller_cursor_observed",
+      "executor_cursor_observed",
+      "controller_cursor_consumed",
+      "executor_cursor_consumed",
+      "continuation_ref",
+      "active_task_id",
+      "task_status",
+      "task_results",
+      "evidence_refs",
+      "pending_wake_key",
+      "wake_delivery_receipt",
+      "failure_class",
+      "legal_next_frontier",
+      "authority_precheck_ref"
+    ],
+    "non_authoritative": [
+      "graph_checkpoint",
+      "loop_tick_number",
+      "local_task_status"
+    ],
+    "canonical": [
+      "native_gwc_receipt_refs",
+      "runtimeplan_identity",
+      "taskcontroller_ce_events",
+      "durable_continuation"
+    ]
+  },
+  "nodes": [
+    {
+      "id": "qualify_tick",
+      "kind": "guard",
+      "on": "tick",
+      "next": "observe_ce",
+      "checks": [
+        "exact_run_session_binding",
+        "pause_scope",
+        "observer_qualification",
+        "one_writer"
+      ]
+    },
+    {
+      "id": "observe_ce",
+      "kind": "read",
+      "next": "reconcile_state",
+      "checks": [
+        "both_ce_cursors",
+        "changed_typed_event_exact_readback",
+        "relevant_durable_continuation",
+        "observed_not_consumed"
+      ]
+    },
+    {
+      "id": "reconcile_state",
+      "kind": "guard",
+      "next": "select_frontier",
+      "checks": [
+        "checkpoint_vs_ce",
+        "plan_digest_match",
+        "no_duplicate_effect",
+        "source_head_current"
+      ]
+    },
+    {
+      "id": "select_frontier",
+      "kind": "deterministic",
+      "routing": {
+        "valid_new_controller_command": "consume_command",
+        "runnable_task": "precheck",
+        "qualified_task_terminal": "terminal_handoff",
+        "no_runnable_task": "evaluate_blocker",
+        "otherwise": "silent_noop"
+      }
+    },
+    {
+      "id": "consume_command",
+      "kind": "read_validate",
+      "next": "precheck",
+      "checks": [
+        "typed_ce_source_actor_seq",
+        "continuation_exact",
+        "recipient",
+        "effect_scope"
+      ]
+    },
+    {
+      "id": "precheck",
+      "kind": "guard",
+      "routing": {
+        "valid": "execute_task",
+        "invalid": "evaluate_blocker"
+      }
+    },
+    {
+      "id": "execute_task",
+      "kind": "adapter",
+      "impl": "hermes.execute_one_bounded_step",
+      "next": "verify_task",
+      "rules": [
+        "one_writer",
+        "no_automatic_controller_wake",
+        "effect_idempotency_key"
+      ]
+    },
+    {
+      "id": "verify_task",
+      "kind": "verification",
+      "routing": {
+        "accepted": "persist_progress",
+        "needs_more_work": "persist_progress",
+        "failure": "evaluate_blocker"
+      }
+    },
+    {
+      "id": "persist_progress",
+      "kind": "persist",
+      "next": "select_frontier",
+      "checks": [
+        "native_receipt_if_required",
+        "checkpoint",
+        "external_effect_exact_readback"
+      ],
+      "rules": [
+        "no_intermediate_controller_wake"
+      ]
+    },
+    {
+      "id": "evaluate_blocker",
+      "kind": "guard",
+      "routing": {
+        "legal_local_next": "select_frontier",
+        "verified_controller_owned_deadlock": "deadlock_handoff",
+        "task_terminal": "terminal_handoff",
+        "otherwise": "silent_noop"
+      },
+      "checks": [
+        "completed_real_bounded_recovery_cycle",
+        "no_legal_local_next",
+        "owner_and_release_trigger"
+      ]
+    },
+    {
+      "id": "deadlock_handoff",
+      "kind": "outbox",
+      "next": "silent_noop",
+      "rules": [
+        "one_key_per_blocker",
+        "pending_not_terminal",
+        "pointer_only_controller_wake_after_durable_receipt"
+      ]
+    },
+    {
+      "id": "terminal_handoff",
+      "kind": "outbox",
+      "next": "end",
+      "rules": [
+        "native_acceptance_evidence",
+        "one_terminal_wake",
+        "not_q0_g6_acceptance"
+      ]
+    },
+    {
+      "id": "silent_noop",
+      "kind": "terminal_tick",
+      "next": "end",
+      "rules": [
+        "no_llm_on_unchanged_observation",
+        "graph_run_not_marked_complete"
+      ]
+    },
+    {
+      "id": "end",
+      "kind": "end"
+    }
+  ],
+  "invariants": [
+    "Workflow nodes are execution steps, not GWC Child Runs",
+    "GWC RuntimePlan and Universal native gate remain authoritative",
+    "Observe != consume != execute != delivery",
+    "Loop tick != workflow terminal",
+    "Intermediate progress never triggers GPT wake",
+    "Only VERIFIED_DEADLOCK_UNLOCK or TASK_TERMINAL wakes Controller",
+    "A deadlock requires a completed bounded recovery cycle and Controller-owned unblock; timer count never proves deadlock",
+    "Checkpoint must reconcile after crash; external effects are idempotent",
+    "No self-repair node in base graph: separate extension after base E2E qualification",
+    "No protected merge, deploy, secrets or production effects"
+  ],
+  "acceptance": [
+    "Compile plan-bound graph; rejects missing digest, unsupported node type, unauthorized effect",
+    "Qualified tick reads bounded exact C/E; no change and no active mission -> zero LLM turns",
+    "New valid C command consumed; task advances and produces exact receipt",
+    "Two dependent tasks complete in order; no intermediate GPT wake",
+    "Tick overlap and restart do not duplicate task effect",
+    "One genuine deadlock produces one durable Controller handoff and one pointer wake",
+    "Verified unlock resumes same task/thread without a new Q0 run",
+    "Terminal task completion produces one separate Controller wake",
+    "Invalid actor/plan digest or real RUN_HOLD fails closed"
+  ]
+}
