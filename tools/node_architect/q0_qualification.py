@@ -15,6 +15,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Mapping
 
+from tools.node_architect.q0_python_env import verify_native_load_proof
 from tools.node_architect.universal_run_kernel import UNIVERSAL_PROFILE, transition_lifecycle
 from tools.node_architect.universal_run_lifecycle import evaluate_transition
 from tools.node_architect.universal_runtime_profile import load_universal_v2_default_profile
@@ -865,14 +866,29 @@ def certify_q0_runtime(
     _require(_valid_sha(loaded_runtime_identity), "RUNTIME_IDENTITY_INVALID")
     _require(loaded_runtime_identity == candidate_sha, "RUNTIME_IDENTITY_DRIFT")
     _require(bool(load_proof_ref), "LOAD_PROOF_REQUIRED")
-    _require(isinstance(load_proof_evidence, Mapping) and bool(load_proof_evidence.get("activation_id")) and bool(load_proof_evidence.get("source_root")), "LOAD_PROOF_REQUIRED")
-    _require(bool(load_proof_evidence.get("runtime_session_id")) and bool(load_proof_evidence.get("runtime_process_id")), "LOAD_PROOF_PROCESS_IDENTITY_REQUIRED")
-    _require(load_proof_evidence.get("loaded_profile_digest") == qualification_profile_digest, "LOAD_PROOF_PROFILE_IDENTITY_MISMATCH")
+    if not isinstance(load_proof_evidence, Mapping):
+        raise Q0QualificationError("LOAD_PROOF_REQUIRED")
+    _require(bool(load_proof_evidence.get("runtime_session_id"))
+             and bool(load_proof_evidence.get("runtime_process_id")),
+             "LOAD_PROOF_PROCESS_IDENTITY_REQUIRED")
+    _require(load_proof_evidence.get("loaded_profile_digest") == qualification_profile_digest,
+             "LOAD_PROOF_PROFILE_IDENTITY_MISMATCH")
     module_identities = load_proof_evidence.get("loaded_module_identities")
     if not isinstance(module_identities, Mapping) or not module_identities:
         raise Q0QualificationError("LOAD_PROOF_MODULE_IDENTITIES_REQUIRED")
-    _require(all(isinstance(path, str) and path and _valid_digest(digest) for path, digest in module_identities.items()), "LOAD_PROOF_MODULE_IDENTITIES_INVALID")
-    _require(load_proof_evidence.get("candidate_sha") == candidate_sha and load_proof_evidence.get("loaded_source_sha") == candidate_sha, "LOAD_PROOF_IDENTITY_MISMATCH")
+    _require(all(isinstance(path, str) and path and _valid_digest(digest)
+                 for path, digest in module_identities.items()),
+             "LOAD_PROOF_MODULE_IDENTITIES_INVALID")
+    _require({"tools/node_architect/q0_qualification.py",
+              "tools/node_architect/q0_python_env.py"}.issubset(module_identities),
+             "LOAD_PROOF_REQUIRED_MODULE_IDENTITY")
+    _require(load_proof_evidence.get("candidate_sha") == candidate_sha
+             and load_proof_evidence.get("loaded_source_sha") == candidate_sha,
+             "LOAD_PROOF_IDENTITY_MISMATCH")
+    _require(verify_native_load_proof(
+        load_proof_evidence, candidate_sha=candidate_sha,
+        qualification_profile_digest=qualification_profile_digest,
+        load_proof_ref=load_proof_ref), "LOAD_PROOF_NATIVE_VERIFICATION_FAILED")
     _validate_matrix_digest(qualification_matrix)
     _require(bool(incident_replay_refs), "ORIGINAL_INCIDENT_REPLAY_REQUIRED")
     validated_replay_provenance = _validate_replay_provenance(replay_provenance)
@@ -945,6 +961,12 @@ def verify_q0_certification(receipt: Mapping[str, Any]) -> bool:
             and _valid_digest(receipt.get("qualification_matrix_digest"))
             and receipt.get("qualification_profile_digest") == q0_qualification_profile().get("profile_digest")
             and isinstance(load_proof, Mapping)
+            and load_proof.get("proof_type") == "NATIVE_LOAD_PROOF"
+            and load_proof.get("load_proof_ref") == receipt.get("load_proof_ref")
+            and bool(load_proof.get("activation_id"))
+            and bool(load_proof.get("source_root"))
+            and bool(load_proof.get("runtime_session_id"))
+            and bool(load_proof.get("runtime_process_id"))
             and load_proof.get("candidate_sha") == receipt.get("candidate_sha")
             and load_proof.get("loaded_source_sha") == receipt.get("candidate_sha")
             and load_proof.get("loaded_profile_digest") == receipt.get("qualification_profile_digest")
