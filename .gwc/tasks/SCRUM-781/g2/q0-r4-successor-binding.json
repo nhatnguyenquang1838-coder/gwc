@@ -1,0 +1,40 @@
+{
+  "schema_id": "gwc.q0.r4-successor-binding.v1",
+  "schema_version": 1,
+  "artifact_type": "q0-r4-successor-binding",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "parent_task": "SCRUM-781",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+  "head_sha": "170b76735f85f77fd941a8772d332d8beb29aade",
+  "protected_base": "031f6ebc44abfc396c291928884fe2b8f8a942db",
+  "active_execution_plan": {
+    "ref": "core/node-architect/scrum781-q0-safe-forward-execution-plan-r4.json",
+    "sha256": "fe25da322827cc8d73d9b066febf59617046b510bcaecfbda81ee67e779d245e",
+    "contract_mode": "SAFE_FORWARD_QUALIFICATION"
+  },
+  "runtime_plan": {
+    "ref": "core/node-architect/q0-r4-native-runtime-plan-r1.json",
+    "digest": "sha256:16445abb85d78f61ac6dc2207c47c98240a45c8107e49f546b369e2d90bfa38f",
+    "note": "Historical revision bound pre_head_sha ad73a12b; successor binding selects current head 170b7673 for SF qualification."
+  },
+  "node_allocation": {
+    "id": "scrum781-q0-fresh-20261010-r1:q0.qualification-campaign:native-successor-r1",
+    "writer_allocation": "scrum781-q0-fresh-20261010-r1:r4:isolation-writer"
+  },
+  "historical_classification": {
+    "original_DWO": "NOT_REPRODUCED",
+    "status": "HISTORICAL_EVIDENCE_NOT_REPRODUCED/NON_BLOCKING",
+    "note": "No search for or manufacture of the historical DWO incident under R4 safe-forward."
+  },
+  "current_checkpoint": {
+    "ref": ".gwc/tasks/SCRUM-781/native-q0-c287/checkpoint-seq7.json",
+    "active_gate": "UR.G6",
+    "sequence": 7,
+    "terminal_state": "OPEN",
+    "note": "Preserved as immutable historical evidence; R4 successor native lifecycle re-materializes under the same parent SCRUM-781."
+  },
+  "created_at": "2026-11-03T02:20:00Z",
+  "created_by": "DWA",
+  "binding_digest": "sha256:a10b41375706031fd993e757f30edc3745c1c11d604a9b98200b8adec9710da1"
+}
