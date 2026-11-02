@@ -19,11 +19,15 @@ def _digest(value):
 
 
 def _provenance(subject="ORIGINAL_DWO", defect_class="GENUINE_GWC_RUNTIME_DEFECT", **updates):
+    if subject == "SAFE_FORWARD_NO_INCIDENT" and defect_class == "GENUINE_GWC_RUNTIME_DEFECT":
+        defect_class = "NO_ACTIVE_RUNTIME_DEFECT"
     body = {
         "subject": subject,
-        "scenario_id": "dwo-incident-42" if subject == "ORIGINAL_DWO" else "controlled-fault-42",
+        "scenario_id": "dwo-incident-42" if subject == "ORIGINAL_DWO" else (
+            "safe-forward-42" if subject == "SAFE_FORWARD_NO_INCIDENT" else "controlled-fault-42"
+        ),
         "observed_prestate_ref": "evidence:prestate-42",
-        "observed_error_ref": "evidence:error-42",
+        "observed_error_ref": "evidence:no-active-runtime-defect-42" if subject == "SAFE_FORWARD_NO_INCIDENT" else "evidence:error-42",
         "defect_class": defect_class,
         "original_incident_replayed": subject == "ORIGINAL_DWO",
     }
@@ -116,14 +120,53 @@ def _certify(**overrides):
 def test_certifies_sealed_provenance_for_each_distinct_subject(subject):
     provenance = _provenance(subject=subject)
     cert = _certify(replay_provenance=provenance)
-    assert cert["schema_version"] == "1.1"
+    assert cert["schema_version"] == "1.2"
     assert cert["replay_provenance"] == provenance
     assert _m().verify_q0_certification(cert) is True
 
 
-def test_empty_incident_refs_keep_original_required_error():
+def test_genuine_defect_still_requires_incident_replay_refs():
     with pytest.raises(_m().Q0QualificationError, match="ORIGINAL_INCIDENT_REPLAY_REQUIRED"):
         _certify(incident_replay_refs=[])
+
+
+def test_safe_forward_certifies_without_searching_for_or_fabricating_incident():
+    provenance = _provenance(subject="SAFE_FORWARD_NO_INCIDENT")
+    cert = _certify(
+        incident_replay_refs=[],
+        replay_result="NOT_APPLICABLE",
+        replay_exact_readback=False,
+        replay_provenance=provenance,
+        previous_failure_state="",
+        first_state_beyond_failure="",
+        forward_progress_refs=["progress:safe-forward-42"],
+    )
+    assert cert["schema_version"] == "1.2"
+    assert cert["replay_provenance"]["subject"] == "SAFE_FORWARD_NO_INCIDENT"
+    assert cert["incident_replay_refs"] == []
+    assert cert["replay_result"] == "NOT_APPLICABLE"
+    assert _m().verify_q0_certification(cert) is True
+
+
+def test_safe_forward_rejects_fabricated_failure_state_or_incident_refs():
+    provenance = _provenance(subject="SAFE_FORWARD_NO_INCIDENT")
+    with pytest.raises(_m().Q0QualificationError, match="SAFE_FORWARD_INCIDENT_REFS_FORBIDDEN"):
+        _certify(
+            replay_provenance=provenance,
+            replay_result="NOT_APPLICABLE",
+            replay_exact_readback=False,
+            previous_failure_state="",
+            first_state_beyond_failure="",
+        )
+    with pytest.raises(_m().Q0QualificationError, match="SAFE_FORWARD_FAILURE_STATE_FORBIDDEN"):
+        _certify(
+            incident_replay_refs=[],
+            replay_result="NOT_APPLICABLE",
+            replay_exact_readback=False,
+            replay_provenance=provenance,
+            previous_failure_state="fabricated-red",
+            first_state_beyond_failure="",
+        )
 
 
 @pytest.mark.parametrize("field", ["subject", "scenario_id", "observed_prestate_ref", "observed_error_ref"])
