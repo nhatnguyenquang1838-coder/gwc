@@ -1,0 +1,37 @@
+{
+  "action": "q0_plan_decompose",
+  "actor": "CONTROLLER",
+  "assignment_digest": "sha256:b76d8574c260f87649930e63c0f2dbaa46c5a4fc7152e3ff492ddabf5f8aeaaf",
+  "authority_granted": false,
+  "effect_authority": "NONE",
+  "evidence_requirements": [
+    "PLAN_RECEIPT"
+  ],
+  "executed_effects": [],
+  "gate": "UR.G1",
+  "idempotency_key": "sha256:21ef65816424b170f0a684812eeeae5ce7d8e5343577bfe524f1be5172416ae3",
+  "next_owner": "CONTROLLER",
+  "node_allocation_digest": "8f694afe7c40fa6053dccac7e2059cb94a4f8b382eceff9ed8847307e568c35a",
+  "node_allocation_id": "scrum781-q0-fresh-20261010-r1:q0.qualification-campaign:r1",
+  "node_id": "q0.qualification-campaign",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+  "runtime_plan_digest": "sha256:a98b9d64812754d9783830e35eda5ad8f89a10f3970633ade9dbaa719309df67",
+  "runtime_profile_digest": "sha256:c724c6b036a9c0cfae5a5738554d6ee1fc075fa81b6b09e132761cc18df33881",
+  "runtime_protocol": "gwc.universal.controller/v2",
+  "schema_id": "gwc.universal-run.controller-local-action.v2",
+  "schema_version": 2,
+  "scope": {
+    "base_sha": "414002f92d48083e7133236346b26e3a2a047e33",
+    "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+    "head_sha": "ab11541dfc1ec9569d0b97961b19a0a855f26245",
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "scope_hash": "sha256:21ef65816424b170f0a684812eeeae5ce7d8e5343577bfe524f1be5172416ae3"
+  },
+  "sequence": 2,
+  "target": {
+    "identity": "ab11541dfc1ec9569d0b97961b19a0a855f26245",
+    "kind": "candidate-branch"
+  },
+  "typed_next": "Q0_PLAN_DECOMPOSE"
+}

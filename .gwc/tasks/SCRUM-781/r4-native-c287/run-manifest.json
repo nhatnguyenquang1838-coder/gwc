@@ -1,0 +1,32 @@
+{
+  "content_digest": {
+    "algorithm": "sha256",
+    "canonicalization": "JCS",
+    "value": "2157f5732eda467ba9ddc8d76c83b0649cdece9390c8ef747522c750970b8325"
+  },
+  "created_at": "2026-11-02T19:16:27Z",
+  "created_by": {
+    "mode": "fresh_ur_g0_boot",
+    "profile": "taskcontroller-controller"
+  },
+  "invoking_node_allocation_ref": null,
+  "lifecycle_profile": {
+    "id": "gwc.universal-run.v2",
+    "version": 2
+  },
+  "parent_run_ref": null,
+  "provenance": {
+    "predecessor_refs": [],
+    "source_refs": [
+      "github://nhatnguyenquang1838-coder/gwc/issues/595",
+      "fix/SCRUM-781-q0-fresh-20261010-r1",
+      "ab11541dfc1ec9569d0b97961b19a0a855f26245"
+    ]
+  },
+  "record_id": "RM-scrum781-q0-fresh-20261010-r1-r1",
+  "revision": 1,
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "run_kind": "ROOT",
+  "schema_id": "gwc.universal-run.run-manifest-revision.v2",
+  "schema_version": 2
+}

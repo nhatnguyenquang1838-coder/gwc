@@ -1,0 +1,54 @@
+{
+  "active_gate": "UR.G0",
+  "content_digest": {
+    "algorithm": "sha256",
+    "canonicalization": "JCS",
+    "value": "40375add648e4c8d6493b0616c3bb3886d909933dcaf093ea752153bd6a072c8"
+  },
+  "created_at": "2026-11-02T19:16:27Z",
+  "created_by": {
+    "mode": "fresh_ur_g0_boot",
+    "profile": "taskcontroller-controller"
+  },
+  "execution_refs": {
+    "cursor_ref": "scrum781-q0-fresh-20261010-r1:UR.G0:seq1",
+    "runtime_plan_digest": "a98b9d64812754d9783830e35eda5ad8f89a10f3970633ade9dbaa719309df67",
+    "runtime_plan_ref": "native://scrum781-q0-fresh-20261010-r1/runtime-plan.json"
+  },
+  "future_contract_refs": {
+    "closure_receipt_ref": null,
+    "handoff_receipt_ref": null,
+    "target_contract_ref": null
+  },
+  "gate_states": {
+    "UR.G0": "ACTIVE",
+    "UR.G1": "NOT_STARTED",
+    "UR.G2": "NOT_STARTED",
+    "UR.G3": "NOT_STARTED",
+    "UR.G4": "NOT_STARTED",
+    "UR.G5": "NOT_STARTED",
+    "UR.G6": "NOT_STARTED"
+  },
+  "lifecycle_profile": {
+    "id": "gwc.universal-run.v2",
+    "version": 2
+  },
+  "predecessor_state_digest": null,
+  "predecessor_state_ref": null,
+  "provenance": {
+    "predecessor_refs": [],
+    "source_refs": [
+      "github://nhatnguyenquang1838-coder/gwc/issues/595",
+      "ab11541dfc1ec9569d0b97961b19a0a855f26245"
+    ]
+  },
+  "record_id": "RS-scrum781-q0-fresh-20261010-r1-seq1",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "run_manifest_digest": "2157f5732eda467ba9ddc8d76c83b0649cdece9390c8ef747522c750970b8325",
+  "run_manifest_ref": "native://scrum781-q0-fresh-20261010-r1/run-manifest.json#record_id=RM-scrum781-q0-fresh-20261010-r1-r1",
+  "schema_id": "gwc.universal-run.run-state-record.v2",
+  "schema_version": 2,
+  "sequence": 1,
+  "state_revision": 1,
+  "terminal_state": "OPEN"
+}

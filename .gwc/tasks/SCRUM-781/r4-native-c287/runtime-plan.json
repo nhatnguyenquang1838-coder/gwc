@@ -1,0 +1,22 @@
+{
+  "digest": "sha256:a98b9d64812754d9783830e35eda5ad8f89a10f3970633ade9dbaa719309df67",
+  "node_allocations": [
+    "scrum781-q0-fresh-20261010-r1:q0.qualification-campaign:r1"
+  ],
+  "previous_digest": null,
+  "qualification_profile_digest": "sha256:2a37d580c26305b74f742f45d25f4caeafae35da043a3b1307b2aedeac34932c",
+  "qualification_profile_ref": "core/node-architect/q0-live-qualification-profile.json",
+  "revision": 1,
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "runtime_default_profile_digest": "sha256:c724c6b036a9c0cfae5a5738554d6ee1fc075fa81b6b09e132761cc18df33881",
+  "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+  "runtime_profile_ref": "core/node-architect/universal-runtime-default-profile.json",
+  "schema_id": "gwc.universal-run.runtime-plan.v2",
+  "schema_version": 2,
+  "source_binding": {
+    "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+    "pre_head_sha": "ab11541dfc1ec9569d0b97961b19a0a855f26245",
+    "repository": "nhatnguyenquang1838-coder/gwc"
+  },
+  "target_contract_ref": "github://nhatnguyenquang1838-coder/gwc/issues/595"
+}

@@ -1,0 +1,65 @@
+{
+  "active_gate": "UR.G1",
+  "consumed_receipts": [],
+  "evidence_gap": [
+    "PLAN_RECEIPT"
+  ],
+  "execution_refs": {
+    "base_sha": "414002f92d48083e7133236346b26e3a2a047e33",
+    "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+    "candidate_sha": "ab11541dfc1ec9569d0b97961b19a0a855f26245",
+    "cursor_ref": "scrum781-q0-fresh-20261010-r1:UR.G1:seq2",
+    "node_allocation_id": "scrum781-q0-fresh-20261010-r1:q0.qualification-campaign:r1",
+    "node_allocation_ref": "native://scrum781-q0-fresh-20261010-r1/node-allocation.json#record_id=NA-scrum781-q0-fresh-20261010-r1-r1",
+    "qualification_profile_digest": "sha256:2a37d580c26305b74f742f45d25f4caeafae35da043a3b1307b2aedeac34932c",
+    "runtime_plan_digest": "sha256:a98b9d64812754d9783830e35eda5ad8f89a10f3970633ade9dbaa719309df67"
+  },
+  "gate_evidence": {
+    "UNDERSTANDING_RECEIPT": {
+      "constraints": {
+        "historical_e9_e5_continuation_reuse": false,
+        "independent_executor_admission_for_g0": false,
+        "legacy_gwc_v1_fallback": false,
+        "new_run_only": true,
+        "protected_executor_effects_allowed": false,
+        "taskcontroller_mailbox_dispatch_for_g0": false
+      },
+      "created_at": "2026-11-02T19:16:40Z",
+      "deliverable": "Create the fresh UR.G1 planning DAG and engineering acceptance criteria.",
+      "gate": "UR.G0",
+      "input_evidence": {
+        "g0_assignment_digest": "sha256:c5321ddf62523151c892fca4e046f10f83a53c07fcccf833afc1157992b343d5",
+        "g0_boot_receipt_digest": "sha256:d6f7bd2430f7b95b697d2d45faa19c93923320543d7da5324b81e3d5925255fb",
+        "node_allocation_digest": "8f694afe7c40fa6053dccac7e2059cb94a4f8b382eceff9ed8847307e568c35a"
+      },
+      "objective": "Qualify and repair GWC Universal V2 against original DWO login runtime failure before SCRUM-782 Login R00 execution.",
+      "owner": "CONTROLLER",
+      "parent": "SCRUM-780",
+      "q0_node": "q0.qualification-campaign",
+      "receipt_digest": "sha256:e22a3c16ab57e4ee0b64659f9c1c00d45526393a6af2c8f336a0d966226eb8ca",
+      "run_id": "scrum781-q0-fresh-20261010-r1",
+      "runtime_plan_digest": "sha256:a98b9d64812754d9783830e35eda5ad8f89a10f3970633ade9dbaa719309df67",
+      "schema_id": "dw.scrum781.understanding-receipt/v1",
+      "source_branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+      "source_refs": [
+        "https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-781",
+        "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595",
+        "core/node-architect/q0-live-qualification-profile.json",
+        "core/runbooks/Q0_LIVE_QUALIFICATION_RUNBOOK_v1.0.md"
+      ],
+      "source_repository": "nhatnguyenquang1838-coder/gwc",
+      "source_sha": "ab11541dfc1ec9569d0b97961b19a0a855f26245",
+      "status": "UNDERSTOOD",
+      "task_id": "SCRUM-781"
+    }
+  },
+  "next_owner": "CONTROLLER",
+  "predecessor_sequence": 1,
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+  "schema_id": "gwc.universal-run.run-state.v2",
+  "schema_version": 2,
+  "sequence": 2,
+  "state_digest": "sha256:6a1c7392793d876407cd7ccbca497aa93839684d93811f26ba64d109117c43b6",
+  "typed_next": "Q0_PLAN_DECOMPOSE"
+}

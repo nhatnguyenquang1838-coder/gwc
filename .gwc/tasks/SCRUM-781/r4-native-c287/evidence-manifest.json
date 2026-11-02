@@ -1,0 +1,18 @@
+{
+  "artifact_type": "q0-r4-native-evidence-manifest",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "evidence_dir": ".gwc/tasks/SCRUM-781/r4-native-c287/",
+  "files": {
+    "fresh-boot-evidence.json": "sha256:f75ed8363abf04741200b0f558e93b88c4eb017a6568b0778c967187b62e3f4e",
+    "fresh-g0-to-g1-result.json": "sha256:593db273592bf48b8a0ccbb998ca45801cc3298de2203952a339ba9981ff7f99",
+    "g0-to-g1-transition.json": "sha256:061a68763eb3ea06ac3c008635942c9d7ca16d5acd01f7a0fa35435e045e7c48",
+    "g0-understanding-receipt.json": "sha256:0cb0ad1ed30ca76587b324aa8b9d4ab191181843e22b5c307e5b0ae7ed9784f5",
+    "g1-controller-assignment.json": "sha256:de1c7e7e3ad8f359e40b51beef03224aefd9690c984e1986b1c1c1a86514ebbf",
+    "g1-controller-run-state.json": "sha256:d86fe3586dffe8da94fe1f24bd24d84ff6aafaad64dbf2a13569ccb36c5df936",
+    "g1-plan-receipt.json": "sha256:d6293f7a231a2c84c9c8701b62806c9cdf15a51b4168e6adcf948be99b8dd333",
+    "logical-run-state.json": "sha256:66497d98f51d0621122b97d63e7b82990ab8da5e48451a11fe20f9d8f7c29e35",
+    "node-allocation.json": "sha256:75adf1827a2d24a07e30d5faaae9bbbbb00337b20beb8abdf324c3add73d4c48",
+    "run-manifest.json": "sha256:94bc8573f48d96ccf26e55e7dab6e385f9927ed9c872a6de0f0f1f9cd8a4c51c",
+    "runtime-plan.json": "sha256:312003509445f15aef7fb23b617fcdc5c333cff8fabbf555cd6dabd2fea1f708"
+  }
+}

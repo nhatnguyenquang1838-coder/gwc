@@ -1,0 +1,40 @@
+{
+  "completion_receipt": {
+    "action": "COMPLETE",
+    "artifact_type": "universal-lifecycle-execution-receipt",
+    "current_gate": "UR.G0",
+    "current_state": "ACTIVE",
+    "edge_kind": "SAME_GATE",
+    "execution_performed": false,
+    "explicit_outcome": null,
+    "lifecycle_profile": {
+      "id": "gwc.universal-run.v2",
+      "version": 2
+    },
+    "next_gate": "UR.G0",
+    "next_state": "PASSED",
+    "noop_reason": "NOOP_STATE_UNCHANGED",
+    "transition_digest": "sha256:ef21eb22394e2ffe83be5964ca7758c571f6f4d862f8581f8cfdf372fc7b43be"
+  },
+  "current_gate": "UR.G0",
+  "next_gate": "UR.G1",
+  "next_state": "ACTIVE",
+  "sequence_delta": 1,
+  "transition_receipt": {
+    "action": "ADVANCE",
+    "artifact_type": "universal-lifecycle-execution-receipt",
+    "current_gate": "UR.G0",
+    "current_state": "PASSED",
+    "edge_kind": "FORWARD",
+    "execution_performed": false,
+    "explicit_outcome": null,
+    "lifecycle_profile": {
+      "id": "gwc.universal-run.v2",
+      "version": 2
+    },
+    "next_gate": "UR.G1",
+    "next_state": "ACTIVE",
+    "noop_reason": "NOOP_STATE_UNCHANGED",
+    "transition_digest": "sha256:034d0d8f4feecb35a40c5ef2b83471df2a8884b469af73a5695feca8d3b100eb"
+  }
+}

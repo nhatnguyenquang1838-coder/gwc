@@ -1,0 +1,42 @@
+{
+  "artifact_type": "native-g1-plan-receipt",
+  "authority_granted": false,
+  "candidate_sha": "ab11541dfc1ec9569d0b97961b19a0a855f26245",
+  "consumed": false,
+  "decision_ref": "sf-precheck:r4-successor-planned",
+  "effect_authority_granted": false,
+  "node_allocation_digest": "sha256:8f694afe7c40fa6053dccac7e2059cb94a4f8b382eceff9ed8847307e568c35a",
+  "node_allocation_id": "scrum781-q0-fresh-20261010-r1:q0.qualification-campaign:r1",
+  "plan_coverage": {
+    "default_route": "PLANNED",
+    "deterministic_replay": "PLANNED",
+    "effect_authority": "PLANNED",
+    "exact_readback": "PLANNED",
+    "fresh_boot": "PLANNED",
+    "node_allocation": "PLANNED",
+    "node_architect_seam": "PLANNED",
+    "recursive_plan_dag_complete": "PLANNED",
+    "restart_recovery": "PLANNED",
+    "runtime_plan": "PLANNED",
+    "self_fix_replay": "PLANNED",
+    "stale_state_fail_closed": "PLANNED",
+    "typed_continuation": "PLANNED"
+  },
+  "provenance_ref": "core/node-architect/scrum781-q0-safe-forward-execution-plan-r4.json",
+  "qualification_results": {},
+  "receipt_digest": "sha256:169165d5a6c1b688268466379174311a6d70f84d7d44381b736ffa8359df99f5",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "runtime_plan_digest": "sha256:8f270c40829b168644fa51a9d7a7035f5339c1b8b8daeb254c5df7aae501d2c7",
+  "schema_id": "gwc.q0.native-g1-plan-receipt.v2",
+  "schema_version": 2,
+  "source_head": "ab11541dfc1ec9569d0b97961b19a0a855f26245",
+  "work_id": "W6",
+  "work_order": [
+    "W1",
+    "W2",
+    "W3",
+    "W4",
+    "W5",
+    "W6"
+  ]
+}

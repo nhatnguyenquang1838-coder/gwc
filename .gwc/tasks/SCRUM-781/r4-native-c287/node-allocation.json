@@ -1,0 +1,33 @@
+{
+  "child_instance_policy": "SINGLE_ACTIVE",
+  "condition_ref": null,
+  "content_digest": {
+    "algorithm": "sha256",
+    "canonicalization": "JCS",
+    "value": "8f694afe7c40fa6053dccac7e2059cb94a4f8b382eceff9ed8847307e568c35a"
+  },
+  "control_justification": null,
+  "created_at": "2026-11-02T19:16:27Z",
+  "created_by": {
+    "mode": "fresh_ur_g0_boot",
+    "profile": "taskcontroller-controller"
+  },
+  "independent_boundary_reasons": [],
+  "kind": "WORK",
+  "lifecycle_profile": {
+    "id": "gwc.universal-run.v2",
+    "version": 2
+  },
+  "node_allocation_id": "scrum781-q0-fresh-20261010-r1:q0.qualification-campaign:r1",
+  "provenance": {
+    "predecessor_refs": [],
+    "source_refs": [
+      "q0.qualification-campaign"
+    ]
+  },
+  "record_id": "NA-scrum781-q0-fresh-20261010-r1-r1",
+  "requirement": "REQUIRED",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "schema_id": "gwc.universal-run.node-allocation.v2",
+  "schema_version": 2
+}
