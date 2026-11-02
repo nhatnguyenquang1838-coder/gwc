@@ -32,6 +32,7 @@ def test_replay_without_race_safe_primitives_refuses_before_any_path_read(tmp_pa
     raw = b'{}'
     path.write_bytes(raw)
     monkeypatch.setattr(replay.os, 'supports_dir_fd', set())
+    monkeypatch.setattr(replay, '_windows_native_available', lambda: False)
     reads = []
     original = Path.read_bytes
     def track(p):
