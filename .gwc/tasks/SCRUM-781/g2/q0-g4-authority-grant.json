@@ -38,10 +38,12 @@
   ],
   "is_draft": true,
   "mergeable": true,
-  "grant_decision": "PENDING",
-  "consumed": false,
+  "grant_decision": "APPROVED",
+  "consumed": true,
   "issued_at": "2026-11-02T11:30:00Z",
   "expires_at": "2026-11-02T12:30:00Z",
   "reason_code": "G4_AUTHORITY_GRANT_Q0_MERGE",
-  "grant_digest": "sha256:f1cf9d07d71df371a180493e14be5fede0d53a33fdba115108db706eb64e3331"
+  "grant_digest": "sha256:1c4bb2f447376042191c652a877f4ac152b6a5d0741a5d2f298d7a8f473d6854",
+  "materialized_at": "2026-11-02T09:29:03.140822Z",
+  "materialized_by": "DWA"
 }
