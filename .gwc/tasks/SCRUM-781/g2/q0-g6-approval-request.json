@@ -1,0 +1,45 @@
+{
+  "schema_id": "dw.gwc.q0.g6-approval-request.v1",
+  "schema_version": 1,
+  "artifact_type": "q0-g6-approval-request",
+  "approval_request_id": "g2_q0_g6_acceptance_8e9857d9dc858f2d",
+  "gate": "G6_PRODUCTION_DATA",
+  "universal_gate": "UR.G6",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+  "head_sha": "5e40763b63b27873ac2cff30ac10f0eeef5a5469",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "scope_hash": "sha256:3946a950bbe313ccb4ab8e9e91419c382ed5664bb9fbefb632b199708c4ca227",
+  "scope_hash_short": "3946a950bbe313cc",
+  "writable_targets": [
+    "tools/node_architect/**",
+    "core/node-architect/**",
+    "core/runbooks/Q0_LIVE_QUALIFICATION_RUNBOOK_v1.0.md",
+    "tests/**",
+    "scripts/scrum781_*.py",
+    ".gwc/tasks/SCRUM-781/**"
+  ],
+  "required_receipts": [
+    {
+      "type": "Q0_ACCEPTANCE_RECEIPT",
+      "digest": "sha256:4257782a583f8e1adafa9fd6626f316006e134657b8a2ee719479e97273f44a0"
+    },
+    {
+      "type": "CLOSURE_RECEIPT",
+      "digest": "sha256:8a59b1b225f9200c501995c74f39d738d8d551b92802e8a67745d4eb0f95e42b"
+    },
+    {
+      "type": "HANDOFF_RECEIPT",
+      "digest": "sha256:f516f784ded204b2f395d78dfef4fb937d92fc06801a4db176f6cd863825fd47"
+    }
+  ],
+  "evidence_base": {
+    "native_plan_receipt_digest": "sha256:53f0fe02e632d0662912efc1406f3a068c13621f1450782425cbd40fd9451a32",
+    "checkpoint_seq7_digest": "sha256:8b3cbc206f7845f2823d29c30d5bebb8ea76e65aa2844936b50792da120dc4b5",
+    "run_state_digest": "sha256:090a35d7f4829e7bcf366a43332ed1985a3004cb8583eb1ad9ed317a703c6e74"
+  },
+  "issued_at": "2026-11-02T08:30:00Z",
+  "expires_at": "2026-11-02T09:30:00Z",
+  "reason_code": "G6_ENVELOPE_Q0_ACCEPTANCE",
+  "approval_request_digest": "sha256:9a01a2d8639d92ae7f2d30de961c0c4eb19927fda9813909ff7e40e32cc1c7aa"
+}

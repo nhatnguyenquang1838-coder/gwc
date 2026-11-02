@@ -1,0 +1,49 @@
+{
+  "schema_id": "dw.gwc.q0.g4-authority-grant.v1",
+  "schema_version": 1,
+  "artifact_type": "q0-g4-authority-grant",
+  "grant_id": "g4_q0_g4_merge_217835d65a4fb593",
+  "gate": "G4_MERGE",
+  "universal_gate": "UR.G4",
+  "pr_number": 615,
+  "pr_url": "https://github.com/nhatnguyenquang1838-coder/gwc/pull/615",
+  "base_ref": "main",
+  "base_sha": "c93b722b2a611d805ada803920b92e205ec8cabc",
+  "head_ref": "fix/SCRUM-781-q0-fresh-20261010-r1",
+  "head_sha": "824cee82",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "scope_hash": "sha256:3946a950bbe313ccb4ab8e9e91419c382ed5664bb9fbefb632b199708c4ca227",
+  "scope_hash_short": "3946a950bbe313cc",
+  "writable_targets": [
+    "tools/node_architect/**",
+    "core/node-architect/**",
+    "core/runbooks/Q0_LIVE_QUALIFICATION_RUNBOOK_v1.0.md",
+    "tests/**",
+    "scripts/scrum781_*.py",
+    ".gwc/tasks/SCRUM-781/**"
+  ],
+  "merge_actions_allowed": [
+    "mark_pr_ready_for_review",
+    "merge_approved_pr"
+  ],
+  "merge_actions_denied": [
+    "force_push",
+    "branch_deletion",
+    "deploy_approved_release",
+    "production_config_change",
+    "production_data_write",
+    "migration",
+    "credential_rotation",
+    "unrelated-product-scope"
+  ],
+  "is_draft": true,
+  "mergeable": true,
+  "grant_decision": "APPROVED",
+  "consumed": true,
+  "issued_at": "2026-11-02T11:30:00Z",
+  "expires_at": "2026-11-02T12:30:00Z",
+  "reason_code": "G4_AUTHORITY_GRANT_Q0_MERGE",
+  "grant_digest": "sha256:1c4bb2f447376042191c652a877f4ac152b6a5d0741a5d2f298d7a8f473d6854",
+  "materialized_at": "2026-11-02T09:29:03.140822Z",
+  "materialized_by": "DWA"
+}

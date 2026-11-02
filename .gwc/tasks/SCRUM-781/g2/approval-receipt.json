@@ -1,0 +1,62 @@
+{
+  "schema_id": "gwc.q0.approval-receipt.v1",
+  "schema_version": 1,
+  "artifact_type": "q0-approval-receipt",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+  "task_id": "SCRUM-781",
+  "checkpoint_id": "cf-precheck-001",
+  "granted_by": "NHAT",
+  "granted_at": "2026-11-02T07:59:28Z",
+  "channel": "chat",
+  "scope": "Q0-lane-writable-targets-only",
+  "authority_kind": "human_grant_for_cf_precheck_and_subsequent_atomic_work",
+  "covers": [
+    "CF-PRECHECK (P1)",
+    "CF-RED (P2)",
+    "CF-FIX (P3)",
+    "CF-LOAD (P4)",
+    "CF-REPLAY (P4)",
+    "CF-CERTIFY (P5/P6)"
+  ],
+  "does_not_cover": [
+    "protected-main-write",
+    "merge_approved_pr",
+    "deploy_approved_release",
+    "production_config_change",
+    "production_data_write",
+    "migration",
+    "credential_rotation",
+    "branch_deletion",
+    "force_push",
+    "unrelated-product-scope",
+    "G6-human-acceptance"
+  ],
+  "writable_targets": [
+    "tools/node_architect/**",
+    "core/node-architect/**",
+    "core/runbooks/Q0_LIVE_QUALIFICATION_RUNBOOK_v1.0.md",
+    "tests/**",
+    "scripts/scrum781_*.py",
+    ".gwc/tasks/SCRUM-781/**"
+  ],
+  "do_not_silently_mutate": [
+    "tools/node_architect/q0_m1_m7_integration.py::PLAN_REF",
+    "existing native checkpoint or consumed-cursor",
+    "core/node-architect/scrum781-q0-fresh-execution-plan-r2.json"
+  ],
+  "integration_ceiling": "draft_pr_only",
+  "envelope_ref": {
+    "path": ".gwc/tasks/SCRUM-781/g2/execution-envelope.yaml",
+    "envelope_digest": "sha256:df2d969eab5dd8e461be7643cb66611f78b9de507d240aaa9bbe7415f7ba5bd4",
+    "reason_code": "G2_ENVELOPE_CF_PRECHECK"
+  },
+  "cf_precheck_evidence": {
+    "path": ".gwc/tasks/SCRUM-781/g2/cf-precheck-evidence.json",
+    "status": "PASS"
+  },
+  "verification_status": "UNVERIFIED",
+  "verification_reason": "AWAITING_CANONICAL_NATIVE_G1_TRANSITION_RECEIPT",
+  "verification_blocked_by": "BLOCKED_NO_CANONICAL_NATIVE_G1_TRANSITION_RECEIPT",
+  "receipt_digest": "sha256:129074b737497c57ba1850728efd4e671a0eb27c86cb7669650080923d830bf4"
+}

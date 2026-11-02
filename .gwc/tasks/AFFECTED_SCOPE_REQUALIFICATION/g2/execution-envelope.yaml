@@ -1,0 +1,32 @@
+schema_version: "1.0"
+artifact_type: "g2-execution-envelope"
+task_id: AFFECTED_SCOPE_REQUALIFICATION
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: c93b722b2a611d805ada803920b92e205ec8cabc
+working_branch: fix/SCRUM-781-q0-fresh-20261010-r1
+risk_class: R3
+authorized_actions:
+  - modify_approved_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+  - create_commit
+excluded_actions:
+  - merge
+  - auto_merge
+  - deploy
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - destructive_migration
+scope_hash: sha256:7e650be75ecb12ddcb467ecf5c56cfbaf9c03dd691439a3044f0bbc0948efd60
+scope_hash_16: 7e650be75ecb12dd
+approval_request_id: g2_affected_scope_requalification_620a2e125b028605
+actor_target:
+  type: human
+  id: NHAT
+issued_at: 2026-11-02T02:15:09Z
+expires_at: 2026-11-02T03:15:09Z
+gate: G2_EXECUTION
+action: modify_approved_files

@@ -1,0 +1,32 @@
+schema_version: "1.0"
+artifact_type: "g2-execution-envelope"
+task_id: SCRUM_832_VERIFICATION
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: c93b722b2a611d805ada803920b92e205ec8cabc
+working_branch: fix/SCRUM-781-q0-fresh-20261010-r1
+risk_class: R2
+authorized_actions:
+  - modify_approved_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+  - create_commit
+excluded_actions:
+  - merge
+  - auto_merge
+  - deploy
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - destructive_migration
+scope_hash: sha256:eb0652ed31900cb9f6585b799535b93f09290eafc83f305f25673beca5088b22
+scope_hash_16: eb0652ed31900cb9
+approval_request_id: g2_scrum_832_verification_e6a045141a2b4cab
+actor_target:
+  type: human
+  id: NHAT
+issued_at: 2026-11-02T02:15:09Z
+expires_at: 2026-11-02T03:15:09Z
+gate: G2_EXECUTION
+action: modify_approved_files

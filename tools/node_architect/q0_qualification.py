@@ -15,6 +15,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Mapping
 
+from tools.node_architect.q0_python_env import verify_native_load_proof
 from tools.node_architect.universal_run_kernel import UNIVERSAL_PROFILE, transition_lifecycle
 from tools.node_architect.universal_run_lifecycle import evaluate_transition
 from tools.node_architect.universal_runtime_profile import load_universal_v2_default_profile
@@ -193,6 +194,116 @@ def resolve_q0_qualification_node(context: Mapping[str, Any]) -> dict[str, Any]:
         "log_contract_valid": tuple(profile.get("required_log_fields", [])) == Q0_REQUIRED_LOG_FIELDS,
         "evidence_contract_valid": profile.get("completion_evidence") == {k:list(v) for k,v in GATE_EVIDENCE.items()},
     }
+
+
+def recover_child_before_parent_g1(
+    *, parent: Mapping[str, Any], children: list[Mapping[str, Any]],
+    canonical_planner, materializer, readback, reconcile_children,
+    m2_status: str, g2_is_execution_predecessor: bool,
+) -> dict[str, Any]:
+    """Recover a child-before-parent G1 gap via canonical, durable readback.
+
+    All effects are delegated to the canonical Universal Run planner/materializer
+    and child reconciler. The deterministic idempotency key makes retries after
+    restart resolve to the same successor revision; this function never writes
+    repository files or treats planning as execution authority.
+    """
+    import hashlib
+
+    if not isinstance(parent, Mapping) or not isinstance(parent.get("run_id"), str) or not parent["run_id"].strip():
+        raise Q0QualificationError("PARENT_RUN_BINDING_REQUIRED")
+    if not children or any(not isinstance(child, Mapping) or not isinstance(child.get("run_id"), str)
+                           or not child["run_id"].strip() for child in children):
+        raise Q0QualificationError("CHILD_RUN_BINDING_REQUIRED")
+    if parent.get("goal_contract") is not None or parent.get("runtime_plan") is not None:
+        raise Q0QualificationError("PARENT_PLAN_MATERIALIZATION_GAP_NOT_DETECTED")
+    if parent.get("exists") is not True:
+        raise Q0QualificationError("PARENT_RUN_IDENTITY_REQUIRED")
+    if not all(callable(fn) for fn in (canonical_planner, materializer, readback, reconcile_children)):
+        raise Q0QualificationError("PARENT_G1_RECOVERY_CAPABILITY_REQUIRED")
+
+    child_ids = sorted(child["run_id"] for child in children)
+    identity = {"parent_run_id": parent["run_id"], "child_run_ids": child_ids}
+    idempotency_key = "parent-g1-recovery:" + hashlib.sha256(
+        json.dumps(identity, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    planned = canonical_planner(parent=copy.deepcopy(dict(parent)),
+                                children=copy.deepcopy(list(children)),
+                                disposition="REPLAN_PARENT_G1", idempotency_key=idempotency_key)
+    if not isinstance(planned, Mapping):
+        raise Q0QualificationError("PARENT_G1_PLAN_INVALID")
+    plan = copy.deepcopy(dict(planned))
+    revision = plan.get("revision")
+    prior_revision = parent.get("g1_revision", parent.get("revision", 0))
+    if (not isinstance(revision, int) or isinstance(revision, bool) or revision < 1
+            or not isinstance(prior_revision, int) or revision <= prior_revision):
+        raise Q0QualificationError("PARENT_G1_REVISION_NOT_NEW")
+    if plan.get("run_id") != parent["run_id"]:
+        raise Q0QualificationError("PARENT_G1_RUN_BINDING_MISMATCH")
+    contract, runtime_plan = plan.get("goal_contract"), plan.get("runtime_plan")
+    if not isinstance(contract, Mapping) or not isinstance(runtime_plan, Mapping):
+        raise Q0QualificationError("PARENT_G1_PLAN_INVALID")
+    plan_digest = runtime_plan.get("digest")
+    if not _valid_digest(plan_digest):
+        raise Q0QualificationError("PARENT_G1_PLAN_DIGEST_INVALID")
+    dag = plan.get("dependency_dag")
+    runtime_dag = runtime_plan.get("dag")
+    if not isinstance(dag, Mapping) or dag != runtime_dag:
+        raise Q0QualificationError("PARENT_G1_DAG_BINDING_MISMATCH")
+    dag_nodes = dag.get("nodes")
+    dag_ids = {node.get("id") for node in dag_nodes if isinstance(node, Mapping)} if isinstance(dag_nodes, list) else set()
+    if not set(child_ids).issubset(dag_ids):
+        raise Q0QualificationError("PARENT_G1_CHILD_DAG_BINDING_MISMATCH")
+    if plan.get("parent_bindings") != {"run_id": parent["run_id"]}:
+        raise Q0QualificationError("PARENT_G1_PARENT_BINDING_MISMATCH")
+    child_bindings = plan.get("child_bindings")
+    if not isinstance(child_bindings, list) or sorted(
+        item.get("run_id") for item in child_bindings if isinstance(item, Mapping)
+    ) != child_ids:
+        raise Q0QualificationError("PARENT_G1_CHILD_BINDING_MISMATCH")
+    validator = plan.get("validator_evidence")
+    if not isinstance(validator, Mapping) or validator.get("status") != "PASS" or not validator.get("ref"):
+        raise Q0QualificationError("PARENT_G1_VALIDATOR_EVIDENCE_REQUIRED")
+
+    materialized = materializer(parent_run_id=parent["run_id"], revision=revision,
+                                plan=copy.deepcopy(plan), idempotency_key=idempotency_key)
+    if not isinstance(materialized, Mapping) or materialized.get("durable") is not True:
+        raise Q0QualificationError("PARENT_G1_MATERIALIZATION_FAILED")
+    expected = {"parent_run_id": parent["run_id"], "revision": revision,
+                "goal_contract": dict(contract), "runtime_plan": dict(runtime_plan),
+                "runtime_plan_digest": plan_digest, "stored_digest": materialized.get("stored_digest"),
+                "parent_bindings": plan["parent_bindings"], "child_bindings": child_bindings,
+                "dependency_dag": dag, "validator_evidence": dict(validator)}
+    if not _valid_digest(expected["stored_digest"]):
+        raise Q0QualificationError("PARENT_G1_STORED_DIGEST_REQUIRED")
+    observed = readback(parent_run_id=parent["run_id"], revision=revision,
+                        expected=copy.deepcopy(expected))
+    if not isinstance(observed, Mapping) or dict(observed) != expected:
+        raise Q0QualificationError("PARENT_G1_READBACK_MISMATCH")
+    reconciliation = reconcile_children(parent_run_id=parent["run_id"],
+                                        parent_revision=revision,
+                                        children=copy.deepcopy(list(children)),
+                                        child_bindings=copy.deepcopy(child_bindings),
+                                        runtime_plan_digest=plan_digest,
+                                        idempotency_key=idempotency_key)
+    reconciled_children = reconciliation.get("children") if isinstance(reconciliation, Mapping) else None
+    reconciled_ids = sorted(item.get("run_id") for item in reconciled_children
+                            if isinstance(item, Mapping)) if isinstance(reconciled_children, list) else []
+    if (not isinstance(reconciliation, Mapping) or reconciliation.get("status") != "PASS"
+            or reconciled_ids != child_ids):
+        raise Q0QualificationError("PARENT_G1_CHILD_RECONCILIATION_FAILED")
+    accepted = m2_status in {"PASS", "ACCEPTED", "EXACT_HEAD_ACCEPTED"}
+    g2_blocked = bool(g2_is_execution_predecessor and not accepted)
+    return {"disposition": "REPLAN_PARENT_G1", "event": "Q0_PARENT_G1_BINDING_ACCEPTED",
+            "idempotency_key": idempotency_key, "parent_run_id": parent["run_id"],
+            "parent_revision": revision, "goal_contract": dict(contract),
+            "runtime_plan": dict(runtime_plan), "runtime_plan_digest": plan_digest,
+            "stored_digest": expected["stored_digest"], "parent_bindings": plan["parent_bindings"],
+            "child_bindings": copy.deepcopy(child_bindings), "dependency_dag": copy.deepcopy(dag),
+            "validator_evidence": dict(validator), "child_reconciliation": dict(reconciliation),
+            "readback_status": "PASS", "g1_status": "PASS", "g1_scope": "PLANNING_ONLY",
+            "m2_status": m2_status, "g2_status": "BLOCKED" if g2_blocked else "ELIGIBLE",
+            "authority_granted": False, "executed_effects": []}
 
 
 def complete_q0_gate(
@@ -627,6 +738,114 @@ def _validate_replay_provenance(replay_provenance: Any) -> dict[str, Any]:
     return copy.deepcopy(provenance)
 
 
+def validate_q0_release_rebinding_evidence(
+    rebinding_record: Mapping[str, Any] | None, *,
+    affected_scope_requalification: Mapping[str, Any] | None,
+    release_merge_receipt: Mapping[str, Any] | None,
+    expected_prior_qualified_dev_sha: str,
+    expected_released_gwc_main_sha: str,
+    expected_repository: str = "nhatnguyenquang1838-coder/gwc",
+) -> dict[str, Any]:
+    """Validate explicit development-to-release rebinding without replacing history.
+
+    The expectations are caller-supplied independently of these evidence objects so
+    a self-consistent forged record cannot define its own binding. This validator
+    records evidence validity only; it never grants release or production authority.
+    """
+    _require(isinstance(rebinding_record, Mapping), "RELEASE_REBINDING_RECORD_REQUIRED")
+    _require(isinstance(affected_scope_requalification, Mapping), "AFFECTED_SCOPE_REQUALIFICATION_REQUIRED")
+    _require(isinstance(release_merge_receipt, Mapping), "RELEASE_MERGE_RECEIPT_REQUIRED")
+    _require(_valid_sha(expected_prior_qualified_dev_sha), "PRIOR_QUALIFIED_DEV_SHA_INVALID")
+    _require(_valid_sha(expected_released_gwc_main_sha), "RELEASED_GWC_MAIN_SHA_INVALID")
+    _require(expected_prior_qualified_dev_sha != expected_released_gwc_main_sha,
+             "RELEASE_REBINDING_SHA_COLLAPSE")
+    _require(isinstance(expected_repository, str) and bool(expected_repository.strip()),
+             "RELEASE_REPOSITORY_REQUIRED")
+
+    record = dict(rebinding_record)
+    record_keys = {
+        "schema_id", "schema_version", "artifact_type", "task_id", "repository",
+        "prior_qualified_development_sha", "historical_development_source_sha",
+        "released_gwc_main_sha", "affected_scope_requalification_ref",
+        "release_merge_receipt_ref", "release_merge_receipt_digest", "attribution",
+        "created_at", "record_digest",
+    }
+    _require(set(record) == record_keys, "RELEASE_REBINDING_RECORD_INVALID")
+    _require(record.get("schema_id") == "gwc.q0.release-rebinding.v1"
+             and record.get("schema_version") == 1
+             and record.get("artifact_type") == "q0-release-rebinding-record",
+             "RELEASE_REBINDING_SCHEMA_INVALID")
+    _require(record.get("task_id") == "SCRUM-781" and record.get("repository") == expected_repository,
+             "RELEASE_REBINDING_SUBJECT_MISMATCH")
+    _require(record.get("prior_qualified_development_sha") == expected_prior_qualified_dev_sha
+             and record.get("historical_development_source_sha") == expected_prior_qualified_dev_sha,
+             "HISTORICAL_DEVELOPMENT_SOURCE_MISMATCH")
+    _require(record.get("released_gwc_main_sha") == expected_released_gwc_main_sha,
+             "RELEASED_GWC_MAIN_SHA_MISMATCH")
+    record_digest = record.get("record_digest")
+    _require(_valid_digest(record_digest) and record_digest == _digest(
+        {key: value for key, value in record.items() if key != "record_digest"}),
+        "RELEASE_REBINDING_DIGEST_MISMATCH")
+    _require(_parse_utc(record.get("created_at")) is not None, "RELEASE_REBINDING_TIMESTAMP_INVALID")
+
+    requalification = dict(affected_scope_requalification)
+    requal_digest = requalification.get("receipt_digest")
+    _require(requalification.get("schema_id") == "gwc.q0.affected-scope-requalification.v1"
+             and requalification.get("artifact_type") == "affected-scope-requalification-receipt"
+             and requalification.get("status") == "PASS",
+             "AFFECTED_SCOPE_REQUALIFICATION_NOT_PASS")
+    _require(requalification.get("repository") == expected_repository
+             and requalification.get("prior_qualified_development_sha") == expected_prior_qualified_dev_sha
+             and requalification.get("released_gwc_main_sha") == expected_released_gwc_main_sha,
+             "AFFECTED_SCOPE_REQUALIFICATION_BINDING_MISMATCH")
+    _require(isinstance(requalification.get("scope_ref"), str) and bool(requalification["scope_ref"].strip())
+             and isinstance(requalification.get("evidence_refs"), list) and bool(requalification["evidence_refs"])
+             and all(isinstance(ref, str) and bool(ref.strip()) for ref in requalification["evidence_refs"]),
+             "AFFECTED_SCOPE_REQUALIFICATION_EVIDENCE_REQUIRED")
+    _require(_valid_digest(requal_digest) and requal_digest == _digest(
+        {key: value for key, value in requalification.items() if key != "receipt_digest"}),
+        "AFFECTED_SCOPE_REQUALIFICATION_DIGEST_INVALID")
+    _require(record.get("affected_scope_requalification_ref") == requalification.get("scope_ref"),
+             "AFFECTED_SCOPE_REQUALIFICATION_REF_MISMATCH")
+
+    release = dict(release_merge_receipt)
+    _require(release.get("schema_id") == "gwc.q0.release-merge-receipt.v1"
+             and release.get("artifact_type") == "release-merge-receipt",
+             "RELEASE_MERGE_RECEIPT_INVALID")
+    release_digest = release.get("receipt_digest")
+    _require(_valid_digest(release_digest) and release_digest == _digest(
+        {key: value for key, value in release.items() if key != "receipt_digest"}),
+        "RELEASE_MERGE_RECEIPT_DIGEST_INVALID")
+    _require(release.get("repository") == expected_repository
+             and release.get("released_gwc_main_sha") == expected_released_gwc_main_sha,
+             "RELEASE_MERGE_RECEIPT_BINDING_MISMATCH")
+    _require(isinstance(release.get("durable_ref"), str) and bool(release["durable_ref"].strip())
+             and record.get("release_merge_receipt_ref") == release.get("durable_ref")
+             and record.get("release_merge_receipt_digest") == release_digest,
+             "RELEASE_MERGE_RECEIPT_NOT_DURABLE")
+    merged_by = release.get("merged_by")
+    _require(isinstance(merged_by, Mapping) and isinstance(merged_by.get("id"), str)
+             and bool(merged_by["id"].strip()) and isinstance(release.get("authority_ref"), str)
+             and bool(release["authority_ref"].strip()), "RELEASE_MERGE_ATTRIBUTION_REQUIRED")
+    _require(isinstance(release.get("merged_at"), str) and _parse_utc(release["merged_at"]) is not None,
+             "RELEASE_MERGE_TIMESTAMP_INVALID")
+    attribution = record.get("attribution")
+    _require(isinstance(attribution, Mapping)
+             and attribution.get("actor") == merged_by.get("id")
+             and attribution.get("authority_ref") == release.get("authority_ref"),
+             "RELEASE_REBINDING_ATTRIBUTION_MISMATCH")
+    return {
+        "valid": True,
+        "prior_qualified_development_sha": expected_prior_qualified_dev_sha,
+        "historical_development_source_sha": expected_prior_qualified_dev_sha,
+        "released_gwc_main_sha": expected_released_gwc_main_sha,
+        "affected_scope_requalification_ref": requalification["scope_ref"],
+        "release_merge_receipt_ref": release["durable_ref"],
+        "release_merge_receipt_digest": release_digest,
+        "authority_granted": False,
+    }
+
+
 def certify_q0_runtime(
     *, run_id: str, task_id: str, runtime_epoch: str, qualification_profile: str,
     qualification_profile_digest: str, qualification_matrix: Mapping[str, Any], candidate_sha: str,
@@ -647,14 +866,6 @@ def certify_q0_runtime(
     _require(_valid_sha(loaded_runtime_identity), "RUNTIME_IDENTITY_INVALID")
     _require(loaded_runtime_identity == candidate_sha, "RUNTIME_IDENTITY_DRIFT")
     _require(bool(load_proof_ref), "LOAD_PROOF_REQUIRED")
-    _require(isinstance(load_proof_evidence, Mapping) and bool(load_proof_evidence.get("activation_id")) and bool(load_proof_evidence.get("source_root")), "LOAD_PROOF_REQUIRED")
-    _require(bool(load_proof_evidence.get("runtime_session_id")) and bool(load_proof_evidence.get("runtime_process_id")), "LOAD_PROOF_PROCESS_IDENTITY_REQUIRED")
-    _require(load_proof_evidence.get("loaded_profile_digest") == qualification_profile_digest, "LOAD_PROOF_PROFILE_IDENTITY_MISMATCH")
-    module_identities = load_proof_evidence.get("loaded_module_identities")
-    if not isinstance(module_identities, Mapping) or not module_identities:
-        raise Q0QualificationError("LOAD_PROOF_MODULE_IDENTITIES_REQUIRED")
-    _require(all(isinstance(path, str) and path and _valid_digest(digest) for path, digest in module_identities.items()), "LOAD_PROOF_MODULE_IDENTITIES_INVALID")
-    _require(load_proof_evidence.get("candidate_sha") == candidate_sha and load_proof_evidence.get("loaded_source_sha") == candidate_sha, "LOAD_PROOF_IDENTITY_MISMATCH")
     _validate_matrix_digest(qualification_matrix)
     _require(bool(incident_replay_refs), "ORIGINAL_INCIDENT_REPLAY_REQUIRED")
     validated_replay_provenance = _validate_replay_provenance(replay_provenance)
@@ -672,6 +883,34 @@ def certify_q0_runtime(
     _require(not list(stale_dependent_state or []), "STALE_DEPENDENT_STATE_REMAINS")
     _require(isinstance(created_by, Mapping) and bool(created_by.get("id")), "Q0_CREATOR_REQUIRED")
     _require(_parse_utc(created_at) is not None, "Q0_CERTIFICATION_TIMESTAMP_INVALID")
+    if not isinstance(load_proof_evidence, Mapping):
+        raise Q0QualificationError("LOAD_PROOF_REQUIRED")
+    activation_id = load_proof_evidence.get("activation_id")
+    _require(isinstance(activation_id, str) and bool(activation_id.strip()),
+             "LOAD_PROOF_REQUIRED")
+    _require(bool(load_proof_evidence.get("runtime_session_id"))
+             and bool(load_proof_evidence.get("runtime_process_id")),
+             "LOAD_PROOF_PROCESS_IDENTITY_REQUIRED")
+    _require(load_proof_evidence.get("loaded_profile_digest") == qualification_profile_digest,
+             "LOAD_PROOF_PROFILE_IDENTITY_MISMATCH")
+    _require(load_proof_evidence.get("candidate_sha") == candidate_sha
+             and load_proof_evidence.get("loaded_source_sha") == candidate_sha,
+             "LOAD_PROOF_IDENTITY_MISMATCH")
+    module_identities = load_proof_evidence.get("module_identities")
+    if not isinstance(module_identities, Mapping) or not module_identities:
+        raise Q0QualificationError("LOAD_PROOF_MODULE_IDENTITIES_REQUIRED")
+    _require(load_proof_evidence.get("loaded_module_identities") == module_identities,
+             "LOAD_PROOF_MODULE_IDENTITIES_INVALID")
+    _require(all(isinstance(path, str) and path and _valid_digest(digest)
+                 for path, digest in module_identities.items()),
+             "LOAD_PROOF_MODULE_IDENTITIES_INVALID")
+    _require({"tools/node_architect/q0_qualification.py",
+              "tools/node_architect/q0_python_env.py"}.issubset(module_identities),
+             "LOAD_PROOF_REQUIRED_MODULE_IDENTITY")
+    _require(verify_native_load_proof(
+        load_proof_evidence, candidate_sha=candidate_sha,
+        qualification_profile_digest=qualification_profile_digest,
+        load_proof_ref=load_proof_ref), "LOAD_PROOF_NATIVE_VERIFICATION_FAILED")
     body = {
         "schema_version": CURRENT_Q0_CERTIFICATION_SCHEMA_VERSION, "artifact_type": "q0-certification-receipt",
         "run_id": run_id, "task_id": task_id, "runtime_epoch": runtime_epoch,
@@ -691,6 +930,7 @@ def certify_q0_runtime(
         "broader_regression_result": broader_regression_result,
         "stale_dependent_state": list(stale_dependent_state or []),
         "certified_q0_sha": candidate_sha, "certification_level": "L3",
+        "certification_claimed": True, "authority_granted": True,
         "campaign_state": "CAMPAIGN_READY_RUNTIME", "created_at": created_at,
         "created_by": copy.deepcopy(dict(created_by)),
     }
@@ -712,21 +952,57 @@ def verify_q0_certification(receipt: Mapping[str, Any]) -> bool:
             receipt.get("artifact_type") == "q0-certification-receipt"
             and receipt.get("certification_level") == "L3"
             and receipt.get("campaign_state") == "CAMPAIGN_READY_RUNTIME"
+            and receipt.get("certification_claimed") is True
+            and receipt.get("authority_granted") is True
             and receipt.get("candidate_sha") == receipt.get("certified_q0_sha") == receipt.get("loaded_runtime_identity")
             and _verify_seal(receipt, "receipt_digest")
         )
         if not valid or version == "1.0":
             return valid
         load_proof = receipt.get("load_proof_evidence")
+        if not isinstance(load_proof, Mapping):
+            return False
+        module_identities = load_proof.get("module_identities")
+        files = load_proof.get("files")
+        if (not isinstance(module_identities, Mapping) or not module_identities
+                or load_proof.get("loaded_module_identities") != module_identities
+                or not isinstance(files, list) or not files
+                or not {"tools/node_architect/q0_qualification.py",
+                        "tools/node_architect/q0_python_env.py"}.issubset(module_identities)):
+            return False
+        file_identities = {}
+        for item in files:
+            if not isinstance(item, Mapping):
+                return False
+            path = item.get("path")
+            committed = item.get("committed_module_sha256")
+            if (not isinstance(path, str) or not path or path in file_identities
+                    or not _valid_digest(module_identities.get(path))
+                    or not _valid_digest("sha256:" + str(item.get("disk_sha256", "")))
+                    or item.get("disk_sha256") != item.get("head_sha256")
+                    or item.get("head_sha256") != committed
+                    or module_identities.get(path) != "sha256:" + str(committed)
+                    or item.get("match") is not True):
+                return False
+            file_identities[path] = committed
+        if set(module_identities) != set(file_identities):
+            return False
         return (
             receipt.get("runtime_epoch") == Q0_RUNTIME_EPOCH
             and receipt.get("qualification_profile") == Q0_WORKFLOW_MODE
             and _valid_digest(receipt.get("qualification_matrix_digest"))
             and receipt.get("qualification_profile_digest") == q0_qualification_profile().get("profile_digest")
-            and isinstance(load_proof, Mapping)
+            and load_proof.get("proof_type") == "NATIVE_LOAD_PROOF"
+            and load_proof.get("load_proof_ref") == receipt.get("load_proof_ref")
+            and bool(load_proof.get("activation_id"))
+            and bool(load_proof.get("source_root"))
+            and bool(load_proof.get("runtime_session_id"))
+            and bool(load_proof.get("runtime_process_id"))
             and load_proof.get("candidate_sha") == receipt.get("candidate_sha")
             and load_proof.get("loaded_source_sha") == receipt.get("candidate_sha")
+            and load_proof.get("head_sha") == receipt.get("candidate_sha")
             and load_proof.get("loaded_profile_digest") == receipt.get("qualification_profile_digest")
+            and load_proof.get("committed_module_sha256") == files[0].get("committed_module_sha256")
         )
     except Exception:
         return False
@@ -801,18 +1077,23 @@ def create_q0_accepted_handoff(*, certification: Mapping[str, Any], acceptance: 
     _require(acceptance.get("run_id") == certification.get("run_id") and acceptance.get("task_id") == certification.get("task_id"), "Q0_HANDOFF_BINDING_MISMATCH")
     _require(acceptance.get("q0_certification_receipt_ref") == certification.get("receipt_digest"), "Q0_CERTIFICATION_REF_MISMATCH")
     _require(acceptance.get("qualification_matrix_digest") == certification.get("qualification_matrix_digest"), "Q0_MATRIX_DIGEST_MISMATCH")
+    _require(acceptance.get("decision_authority") == {"type": "human", "id": "NHAT"}, "Q0_DECISION_AUTHORITY_INVALID")
+    _require(acceptance.get("decided_by") == {"type": "human", "id": "NHAT"}, "Q0_DECISION_ACTOR_INVALID")
+    _require(acceptance.get("consumed") is True, "Q0_ACCEPTANCE_NOT_CONSUMED")
+    _require(acceptance.get("effect_authority_granted") is False, "Q0_EFFECT_AUTHORITY_FORBIDDEN")
+    consumed_acceptance = copy.deepcopy(dict(acceptance))
     closure = _sealed({
         "schema_version": "1.0", "artifact_type": "closure-receipt", "run_id": certification["run_id"],
-        "gate": "UR.G6", "closure_outcome": "ACCEPTED", "acceptance_receipt_ref": acceptance["receipt_digest"],
+        "gate": "UR.G6", "closure_outcome": "ACCEPTED", "acceptance_receipt_ref": consumed_acceptance["receipt_digest"],
         "closed_at": created_at,
     })
     handoff = _sealed({
         "schema_version": "1.0", "artifact_type": "handoff-receipt", "run_id": certification["run_id"],
         "target": LOGIN_TARGET, "certified_q0_sha": certification["certified_q0_sha"],
-        "acceptance_receipt_ref": acceptance["receipt_digest"], "closure_receipt_ref": closure["receipt_digest"],
+        "acceptance_receipt_ref": consumed_acceptance["receipt_digest"], "closure_receipt_ref": closure["receipt_digest"],
         "status": "Q0_ACCEPTED_AUTONOMOUS_HANDOFF", "created_at": created_at,
     })
-    return {"acceptance": copy.deepcopy(dict(acceptance)), "closure": closure, "handoff": handoff,
+    return {"acceptance": consumed_acceptance, "closure": closure, "handoff": handoff,
             "status": "Q0_ACCEPTED_AUTONOMOUS_HANDOFF", "effect_authority_granted": False}
 
 
@@ -824,6 +1105,10 @@ def can_start_login_r00(*, certification: Mapping[str, Any], acceptance: Mapping
     handoff = acceptance.get("handoff", {})
     closure = acceptance.get("closure", {})
     _require(decision.get("decision") == "ACCEPT" and _verify_seal(decision, "receipt_digest"), "Q0_ACCEPTANCE_RECEIPT_REQUIRED")
+    _require(decision.get("decision_authority") == {"type": "human", "id": "NHAT"} and decision.get("decided_by") == {"type": "human", "id": "NHAT"}, "Q0_DECISION_AUTHORITY_INVALID")
+    _require(decision.get("consumed") is True, "Q0_ACCEPTANCE_NOT_CONSUMED")
+    _require(decision.get("effect_authority_granted") is False, "Q0_EFFECT_AUTHORITY_FORBIDDEN")
+    _require(decision.get("certified_q0_sha") == certification.get("certified_q0_sha") and decision.get("q0_certification_receipt_ref") == certification.get("receipt_digest") and decision.get("qualification_matrix_digest") == certification.get("qualification_matrix_digest"), "Q0_ACCEPTANCE_BINDING_MISMATCH")
     _require(handoff.get("target") == LOGIN_TARGET and handoff.get("certified_q0_sha") == certification.get("certified_q0_sha"), "Q0_HANDOFF_BINDING_MISMATCH")
     _require(decision.get("run_id") == certification.get("run_id") and decision.get("task_id") == certification.get("task_id"), "Q0_HANDOFF_BINDING_MISMATCH")
     _require(handoff.get("run_id") == certification.get("run_id") and handoff.get("acceptance_receipt_ref") == decision.get("receipt_digest"), "Q0_HANDOFF_BINDING_MISMATCH")
@@ -837,5 +1122,5 @@ __all__ = [
     "Q0_ACCEPTANCE_GATE", "Q0_INTEGRATION_GATE", "Q0QualificationError",
     "advance_qualification_gate", "can_start_login_r00", "certify_q0_runtime",
     "complete_q0_gate", "create_q0_acceptance_request", "create_q0_accepted_handoff",
-    "decide_q0_acceptance", "q0_qualification_profile", "resolve_q0_qualification_node", "validate_q0_route_context", "verify_q0_certification",
+    "decide_q0_acceptance", "q0_qualification_profile", "recover_child_before_parent_g1", "resolve_q0_qualification_node", "validate_q0_release_rebinding_evidence", "validate_q0_route_context", "verify_q0_certification",
 ]

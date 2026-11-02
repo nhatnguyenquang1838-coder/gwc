@@ -1226,7 +1226,19 @@ def observe_q0(root: Path | str, *, activity_id: str, state_path: Path | str) ->
     if not prior or prior.get('state') != projection:
         persist_to_file(path, item)
     readback = validate_readback(load_store(path), item)
+    durable_store = load_store(path)
+    replayed = replay_checkpoint(durable_store, operation['task_id'], operation['run_id'], node_id)
+    if not isinstance(replayed, Mapping) or replayed.get('state') != projection:
+        raise ValueError('Q0_DURABLE_REPLAY_STATE_MISMATCH')
+    final_output_digest = _digest(projection)
+    if replayed.get('state_digest') != final_output_digest:
+        raise ValueError('Q0_DURABLE_REPLAY_DIGEST_MISMATCH')
     return {'operation': operation, 'verdict': {key: raw[key] for key in ('status', 'reason_code', 'current_activity')},
-            'checkpoint_readback': readback, 'native_activation_permitted': False,
+            'checkpoint_readback': readback, 'final_live_replay_equality': True,
+            'final_output_digest': final_output_digest,
+            'replay_evidence': {'checkpoint_ref': str(path.resolve()),
+                                'checkpoint_revision': replayed.get('revision'),
+                                'checkpoint_state_digest': replayed.get('state_digest')},
+            'native_activation_permitted': False,
             'native_admission': 'C_E_LOOP_ACTIVATION_BLOCKED', 'authority_granted': False,
             'executed_effects': [], 'evidence_class': 'SOURCE_BOUND_READINESS_NOT_LIVE_QUALIFICATION'}

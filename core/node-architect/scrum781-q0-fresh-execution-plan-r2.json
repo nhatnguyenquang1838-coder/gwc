@@ -253,6 +253,7 @@
     "Dependent stale controller/runtime/authority artifacts invalidated and regenerated after changed SHA",
     "Original incident replay exact-readback and progress beyond old failure",
     "All mandatory Q0 qualification matrix entries PASS with broader regression and no unresolved defects",
+    "Release rebinding requires a durable, attributable release/merge receipt naming the exact released gwc/main SHA, a PASS affected-scope requalification bound to both that SHA and the prior qualified development SHA, and a digest-sealed rebinding record that preserves historical development-source provenance; never infer release from a plan receipt or replace the development SHA with the release SHA.",
     "Q0 certified CAMPAIGN_READY_RUNTIME/L3 and Draft PR submitted for separately authorized G6 acceptance"
   ],
   "continue_until": [

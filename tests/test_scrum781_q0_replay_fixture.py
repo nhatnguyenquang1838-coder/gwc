@@ -56,14 +56,30 @@ def sandbox(tmp_path):
         'command': ['python', seam['path'], '--sandbox', '--offline'],
         'environment': {'Q0_SANDBOX': '1', 'Q0_OFFLINE': '1', 'PYTHONHASHSEED': '0'},
         'dependencies': [dep],
+        'previous_failure_state': 'UR.G2',
         'expected_result': {'next_state': 'UR.G3', 'poststate': {'seen': [1]}},
-        'legal_next_states': ['UR.G3'], 'max_age_seconds': 3600,
+        'legal_next_states': ['UR.G2', 'UR.G3'], 'max_age_seconds': 3600,
     }
     spec = {'binding': copy.deepcopy(binding), 'command': policy['command'][:],
             'environment': dict(policy['environment']), 'dependencies': [dep],
             'input': {'event': 'synthetic'}, 'prestate': {'seen': []},
             'snapshots': [put(tmp_path, 'sandbox/snapshot.json', b'{"seen":[]}')]}
     return tmp_path, policy, spec
+
+
+def test_forward_progress_requires_first_state_different_from_failure_state():
+    api = importlib.import_module(MODULE)
+    api._require_forward_progress('UR.G2', 'UR.G3')
+    with pytest.raises(api.ReplayFixtureError, match='FORWARD_PROGRESS_REQUIRED'):
+        api._require_forward_progress('UR.G2', 'UR.G2')
+
+
+def test_replay_rejects_expected_state_that_repeats_the_failure_state(sandbox):
+    api = importlib.import_module(MODULE)
+    root, policy, spec = sandbox
+    policy['expected_result']['next_state'] = policy['previous_failure_state']
+    with pytest.raises(api.ReplayFixtureError, match='FORWARD_PROGRESS_REQUIRED'):
+        api.capture_fixture(spec, root=root, policy=policy)
 
 
 def test_capture_roundtrip_canonical_hashes_closed_claims(sandbox):
