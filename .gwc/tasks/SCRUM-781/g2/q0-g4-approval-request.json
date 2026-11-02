@@ -43,5 +43,9 @@
   "issued_at": "2026-11-02T10:30:00Z",
   "expires_at": "2026-11-02T11:30:00Z",
   "reason_code": "G4_ENVELOPE_Q0_MERGE",
-  "approval_request_digest": "sha256:1c51a37087013fb7d250e3fa57ef664f9f2e9022da34bd0f9b203e216d499848"
+  "approval_request_digest": "sha256:498177a999b13f4104eabca5ae1bcd00a11d28d42ae8aeb172232b3a5655f321",
+  "consumed": true,
+  "materialized_at": "2026-11-02T08:58:09.874728Z",
+  "materialized_by": "DWA",
+  "approval_decision": "APPROVED"
 }
