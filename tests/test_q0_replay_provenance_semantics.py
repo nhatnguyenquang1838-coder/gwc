@@ -43,6 +43,15 @@ def _inputs(**overrides):
     }
     matrix = {"digest": _digest(matrix_body), **matrix_body}
     profile_digest = m.q0_qualification_profile()["profile_digest"]
+    # Use genuine live-source identities so verify_native_load_proof can pass in
+    # a real worktree: candidate/HEAD equals the worktree git HEAD, source_root is
+    # the worktree, and modules are already imported in this process.
+    import os
+    import subprocess
+    root = Path(__file__).resolve().parents[1]
+    head = subprocess.run(["git", "-C", str(root), "rev-parse", "HEAD"],
+                          check=True, capture_output=True, text=True).stdout.strip()
+    identity = head
     values = {
         "run_id": "scrum781-q0-replay-provenance-test",
         "task_id": "SCRUM-781",
@@ -50,18 +59,20 @@ def _inputs(**overrides):
         "qualification_profile": "q0_live_qualification",
         "qualification_profile_digest": profile_digest,
         "qualification_matrix": matrix,
-        "candidate_sha": "a" * 40,
-        "loaded_runtime_identity": "a" * 40,
+        "candidate_sha": identity,
+        "loaded_runtime_identity": identity,
         "load_proof_ref": "load-proof:replay-test",
         "load_proof_evidence": {
             "activation_id": "activation-replay-test",
-            "candidate_sha": "a" * 40,
-            "loaded_source_sha": "a" * 40,
-            "source_root": "worktree:q0",
+            "candidate_sha": identity,
+            "loaded_source_sha": identity,
+            "head_sha": identity,
+            "source_root": str(root),
             "runtime_session_id": "session-replay-test",
-            "runtime_process_id": "process-replay-test",
+            "runtime_process_id": str(os.getpid()),
             "loaded_profile_digest": profile_digest,
-            "loaded_module_identities": {"tools/node_architect/q0_qualification.py": "sha256:" + "e" * 64},
+            "proof_type": "NATIVE_LOAD_PROOF",
+            "load_proof_ref": "load-proof:replay-test",
         },
         "incident_replay_refs": ["replay:incident-42"],
         "replay_result": "PASS",
@@ -76,6 +87,23 @@ def _inputs(**overrides):
         "created_at": "2026-10-22T00:00:00Z",
         "created_by": {"type": "agent", "id": "Codex-GPT"},
     }
+    # module_identities for the required modules, computed from git blobs at HEAD
+    module_identities = {}
+    for rel in ("tools/node_architect/q0_qualification.py",
+                "tools/node_architect/q0_python_env.py"):
+        blob = subprocess.run(["git", "-C", str(root), "show", f"{head}:{rel}"],
+                              check=True, capture_output=True).stdout
+        module_identities[rel] = "sha256:" + hashlib.sha256(blob).hexdigest()
+    values["load_proof_evidence"]["module_identities"] = module_identities
+    values["load_proof_evidence"]["loaded_module_identities"] = dict(module_identities)
+    values["load_proof_evidence"]["committed_module_sha256"] = module_identities[
+        "tools/node_architect/q0_qualification.py"].split(":", 1)[1]
+    values["load_proof_evidence"]["files"] = [
+        {"path": rel, "disk_sha256": digest.split(":", 1)[1],
+         "head_sha256": digest.split(":", 1)[1],
+         "committed_module_sha256": digest.split(":", 1)[1], "match": True}
+        for rel, digest in module_identities.items()
+    ]
     values.update(overrides)
     return values
 
