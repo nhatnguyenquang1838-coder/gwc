@@ -104,5 +104,13 @@ secrets, migrations, cleanup/reset/rebase/force-push or silent route/strategy ch
 Do not auto-resume any control, manufacture a firing, reset counters, or manually
 settle/abandon another owner's tick. Return actual action, evidence, owner/NEXT and
 current blocker. Native owner retains cadence and fire/complete/abandon lifecycle.
-Do not emit LOOP_COMPLETE unless the run's real terminal condition is verified.
+When the CLI emits loop_handoff with child_state TERMINAL_LOCAL_EVIDENCE_ACCEPTED,
+propagate that exact child receipt and parent_state to the parent Loop. Once the
+receipt is verified, the native owner should park this child schedule immediately
+using its owner-guarded supported control; never stop or mark the parent complete
+from child acceptance. If the CLI emits parent_ready_event, verify its exact
+authorization binding and consume its event_key once before waking the parent for
+that distinct child run. Resume only once for a separately authorized new task,
+preserving the prior receipt. Do not emit LOOP_COMPLETE unless the parent run's
+real terminal condition is verified.
 '''

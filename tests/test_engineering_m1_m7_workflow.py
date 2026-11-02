@@ -54,6 +54,84 @@ def test_duplicate_invocation_and_work_cannot_reexecute(tmp_path):
     assert counts=={'read':2,'execute':1}
 
 
+def test_terminal_child_handoff_parks_idle_ticks_and_preserves_parent_open(tmp_path):
+    import sqlite3
+    c=binding(tmp_path);c['engineering']['work_items']=[];c['engineering']['parent_run']='parent-q0'
+    counts={'read':0,'execute':0}
+    caps=capabilities(c,counts)
+    original_read=caps['engineering.communication_read_once']
+    def read(ctx):
+        result=original_read(ctx)
+        result['dispositions']=[{
+            'run_id':ctx['run']['id'],'seq':80,'kind':'CONTROLLER_DISPOSITION',
+            'from':'GPT Controller','to':'Hermes Mac / DWA',
+            'source_ref':ctx['communication']['issue_ref'],
+            'reply_to':'https://github.com/owner/repo/issues/1#issuecomment-6290623979',
+            'comment_id':6290784423,
+            'comment_url':'https://github.com/owner/repo/issues/1#issuecomment-6290784423',
+            'author':'owner','body_sha256':'d'*64,
+            'evidence_class':'CONTROLLER_DISPOSITION_ADVISORY',
+            'child_terminal_accepted':True,'parent_terminal':False,
+            'authority_granted':False,'typed_ce_admitted':False,
+        }]
+        return result
+    caps['engineering.communication_read_once']=read
+    caps['engineering.work_frontier']=lambda ctx:{
+        'source_head':ctx['repository']['head_sha'],
+        'runtime_plan_digest':ctx['run']['runtime_plan_digest'],
+        'authority_granted':False,'selected_work':None,'items':[]}
+    results=[run_task_workflow(c,host_capabilities=caps,invocation_key=f'idle-{i}') for i in range(6)]
+    assert all(result['verdict']['reason_code']=='ENGINEERING_CHILD_PARKED_TERMINAL_ACCEPTED' for result in results)
+    assert all(result['loop_handoff']['child_state']=='TERMINAL_LOCAL_EVIDENCE_ACCEPTED' for result in results)
+    assert all(result['loop_handoff']['parent_state']=='UR.G2 / RUN_NOT_COMPLETE' for result in results)
+    assert all(result['loop_handoff']['parent_terminal'] is False for result in results)
+    assert all(result['loop_handoff']['scheduler_directive']=='PARK_IDLE_PENDING_AUTHORIZED_WORK' for result in results)
+    assert all(result['graph_requests']==[] and result['terminal_exchange_request'] is None for result in results)
+    assert counts=={'read':6,'execute':0}
+    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
+        row=db.execute('SELECT count(*) FROM engineering_child_terminal').fetchone()
+    assert row==(1,)
+
+
+def test_new_eligible_work_is_selected_once_without_erasing_terminal_receipt(tmp_path):
+    import sqlite3
+    c=binding(tmp_path);c['engineering']['work_items']=[];c['engineering']['parent_run']='parent-q0'
+    counts={'read':0,'execute':0}
+    caps=capabilities(c,counts)
+    caps['engineering.communication_read_once']=lambda ctx:{
+        'seq':43,'run_id':ctx['run']['id'],'kind':'CORRECTION','from':'GPT','to':'Hermes',
+        'issue_ref':ctx['communication']['issue_ref'],'comment_id':123,'body_sha256':'a'*64,
+        'comment_url':'https://github.com/owner/repo/issues/1#issuecomment-123',
+        'evidence_class':'HUMAN_COMMUNICATION_ONLY','dispositions':[{
+            'run_id':ctx['run']['id'],'seq':80,'kind':'CONTROLLER_DISPOSITION',
+            'from':'GPT Controller','to':'Hermes Mac / DWA','source_ref':ctx['communication']['issue_ref'],
+            'reply_to':'https://github.com/owner/repo/issues/1#issuecomment-6290623979',
+            'comment_id':6290784423,'comment_url':'https://github.com/owner/repo/issues/1#issuecomment-6290784423',
+            'author':'owner','body_sha256':'d'*64,'evidence_class':'CONTROLLER_DISPOSITION_ADVISORY',
+            'child_terminal_accepted':True,'parent_terminal':False,'authority_granted':False,'typed_ce_admitted':False}]}
+    frontier={'source_head':c['repository']['head_sha'],'runtime_plan_digest':c['run']['runtime_plan_digest'],
+              'authority_granted':False,'selected_work':None,'items':[]}
+    caps['engineering.work_frontier']=lambda ctx:frontier
+    parked=run_task_workflow(c,host_capabilities=caps,invocation_key='park-before-new-work')
+    assert parked['loop_handoff']['parent_terminal'] is False
+    frontier['authorized_parent_task']={'task_id':'authorized-successor','run_id':'successor-run-2',
+        'parent_run':'parent-q0','authorization_ref':'g2-activation:successor-run-2',
+        'authorization_digest':'sha256:'+'e'*64,'source_head':c['repository']['head_sha'],
+        'eligibility':'READY','authorization_verified':True}
+    resumed=run_task_workflow(c,host_capabilities=caps,invocation_key='new-work-wake')
+    replay=run_task_workflow(c,host_capabilities=caps,invocation_key='new-work-replay')
+    assert resumed['parent_ready_event']['parent_state']=='READY'
+    assert resumed['parent_ready_event']['newly_materialized'] is True
+    assert resumed['parent_ready_event']['run_id']=='successor-run-2'
+    assert replay['parent_ready_event'] is None
+    assert counts=={'read':0,'execute':0}
+    assert resumed['loop_handoff']['parent_terminal'] is False
+    assert replay['loop_handoff']['parent_terminal'] is False
+    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
+        assert db.execute('SELECT count(*) FROM engineering_child_terminal').fetchone()==(1,)
+        assert db.execute('SELECT count(*) FROM engineering_parent_ready_events').fetchone()==(1,)
+
+
 def _fixture_effect_fence():
     """Unit-test refusal-check inputs, not authenticated live authority."""
     return {'read_latest_command': lambda: {'seq': 43}, 'last_acked_seq': 43,
