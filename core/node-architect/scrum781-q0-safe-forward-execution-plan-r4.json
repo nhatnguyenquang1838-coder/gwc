@@ -1,0 +1,121 @@
+{
+  "schema_id": "gwc.scrum781.q0-execution-plan.v4",
+  "version": 4,
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "parent_task": "SCRUM-781",
+  "workflow_mode": "q0_live_qualification",
+  "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+  "current_gate": "UR.G1",
+  "contract_mode": "SAFE_FORWARD_QUALIFICATION",
+  "owner": "CONTROLLER",
+  "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+  "source_repo": "nhatnguyenquang1838-coder/gwc",
+  "supersedes_ref": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+  "goal": "Qualify GWC Universal V2 by safe forward progress. Do not search for, manufacture, inject, or require an incident that has not occurred. If a genuine runtime defect is observed during qualification, enter bounded self-remediation and then continue.",
+  "human_target_correction": {
+    "status": "APPROVED",
+    "recorded_date": "2026-11-03",
+    "channel": "bound ChatGPT conversation",
+    "statements": [
+      "không cố tạo tìm incident chưa xảy ra. Cần đi tiếp an toàn, không phải blocking.",
+      "cần update các statement gây cản trở gwc v2 release"
+    ],
+    "effect_authority_granted": false
+  },
+  "authority_boundary": {
+    "allowed": [
+      "read_exact_source",
+      "branch_local_q0_fix",
+      "sandbox_validation",
+      "additive_commit_push",
+      "draft_pr"
+    ],
+    "denied": [
+      "protected_main_write",
+      "merge",
+      "deploy",
+      "production_effect",
+      "production_config_data",
+      "secrets_credentials",
+      "migration",
+      "destructive_effect",
+      "force_push"
+    ]
+  },
+  "recursive_plan": {
+    "id": "SF0-Q0-SAFE-FORWARD",
+    "atomic": false,
+    "children": [
+      {
+        "id": "SF-PRECHECK",
+        "atomic": true,
+        "depends_on": [],
+        "action": "Reconcile exact source, current checkpoint, successor plan and profile; classify historical original DWO NOT_REPRODUCED as non-blocking evidence."
+      },
+      {
+        "id": "SF-LOAD",
+        "atomic": true,
+        "depends_on": [
+          "SF-PRECHECK"
+        ],
+        "action": "Start a clean isolated runtime activation and prove exact source/profile/module/instruction identity."
+      },
+      {
+        "id": "SF-QUALIFY",
+        "atomic": true,
+        "depends_on": [
+          "SF-LOAD"
+        ],
+        "action": "Execute the complete mandatory Q0 matrix using safe deterministic scenarios. Continue on PASS. Enter self-remediation only if a genuine current runtime defect is observed."
+      },
+      {
+        "id": "SF-VALIDATE",
+        "atomic": true,
+        "depends_on": [
+          "SF-QUALIFY"
+        ],
+        "action": "Run broader regression, exact readback and UR.G5 target validation against the exact qualified identity."
+      },
+      {
+        "id": "SF-CERTIFY",
+        "atomic": true,
+        "depends_on": [
+          "SF-VALIDATE"
+        ],
+        "action": "Issue L3 certification using genuine-defect replay evidence when a real defect occurred, otherwise SAFE_FORWARD_NO_INCIDENT provenance; prepare UR.G6 human acceptance without implying effect authority."
+      }
+    ]
+  },
+  "qualification_semantics": {
+    "default_behavior": "VERIFY_PASS_CONTINUE",
+    "incident_required": false,
+    "historical_original_dwo_status": "NOT_REPRODUCED_NON_BLOCKING",
+    "genuine_defect_behavior": "FREEZE_EVIDENCE_THEN_RED_FIX_GREEN_LOAD_REPLAY_CONTINUE",
+    "injected_fault_for_release_certification": "FORBIDDEN_AS_SUBSTITUTE_FOR_GENUINE_INCIDENT",
+    "mandatory_matrix_exit": "ALL_REQUIRED_CAPABILITIES_VERIFIED",
+    "ur_g5_required": true,
+    "ur_g6_human_acceptance_required": true
+  },
+  "acceptance_criteria": [
+    "No qualification step searches for or manufactures a runtime incident solely to obtain RED/replay evidence.",
+    "No genuine current defect remains unresolved.",
+    "Exact candidate, loaded source, profile and module/instruction identities are bound and verified.",
+    "Mandatory Q0 matrix is complete with observed evidence and broader regression PASS.",
+    "If a genuine defect occurred, its remediation has exact replay/readback and forward-progress evidence.",
+    "If no genuine defect occurred, certification uses SAFE_FORWARD_NO_INCIDENT / NO_ACTIVE_RUNTIME_DEFECT provenance with no fabricated failure state.",
+    "UR.G5 validates the exact qualified target identity.",
+    "UR.G6 acceptance remains a separate Human NHAT decision and grants no merge/deploy/production authority."
+  ],
+  "stop_conditions": [
+    "SOURCE_OR_BASE_DRIFT",
+    "WRITE_SCOPE_EXPANSION_REQUIRED",
+    "DESTRUCTIVE_OR_PRODUCTION_AUTHORITY_REQUIRED",
+    "UNRESOLVED_PRODUCT_OR_RISK_DECISION",
+    "GENUINE_CURRENT_RUNTIME_DEFECT_NOT_SELF_REMEDIABLE"
+  ],
+  "continue_until": [
+    "MANDATORY_MATRIX_COMPLETE",
+    "UR_G5_TARGET_VALIDATION_COMPLETE",
+    "Q0_ACCEPTANCE_REQUEST_READY"
+  ]
+}
