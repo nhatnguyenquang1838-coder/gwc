@@ -1,0 +1,27 @@
+{
+  "schema_id": "dw.gwc.q0.handoff-receipt.v1",
+  "schema_version": 1,
+  "artifact_type": "q0-handoff-receipt",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "gate": "UR.G6",
+  "closure_receipt_ref": "sha256:8a59b1b225f9200c501995c74f39d738d8d551b92802e8a67745d4eb0f95e42b",
+  "acceptance_receipt_ref": "sha256:4257782a583f8e1adafa9fd6626f316006e134657b8a2ee719479e97273f44a0",
+  "target": {
+    "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+    "identity": "5e40763b63b27873ac2cff30ac10f0eeef5a5469",
+    "kind": "candidate-branch",
+    "repository": "nhatnguyenquang1838-coder/gwc"
+  },
+  "typed_next": "CONTINUE_UNIVERSAL_LANE_REMEDIATION",
+  "authority_granted": false,
+  "consumed": true,
+  "issued_at": "2026-11-02T08:30:00Z",
+  "expires_at": "2026-11-02T09:30:00Z",
+  "reason_code": "Q0_HANDOFF_G6",
+  "receipt_digest": "sha256:50d7a3fcc15494179a194a6916f56a9d8bd8182b1d77638e0381a25423dd5c38",
+  "approval_bound_to": "g2_q0_g6_acceptance_8e9857d9dc858f2d",
+  "approval_issued_at": "2026-11-02T09:30:00Z",
+  "approval_gate": "G6_PRODUCTION_DATA",
+  "materialized_at": "2026-11-02T08:53:20.897881Z",
+  "materialized_by": "DWA"
+}

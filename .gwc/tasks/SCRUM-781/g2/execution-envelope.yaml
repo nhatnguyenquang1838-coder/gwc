@@ -1,0 +1,55 @@
+schema_version: '1.1'
+artifact_type: g2-execution-envelope
+activation_state: ACTIVE
+task_id: SCRUM-781
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: c93b722b2a611d805ada803920b92e205ec8cabc
+working_branch: fix/SCRUM-781-q0-fresh-20261010-r1
+risk_class: R2
+risk_digest: sha256:c6bc3488cbff657090db2f33b31075fb42863ce74d4b1a1b8b33ba4e9ded2ead
+authorized_actions:
+- modify_approved_files
+- run_sandboxed_validation
+- stage
+- create_guarded_branch_or_worktree
+excluded_actions:
+- open_draft_pr
+- mark_pr_ready
+- merge
+- auto_merge
+- force_push
+- branch_deletion
+- protected_branch_write
+- deploy
+- release
+- production_data_change
+- production_config_change
+- g3_pr_promotion
+- g4_merge
+- g5_deploy
+- g6_production
+scope_hash: sha256:3946a950bbe313ccb4ab8e9e91419c382ed5664bb9fbefb632b199708c4ca227
+f1_artifact_digests:
+  scrum781-q0-controlled-failure-execution-plan-r3.json: sha256:08028c21107c7abbd8e0ab3525f5d5a32b66e5f314d949f45a385541de6c3f06
+f2_digests: {}
+approval_request_ref:
+  source: human
+  granted_by: NHAT
+  granted_at: '2026-11-02T07:59:28Z'
+  channel: chat
+  scope: Q0-lane-writable-targets-only
+checkpoint_id: cf-precheck-001
+issued_at: '2026-11-02T07:59:28Z'
+expires_at: '2026-11-02T08:59:28Z'
+reason_code: G2_ENVELOPE_CF_PRECHECK
+exclusions:
+- G3_PR
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION
+execution_started: false
+verification_status: UNVERIFIED
+verification_reason: AWAITING_CANONICAL_NATIVE_G1_TRANSITION_RECEIPT
+verification_blocked_by: BLOCKED_NO_CANONICAL_NATIVE_G1_TRANSITION_RECEIPT
+envelope_digest: sha256:df2d969eab5dd8e461be7643cb66611f78b9de507d240aaa9bbe7415f7ba5bd4

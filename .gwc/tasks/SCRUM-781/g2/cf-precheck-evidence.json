@@ -1,0 +1,84 @@
+{
+  "checkpoint_id": "cf-precheck-001",
+  "action": "CF-PRECHECK",
+  "package": "P1",
+  "status": "COMPLETED",
+  "evidence_requirements_met": {
+    "plan_source_sha_digest": {
+      "value": "sha256:08028c21107c7abbd8e0ab3525f5d5a32b66e5f314d949f45a385541de6c3f06",
+      "file": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+      "status": "VERIFIED"
+    },
+    "human_option_b_decision": {
+      "exact_text": "APPROVE OPTION B — Replan Q0 sang Controlled Failure Campaign, giữ original DWO NOT_REPRODUCED.",
+      "channel": "bound ChatGPT conversation",
+      "recorded_date": "2026-10-20",
+      "context_ref": "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6281823173",
+      "scope": "ACCEPTANCE_TARGET_CHANGE_AND_G1_SUCCESSOR_PLAN_ONLY",
+      "not_effect_authority": true,
+      "status": "VERIFIED"
+    },
+    "owner_session_checkpoint_identity": {
+      "run_id": "scrum781-q0-fresh-20261010-r1",
+      "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+      "current_gate": "UR.G2",
+      "active_gate_native": "UR.G3",
+      "authority_granted": false,
+      "first_atomic_work_id": "CF-PRECHECK",
+      "initial_status": "PENDING_HERMES_CF_PRECHECK",
+      "owner": "CONTROLLER",
+      "recipient": "q0-actions-engineering",
+      "node_allocation_id": null,
+      "runtime_plan_digest": "sha256:936a1b411ba64f99f350f459534e939a5bd8a63bbadfdeb7afc5250f93a74dba",
+      "status": "VERIFIED"
+    },
+    "dag_validation": {
+      "total_nodes": 11,
+      "atomic_nodes": [
+        "CF-PRECHECK",
+        "CF-RED",
+        "CF-FIX",
+        "CF-LOAD",
+        "CF-REPLAY",
+        "CF-CERTIFY"
+      ],
+      "f1_groups": [
+        "F1-PLAN-IDENTITY",
+        "F1-REPRODUCE-FIX",
+        "F1-LOAD-REPLAY",
+        "F1-CERTIFY-HANDOFF"
+      ],
+      "cycles": [],
+      "missing_dependencies": [],
+      "dag_valid": true,
+      "status": "VERIFIED"
+    }
+  },
+  "findings": [],
+  "blockers": [],
+  "cross_parent_dependencies": [
+    "CF-RED(parent=F1-REPRODUCE-FIX) -> CF-PRECHECK(parent=F1-PLAN-IDENTITY)",
+    "CF-LOAD(parent=F1-LOAD-REPLAY) -> CF-FIX(parent=F1-REPRODUCE-FIX)",
+    "CF-CERTIFY(parent=F1-CERTIFY-HANDOFF) -> CF-REPLAY(parent=F1-LOAD-REPLAY)"
+  ],
+  "do_not_silently_mutate_protected": [
+    "tools/node_architect/q0_m1_m7_integration.py::PLAN_REF",
+    "existing native checkpoint or consumed-cursor",
+    "core/node-architect/scrum781-q0-fresh-execution-plan-r2.json"
+  ],
+  "authority_boundary": {
+    "authority_granted": false,
+    "envelope_activation_state": "ACTIVE",
+    "envelope_reason_code": "G2_ENVELOPE_CF_PRECHECK",
+    "read_only_validation": true,
+    "no_effect_performed": true
+  },
+  "controlled_scenario_boundaries": {
+    "acceptance_criteria_count": 11,
+    "original_DWO_NOT_REPRODUCED": "NOT_REPRODUCED",
+    "controlled_sandbox_target": "CONTROLLED_SANDBOX_RUNTIME_FAILURE",
+    "no_original_replay_claim": true
+  },
+  "overall_status": "PASS",
+  "cf_precheck_ready_for_next": true
+}

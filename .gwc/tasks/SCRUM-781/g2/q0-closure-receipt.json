@@ -1,0 +1,22 @@
+{
+  "schema_id": "dw.gwc.q0.closure-receipt.v1",
+  "schema_version": 1,
+  "artifact_type": "q0-closure-receipt",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "gate": "UR.G6",
+  "acceptance_receipt_ref": "sha256:4257782a583f8e1adafa9fd6626f316006e134657b8a2ee719479e97273f44a0",
+  "native_plan_receipt_ref": "sha256:53f0fe02e632d0662912efc1406f3a068c13621f1450782425cbd40fd9451a32",
+  "run_state_digest": "sha256:090a35d7f4829e7bcf366a43332ed1985a3004cb8583eb1ad9ed317a703c6e74",
+  "sequence": 7,
+  "authority_granted": false,
+  "consumed": true,
+  "issued_at": "2026-11-02T08:30:00Z",
+  "expires_at": "2026-11-02T09:30:00Z",
+  "reason_code": "Q0_CLOSURE_G6",
+  "receipt_digest": "sha256:faf45a138e7b648055340d4be466421168be13b5523aaee9c85d5dcb121264c3",
+  "approval_bound_to": "g2_q0_g6_acceptance_8e9857d9dc858f2d",
+  "approval_issued_at": "2026-11-02T09:30:00Z",
+  "approval_gate": "G6_PRODUCTION_DATA",
+  "materialized_at": "2026-11-02T08:53:20.897446Z",
+  "materialized_by": "DWA"
+}
