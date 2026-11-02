@@ -138,9 +138,7 @@ def _windows_backend():
     # "python scripts/scrum781_q0_replay_fixture.py" invocation.
     try:
         from scripts import _windows_safe_read
-    except ModuleNotFoundError as exc:
-        if exc.name != 'scripts':
-            raise
+    except (ImportError, ModuleNotFoundError):
         import _windows_safe_read
     return _windows_safe_read
 
