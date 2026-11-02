@@ -868,11 +868,15 @@ def certify_q0_runtime(
     _require(bool(load_proof_ref), "LOAD_PROOF_REQUIRED")
     if not isinstance(load_proof_evidence, Mapping):
         raise Q0QualificationError("LOAD_PROOF_REQUIRED")
+    _require(bool(load_proof_evidence.get("activation_id")), "LOAD_PROOF_REQUIRED")
     _require(bool(load_proof_evidence.get("runtime_session_id"))
              and bool(load_proof_evidence.get("runtime_process_id")),
              "LOAD_PROOF_PROCESS_IDENTITY_REQUIRED")
     _require(load_proof_evidence.get("loaded_profile_digest") == qualification_profile_digest,
              "LOAD_PROOF_PROFILE_IDENTITY_MISMATCH")
+    _require(load_proof_evidence.get("candidate_sha") == candidate_sha
+             and load_proof_evidence.get("loaded_source_sha") == candidate_sha,
+             "LOAD_PROOF_IDENTITY_MISMATCH")
     module_identities = load_proof_evidence.get("module_identities")
     if not isinstance(module_identities, Mapping) or not module_identities:
         raise Q0QualificationError("LOAD_PROOF_MODULE_IDENTITIES_REQUIRED")
@@ -957,12 +961,38 @@ def verify_q0_certification(receipt: Mapping[str, Any]) -> bool:
         if not valid or version == "1.0":
             return valid
         load_proof = receipt.get("load_proof_evidence")
+        if not isinstance(load_proof, Mapping):
+            return False
+        module_identities = load_proof.get("module_identities")
+        files = load_proof.get("files")
+        if (not isinstance(module_identities, Mapping) or not module_identities
+                or load_proof.get("loaded_module_identities") != module_identities
+                or not isinstance(files, list) or not files
+                or not {"tools/node_architect/q0_qualification.py",
+                        "tools/node_architect/q0_python_env.py"}.issubset(module_identities)):
+            return False
+        file_identities = {}
+        for item in files:
+            if not isinstance(item, Mapping):
+                return False
+            path = item.get("path")
+            committed = item.get("committed_module_sha256")
+            if (not isinstance(path, str) or not path or path in file_identities
+                    or not _valid_digest(module_identities.get(path))
+                    or not _valid_digest("sha256:" + str(item.get("disk_sha256", "")))
+                    or item.get("disk_sha256") != item.get("head_sha256")
+                    or item.get("head_sha256") != committed
+                    or module_identities.get(path) != "sha256:" + str(committed)
+                    or item.get("match") is not True):
+                return False
+            file_identities[path] = committed
+        if set(module_identities) != set(file_identities):
+            return False
         return (
             receipt.get("runtime_epoch") == Q0_RUNTIME_EPOCH
             and receipt.get("qualification_profile") == Q0_WORKFLOW_MODE
             and _valid_digest(receipt.get("qualification_matrix_digest"))
             and receipt.get("qualification_profile_digest") == q0_qualification_profile().get("profile_digest")
-            and isinstance(load_proof, Mapping)
             and load_proof.get("proof_type") == "NATIVE_LOAD_PROOF"
             and load_proof.get("load_proof_ref") == receipt.get("load_proof_ref")
             and bool(load_proof.get("activation_id"))
@@ -971,7 +1001,9 @@ def verify_q0_certification(receipt: Mapping[str, Any]) -> bool:
             and bool(load_proof.get("runtime_process_id"))
             and load_proof.get("candidate_sha") == receipt.get("candidate_sha")
             and load_proof.get("loaded_source_sha") == receipt.get("candidate_sha")
+            and load_proof.get("head_sha") == receipt.get("candidate_sha")
             and load_proof.get("loaded_profile_digest") == receipt.get("qualification_profile_digest")
+            and load_proof.get("committed_module_sha256") == files[0].get("committed_module_sha256")
         )
     except Exception:
         return False

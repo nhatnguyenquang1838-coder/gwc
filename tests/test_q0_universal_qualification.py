@@ -108,6 +108,10 @@ def _cert_inputs(**overrides):
         "created_by": {"type": "agent", "id": "dwa"},
     }
     d.update(overrides)
+    d["load_proof_evidence"]["module_identities"] = {
+        "tools/node_architect/q0_qualification.py": "sha256:" + "e" * 64,
+        "tools/node_architect/q0_python_env.py": "sha256:" + "f" * 64,
+    }
     return d
 
 
@@ -127,7 +131,7 @@ def test_r3_replay_provenance_negative_shape_only(field,value,code):
 
 
 @pytest.mark.parametrize('field,value,code', [
-    ('activation_id',None,'LOAD_PROOF_REQUIRED'),
+    ('activation_id',None,'LOAD_PROOF_NATIVE_VERIFICATION_FAILED'),
     ('runtime_session_id',None,'LOAD_PROOF_PROCESS_IDENTITY_REQUIRED'),
     ('loaded_module_identities',{},'LOAD_PROOF_MODULE_IDENTITIES_REQUIRED'),
     ('loaded_source_sha','0'*40,'LOAD_PROOF_IDENTITY_MISMATCH'),
