@@ -133,13 +133,24 @@ def _ref(ref: Any, *, seam: bool = False) -> None:
                  ref['symbol'].isidentifier(), 'EXECUTABLE_SEAM_MISSING')
 
 
+def _windows_backend():
+    # Support both "python -m scripts.scrum781_q0_replay_fixture" and direct
+    # "python scripts/scrum781_q0_replay_fixture.py" invocation.
+    try:
+        from scripts import _windows_safe_read
+    except ModuleNotFoundError as exc:
+        if exc.name != 'scripts':
+            raise
+        import _windows_safe_read
+    return _windows_safe_read
+
+
 def _windows_native_available() -> bool:
-    from scripts import _windows_safe_read
-    return _windows_safe_read.available()
+    return _windows_backend().available()
 
 
 def _windows_read_bounded(path: Path, *, cli: bool = False) -> bytes:
-    from scripts import _windows_safe_read
+    _windows_safe_read = _windows_backend()
     try:
         return _windows_safe_read.read_bounded(path, MAX_BYTES)
     except _windows_safe_read.WindowsUnsafePath as exc:
