@@ -107,6 +107,16 @@ non-default policy.
 
 **TASKCONTROLLER_OPTIONAL / NODE_ARCHITECT_CONTROLLER_AGNOSTIC:** GWC v2 and Node Architect run under their native lifecycle, authority, task-claim, node-routing and validation contracts without a TaskController working-mode binding. TaskController, its mailbox/v2 transport, Controller–Executor separation, continuation, Slack RootCard and human-plane procedure are applied **only** when explicitly selected by the user or an authorized parent/run binding. An autonomous governed task, node DAG, delegation requirement, or installed TaskController skill does not imply activation. A TaskController selection adds orchestration and cannot replace GWC gate authority or bypass Node Architect runtime. Working mode is independent from execution capability mode (`local_agent` or `chat_connector_only`).
 
+## Hermes native Universal v2 bootstrap routing
+
+Before applying Hermes role overlays, resolve runtime epoch, active project profile and explicitly selected working mode.
+
+- For `UNIVERSAL_V2_DEVELOPMENT` without explicit Slack Controller–Executor binding, load `agents/hermes/native-universal-v2.md` and the native runtime contracts, not the Slack MVP Executor overlay or its `WAIT_CONTROLLER` semantics.
+- For explicitly selected Slack Controller–Executor mode, load the Slack chain in `agents/README.md` and `agents/hermes/agent-instructions.md`.
+- Missing/ambiguous route denies writes and effects while permitting read-only diagnosis. A route never creates approval or expands authority.
+- Installed skill or repository source is not proof of Hermes load, activation or task application. Capture real host/session evidence; absent proof is `HERMES_NATIVE_LOAD_PROOF_UNAVAILABLE`, never PASS.
+- Preserve terminal Q0 identity, historical receipts and DWO isolation.
+
 ## Agent-specific routing
 
 The shared boot, execution modes, gate lifecycle, connector-call enforcement,
