@@ -1,0 +1,38 @@
+schema_version: "1.0"
+artifact_type: "g2-execution-envelope"
+task_id: SCRUM-797
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: c93b722b2a611d805ada803920b92e205ec8cabc
+working_branch: fix/SCRUM-781-q0-fresh-20261010-r1
+risk_class: R2
+authorized_actions:
+  - modify_approved_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+  - create_commit
+excluded_actions:
+  - merge
+  - auto_merge
+  - deploy
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - destructive_migration
+authorized_paths:
+  - tools/node_architect/q0_qualification.py
+  - scripts/scrum781_engineering_loop.py
+  - tests/test_engineering_host_adapter.py
+  - tests/test_engineering_m1_m7_workflow.py
+  - tests/test_scrum781_engineering_loop_resume.py
+scope_hash: sha256:c5f3935d9a91bdaf7d5acc12830b141ce7bd33a202df3f975d2bb77890199ff8
+scope_hash_16: c5f3935d9a91bdaf
+approval_request_id: g2_scrum-797_862b1e269d89ae79
+actor_target:
+  type: human
+  id: NHAT
+issued_at: 2026-11-02T02:15:09Z
+expires_at: 2026-11-02T03:15:09Z
+gate: G2_EXECUTION
+action: modify_approved_files

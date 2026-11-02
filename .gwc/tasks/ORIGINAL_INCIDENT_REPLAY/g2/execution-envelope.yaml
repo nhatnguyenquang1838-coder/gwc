@@ -1,0 +1,35 @@
+schema_version: "1.0"
+artifact_type: "g2-execution-envelope"
+task_id: ORIGINAL_INCIDENT_REPLAY
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: c93b722b2a611d805ada803920b92e205ec8cabc
+working_branch: fix/SCRUM-781-q0-fresh-20261010-r1
+risk_class: R2
+authorized_actions:
+  - modify_approved_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+  - create_commit
+excluded_actions:
+  - merge
+  - auto_merge
+  - deploy
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - destructive_migration
+authorized_paths:
+  - scripts/scrum781_q0_replay_fixture.py
+  - tools/node_architect/stable_json.py
+scope_hash: sha256:c871f831e7a7748ea8fc869b0dbde8a9cf01488a10b733b08a60212818d9b8b7
+scope_hash_16: c871f831e7a7748e
+approval_request_id: g2_original_incident_replay_33efa8db13cb3669
+actor_target:
+  type: human
+  id: NHAT
+issued_at: 2026-11-02T02:15:09Z
+expires_at: 2026-11-02T03:15:09Z
+gate: G2_EXECUTION
+action: modify_approved_files

@@ -1,0 +1,35 @@
+schema_version: "1.0"
+artifact_type: "g2-execution-envelope"
+task_id: LOAD_PROOF_VERIFICATION
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: c93b722b2a611d805ada803920b92e205ec8cabc
+working_branch: fix/SCRUM-781-q0-fresh-20261010-r1
+risk_class: R2
+authorized_actions:
+  - modify_approved_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+  - create_commit
+excluded_actions:
+  - merge
+  - auto_merge
+  - deploy
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - destructive_migration
+authorized_paths:
+  - tools/node_architect/q0_python_env.py
+  - tools/node_architect/q0_qualification.py
+scope_hash: sha256:f22f888ee0707847c8db504a0fa15ed8c758627e657c57c8905c7c64a10eb7ee
+scope_hash_16: f22f888ee0707847
+approval_request_id: g2_load_proof_verification_2e0fe1582ba7504b
+actor_target:
+  type: human
+  id: NHAT
+issued_at: 2026-11-02T02:15:09Z
+expires_at: 2026-11-02T03:15:09Z
+gate: G2_EXECUTION
+action: modify_approved_files

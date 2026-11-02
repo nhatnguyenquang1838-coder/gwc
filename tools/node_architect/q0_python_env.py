@@ -56,6 +56,9 @@ def capture_native_load_proof(*, source_root: str | Path, candidate_sha: str,
         identities[relative] = "sha256:" + disk
         files.append({"path": relative, "disk_sha256": disk, "head_sha256": committed,
                       "committed_module_sha256": committed, "match": True})
+    if not {"tools/node_architect/q0_qualification.py",
+            "tools/node_architect/q0_python_env.py"}.issubset(identities):
+        raise ValueError("LOAD_PROOF_REQUIRED_MODULE_IDENTITY")
     return {"proof_type": "NATIVE_LOAD_PROOF", "load_proof_ref": load_proof_ref,
             "activation_id": activation_id, "source_root": str(root),
             "runtime_session_id": runtime_session_id, "runtime_process_id": str(os.getpid()),
@@ -63,7 +66,8 @@ def capture_native_load_proof(*, source_root: str | Path, candidate_sha: str,
             "candidate_sha": candidate_sha, "loaded_source_sha": head,
             "loaded_profile_digest": qualification_profile_digest,
             "committed_module_sha256": files[0]["committed_module_sha256"],
-            "files": files, "loaded_module_identities": identities}
+            "files": files, "module_identities": identities,
+            "loaded_module_identities": identities}
 
 
 def verify_native_load_proof(evidence: Mapping[str, Any], *, candidate_sha: str,
@@ -79,8 +83,17 @@ def verify_native_load_proof(evidence: Mapping[str, Any], *, candidate_sha: str,
             or evidence.get("loaded_profile_digest") != qualification_profile_digest):
         return False
     root_value, files = evidence.get("source_root"), evidence.get("files")
-    identities = evidence.get("loaded_module_identities")
-    if not isinstance(root_value, str) or not isinstance(files, list) or not files or not isinstance(identities, Mapping):
+    identities = evidence.get("module_identities")
+    if (not isinstance(root_value, str) or not root_value.strip()
+            or not isinstance(evidence.get("activation_id"), str)
+            or not evidence["activation_id"].strip()
+            or not isinstance(evidence.get("runtime_session_id"), str)
+            or not evidence["runtime_session_id"].strip()
+            or not isinstance(evidence.get("runtime_process_id"), str)
+            or not evidence["runtime_process_id"].isdigit()
+            or not isinstance(files, list) or not files
+            or not isinstance(identities, Mapping)
+            or evidence.get("loaded_module_identities") != identities):
         return False
     try:
         root = Path(root_value).resolve(strict=True)
