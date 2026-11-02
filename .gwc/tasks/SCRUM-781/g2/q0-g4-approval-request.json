@@ -1,0 +1,47 @@
+{
+  "schema_id": "dw.gwc.q0.g4-approval-request.v1",
+  "schema_version": 1,
+  "artifact_type": "q0-g4-approval-request",
+  "approval_request_id": "g4_q0_g4_merge_55b783e6402908a7",
+  "gate": "G4_MERGE",
+  "universal_gate": "UR.G4",
+  "pr_number": 615,
+  "pr_url": "https://github.com/nhatnguyenquang1838-coder/gwc/pull/615",
+  "base_ref": "main",
+  "base_sha": "c93b722b2a611d805ada803920b92e205ec8cabc",
+  "head_ref": "fix/SCRUM-781-q0-fresh-20261010-r1",
+  "head_sha": "e8eb6e2ae2420db571b9fd4999620c03547917f9",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "scope_hash": "sha256:3946a950bbe313ccb4ab8e9e91419c382ed5664bb9fbefb632b199708c4ca227",
+  "scope_hash_short": "3946a950bbe313cc",
+  "writable_targets": [
+    "tools/node_architect/**",
+    "core/node-architect/**",
+    "core/runbooks/Q0_LIVE_QUALIFICATION_RUNBOOK_v1.0.md",
+    "tests/**",
+    "scripts/scrum781_*.py",
+    ".gwc/tasks/SCRUM-781/**"
+  ],
+  "is_draft": true,
+  "mergeable": true,
+  "review_decision": null,
+  "required_receipts": [
+    {
+      "type": "Q0_ACCEPTANCE_RECEIPT",
+      "digest": "sha256:b20f15ccb481faa274848dcf1ff5cd73427fe018487d0efb9962edacbeb1be04"
+    },
+    {
+      "type": "CLOSURE_RECEIPT",
+      "digest": "sha256:faf45a138e7b648055340d4be466421168be13b5523aaee9c85d5dcb121264c3"
+    },
+    {
+      "type": "HANDOFF_RECEIPT",
+      "digest": "sha256:50d7a3fcc15494179a194a6916f56a9d8bd8182b1d77638e0381a25423dd5c38"
+    }
+  ],
+  "g6_approval_ref": "g2_q0_g6_acceptance_8e9857d9dc858f2d",
+  "issued_at": "2026-11-02T10:30:00Z",
+  "expires_at": "2026-11-02T11:30:00Z",
+  "reason_code": "G4_ENVELOPE_Q0_MERGE",
+  "approval_request_digest": "sha256:1c51a37087013fb7d250e3fa57ef664f9f2e9022da34bd0f9b203e216d499848"
+}
