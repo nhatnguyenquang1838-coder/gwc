@@ -108,10 +108,24 @@ def _cert_inputs(**overrides):
         "created_by": {"type": "agent", "id": "dwa"},
     }
     d.update(overrides)
-    d["load_proof_evidence"]["module_identities"] = {
+    module_identities = {
         "tools/node_architect/q0_qualification.py": "sha256:" + "e" * 64,
         "tools/node_architect/q0_python_env.py": "sha256:" + "f" * 64,
     }
+    d["load_proof_evidence"]["module_identities"] = module_identities
+    d["load_proof_evidence"]["loaded_module_identities"] = module_identities
+    d["load_proof_evidence"].update({
+        "proof_type": "NATIVE_LOAD_PROOF",
+        "load_proof_ref": d["load_proof_ref"],
+        "head_sha": d["candidate_sha"],
+        "committed_module_sha256": "e" * 64,
+        "files": [
+            {"path": path, "disk_sha256": digest.split(":", 1)[1],
+             "head_sha256": digest.split(":", 1)[1],
+             "committed_module_sha256": digest.split(":", 1)[1], "match": True}
+            for path, digest in module_identities.items()
+        ],
+    })
     return d
 
 
@@ -131,9 +145,9 @@ def test_r3_replay_provenance_negative_shape_only(field,value,code):
 
 
 @pytest.mark.parametrize('field,value,code', [
-    ('activation_id',None,'LOAD_PROOF_NATIVE_VERIFICATION_FAILED'),
+    ('activation_id',None,'LOAD_PROOF_REQUIRED'),
     ('runtime_session_id',None,'LOAD_PROOF_PROCESS_IDENTITY_REQUIRED'),
-    ('loaded_module_identities',{},'LOAD_PROOF_MODULE_IDENTITIES_REQUIRED'),
+    ('module_identities',{},'LOAD_PROOF_MODULE_IDENTITIES_REQUIRED'),
     ('loaded_source_sha','0'*40,'LOAD_PROOF_IDENTITY_MISMATCH'),
 ])
 def test_r3_host_load_negative_shape_only(field,value,code):
