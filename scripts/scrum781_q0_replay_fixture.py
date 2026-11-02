@@ -75,6 +75,13 @@ def _json_digest(value: Any) -> str:
     return digest(canonical_json(value))
 
 
+def _require_forward_progress(previous_failure_state: Any, first_state_beyond_failure: Any) -> None:
+    _require(type(previous_failure_state) is str and bool(previous_failure_state)
+             and type(first_state_beyond_failure) is str and bool(first_state_beyond_failure)
+             and first_state_beyond_failure != previous_failure_state,
+             'FORWARD_PROGRESS_REQUIRED')
+
+
 def _fields(value: Any, names: set[str], reason: str) -> None:
     _require(type(value) is dict and set(value) == names, reason)
 
@@ -188,11 +195,14 @@ def _source(ref: dict, root: Path) -> None:
 def _validate_spec(spec: dict, root: Path, policy: dict) -> None:
     _fields(spec, SPEC_FIELDS, 'SPEC_FIELDS_INVALID')
     _fields(policy, {'binding', 'command', 'environment', 'dependencies', 'expected_result',
-                     'legal_next_states', 'max_age_seconds'}, 'POLICY_FIELDS_INVALID')
+                     'legal_next_states', 'max_age_seconds', 'previous_failure_state'}, 'POLICY_FIELDS_INVALID')
     canonical_json(spec)
     canonical_json(policy)
     _nonsecret(spec)
     _nonsecret(policy)
+    _require(type(policy['expected_result']) is dict, 'RESULT_ORACLE_INVALID')
+    _require_forward_progress(policy['previous_failure_state'],
+                              policy['expected_result'].get('next_state'))
     for key in ('binding', 'command', 'environment', 'dependencies'):
         _require(canonical_json(spec[key]) == canonical_json(policy[key]), 'POLICY_BINDING_MISMATCH')
     b = spec['binding']
