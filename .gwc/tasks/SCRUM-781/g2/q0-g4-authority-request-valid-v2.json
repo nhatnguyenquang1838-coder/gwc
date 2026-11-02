@@ -9,7 +9,7 @@
   "pr_url": "https://github.com/nhatnguyenquang1838-coder/gwc/pull/619",
   "base_ref": "main",
   "base_sha": "99ab7b03669bab5578f88420dce347071a5435ce",
-  "head_sha": "827f7f424d83a037b29b29e7d0dd627dbf592afb",
+  "head_sha": "fbc149f7",
   "repository": "nhatnguyenquang1838-coder/gwc",
   "scope_hash": "sha256:3946a950bbe313ccb4ab8e9e91419c382ed5664bb9fbefb632b199708c4ca227",
   "scope_hash_short": "3946a950bbe313cc",
@@ -21,5 +21,5 @@
   "reason_code": "G4_AUTHORITY_REQUEST_Q0_CHILD_C_MERGE_V2",
   "supersedes_unverified_grant": "g4_q0_g4_native_activation_20261102 (UNVERIFIED_CHRONOLOGICALLY_IMPOSSIBLE, preserved, not used)",
   "supersedes_expired_request": "g4_q0_g4_merge_20261102_valid (expired before approval)",
-  "approval_request_digest": "sha256:e1c2e8920977d005bc028648c2617954dc5924a13dfcdc0a62b58cb49f0410c3"
+  "approval_request_digest": "sha256:a9690248de596c5a33b929e4982f7281030fb4497b763c526c9cbcee8d7685c3"
 }
