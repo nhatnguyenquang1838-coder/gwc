@@ -29,3 +29,10 @@ For autonomous delivery, load `agents/autonomous-agent/agent-instructions.md` an
 ## Independent G4 pre-prod audit
 
 At `G4_PREPROD_AUDIT_TRIGGER`, use `agents/agent-audit/agent-instructions.md` with `skills/audit-guardrail/SKILL.md`. The auditor is read-only, independent, exact-head-bound, and has `merge_authority=false`. A PASS receipt is evidence for the separate standing G4 evaluator; BLOCK returns to TaskController.
+
+
+## Hermes native Universal v2 mode
+
+Resolve `runtime_epoch`, active project profile and explicitly selected working mode before loading Hermes overlays. For `UNIVERSAL_V2_DEVELOPMENT` without explicit Slack Controller–Executor binding, load root `AGENTS.md`, native runtime profile and `agents/hermes/native-universal-v2.md`. Slack MVP instructions do not apply by default.
+
+For explicit Slack Controller–Executor binding, retain the Slack MVP chain above. Missing/ambiguous mode allows read-only diagnostics, not writes/effects. Record the actual resolved route, required skills, Hermes host/session loader and activation evidence. Installed skill presence alone cannot satisfy BP-03.
