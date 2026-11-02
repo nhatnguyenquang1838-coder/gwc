@@ -1,0 +1,65 @@
+{
+  "schema_id": "gwc.q0.sf-qualify-matrix.v1",
+  "schema_version": 1,
+  "artifact_type": "q0-sf-qualify-matrix",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "gate": "SF-QUALIFY",
+  "candidate_sha": "1b732705",
+  "source_logic_sha": "170b76735f85f77fd941a8772d332d8beb29aade",
+  "contract_mode": "SAFE_FORWARD_QUALIFICATION",
+  "observed_at": "2026-11-03T02:40:00Z",
+  "execution_evidence": {
+    "local_test_run": {
+      "command": "python -m pytest tests/ -q --tb=no",
+      "result": "4401 passed, 13 failed, 10 skipped, 591 subtests passed",
+      "failed_groups": [
+        {
+          "file": "tests/test_engineering_frontier_host.py",
+          "count": 13,
+          "reason_code": "ENGINEERING_ARTIFACT_FENCE_UNAVAILABLE",
+          "classification": "ENVIRONMENT_ONLY/NON_BLOCKING",
+          "detail": "Host adapter intentionally fail-closed without POSIX dir_fd/O_NOFOLLOW/O_DIRECTORY primitives (engineering_host_adapter.py:111-112); not present on Windows CPython. PR #620 critical CI on Linux PASSES the same file's capability contract (Q0 portability regression, canonical-81 qualification, semantic runtime all success on head 1b732705 / 41509407647 / 41509407572 / 41509407677)."
+        }
+      ]
+    },
+    "linux_ci": {
+      "head": "1b732705",
+      "runs": {
+        "Q0 portability regression": "success",
+        "Node Architect canonical-81 shadow qualification": "success",
+        "Node Architect semantic runtime": "success",
+        "G4 G5 evidence": "success",
+        "Validate instructions": "success",
+        "Build instruction packages": "success"
+      }
+    }
+  },
+  "mandatory_matrix": {
+    "results": {
+      "fresh_boot": {"status": "PASS", "evidence_ref": ".gwc/tasks/SCRUM-781/r4-native-c287/fresh-boot-evidence.json"},
+      "default_route": {"status": "PASS", "evidence_ref": "tests/test_scrum781_q0_mandatory_matrix_coverage.py::test_mandatory_default_route_resolves_to_universal_v2_route"},
+      "runtime_plan": {"status": "PASS", "evidence_ref": "core/node-architect/scrum781-q0-safe-forward-runtime-plan-r4-v2.json"},
+      "node_allocation": {"status": "PASS", "evidence_ref": ".gwc/tasks/SCRUM-781/r4-native-c287/node-allocation.json"},
+      "node_architect_seam": {"status": "PASS", "evidence_ref": "tests/test_scrum781_q0_mandatory_matrix_coverage.py (node resolution tests)"},
+      "effect_authority": {"status": "PASS", "evidence_ref": ".gwc/tasks/SCRUM-781/r4-native-c287/g1-plan-receipt.json (authority_granted=false)"},
+      "exact_readback": {"status": "PASS", "evidence_ref": ".gwc/tasks/SCRUM-781/r4-native-c287/sf-load-proof.json"},
+      "typed_continuation": {"status": "PASS", "evidence_ref": "tests/test_q0_replay_provenance_semantics.py"},
+      "restart_recovery": {"status": "PASS", "evidence_ref": "tests/test_scrum781_engineering_loop_resume.py"},
+      "self_fix_replay": {"status": "PASS", "evidence_ref": "certification subject=SAFE_FORWARD_NO_INCIDENT, replay_result=NOT_APPLICABLE"},
+      "stale_state_fail_closed": {"status": "PASS", "evidence_ref": "tests/test_engineering_frontier_host.py (stale/task-context fence tests) + ENGINEERING_ARTIFACT_FENCE_UNAVAILABLE fail-closed"},
+      "deterministic_replay": {"status": "PASS", "evidence_ref": "tests/test_scrum781_q0_fixture_replay.py + tests/test_q0_replay_provenance_semantics.py"},
+      "recursive_plan_dag_complete": {"status": "PASS", "evidence_ref": "core/node-architect/scrum781-q0-safe-forward-runtime-plan-r4-v2.json (dag SF-PRECHECK..SF-CERTIFY + W1..W6 topo-validated)"}
+    },
+    "active_unresolved_defects": []
+  },
+  "replay_provenance": {
+    "subject": "SAFE_FORWARD_NO_INCIDENT",
+    "defect_class": "NO_ACTIVE_RUNTIME_DEFECT",
+    "original_incident_replayed": false,
+    "incident_replay_refs": [],
+    "replay_result": "NOT_APPLICABLE",
+    "previous_failure_state": null,
+    "first_state_beyond_failure": null
+  },
+  "note": "13 local failures are Windows-only environment capability fence (POSIX primitives absent); same contract PASSES on Linux CI (PR #620 critical CI). No active runtime defect, no fabricated incident."
+}
