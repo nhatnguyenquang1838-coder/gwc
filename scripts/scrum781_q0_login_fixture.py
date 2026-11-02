@@ -23,7 +23,7 @@ PLAN = ROOT / 'core/node-architect/scrum781-q0-fresh-execution-plan-r2.json'
 RUN = 'scrum781-q0-fresh-20261010-r1'
 BRANCH = 'fix/SCRUM-781-q0-fresh-20261010-r1'
 PROFILE = 'UNIVERSAL_V2_DEVELOPMENT'
-PLAN_DIGEST = 'ac8e8b855d5564ec9e503f965cd73deb60b546caf70a7304c43140a315422500'
+PLAN_DIGEST = 'b72276e1df056fe33dd589d1ab2d41496b0d35cb8b59d3f9943e5c5d20081bd2'
 REQUIRED_EVENTS = {'sign_in', 'visit_runs', 'visit_login', 'logout'}
 SCENARIO_ID_RE = re.compile(r'^LOGIN-[0-9]{2}$')
 

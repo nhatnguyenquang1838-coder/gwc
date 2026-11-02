@@ -10,7 +10,7 @@
     "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
     "baseline_sha": "80a3995ce374d678eaeaf223d25959aba4ea8d35",
     "runtimeplan_path": "core/node-architect/scrum781-q0-fresh-execution-plan-r2.json",
-    "runtimeplan_sha256": "ac8e8b855d5564ec9e503f965cd73deb60b546caf70a7304c43140a315422500"
+    "runtimeplan_sha256": "b72276e1df056fe33dd589d1ab2d41496b0d35cb8b59d3f9943e5c5d20081bd2"
   },
   "incident": {
     "parent_id": "DWO-LOGIN-AUTH-R1",

@@ -1,0 +1,71 @@
+{
+  "schema_id": "dw.gwc.q0.child-c-remediation-report.v2",
+  "schema_version": 2,
+  "artifact_type": "q0-child-c-remediation-report",
+  "report_id": "gw0-q0-child-c-remediation-20261102-r2",
+  "created_at": "2026-11-02T11:20:00Z",
+  "created_by": "DWA",
+  "child": "C",
+  "priority": "P1",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+  "head_sha": "a481af23",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "r3_plan_digest": "sha256:08028c21107c7abbd8e0ab3525f5d5a32b66e5f314d949f45a385541de6c3f06",
+  "g3_review_disposition": "CHANGES_REQUIRED",
+  "g3_review_evidence": "Independent G3.2 review at PR #619 head a481af23; reviewer Hermes Agent. Findings: (1) G4 activation grant chronologically impossible (materialized_at 2026-11-02T10:38:04Z before issued_at 11:30:00Z) — BLOCKER, preserve as unverified, reconcile via canonical authority source; (2) positive certification-test helpers hand-build synthetic load_proof_evidence (placeholder activation/session IDs) rather than invoking the genuine native load-proof producer — MAJOR, evidence overstate.",
+  "summary": "Source-binding drift correction verified and Windows native reader fail-closed verified. G3.2 review accepted those parts but required changes: (1) G4 activation grant must be treated as UNVERIFIED (chronologically impossible), not as valid authority; (2) report must not present synthetic unit-test fixtures as genuine native LOAD_PROOF evidence. This report v2 corrects language and records the blocked grant.",
+  "steps_completed": [
+    {
+      "step": "C1 — Authoritative runtime state",
+      "result": "RESOLVED",
+      "evidence": "checkpoint-seq7.json UR.G6/seq7/OPEN; progress-summary-seq7.json agrees; progress-summary.json (UR.G3/seq4) stale projection."
+    },
+    {
+      "step": "C2 — Recursive DAG bindings",
+      "result": "VERIFIED",
+      "evidence": "q0_work_evidence._MAPPING maps all 6 CF leaves to W nodes; tests pass."
+    },
+    {
+      "step": "C3 — Native G1 admission preparation",
+      "result": "PREPARED_VALIDATED_PARTIAL",
+      "evidence": "build_native_g1_plan_receipt + validate_native_g1_plan_receipt PASSED used genuine live-source identities (real git HEAD, real source_root, real process id, module identities from git blobs). NOTE: positive certification-test helpers in replay_provenance_semantics and verify_functions_coverage construct synthetic load_proof_evidence with placeholder activation/session IDs; they exercise validator behavior only and are NOT proof of live native LOAD_PROOF or native admission. Sandbox genesis not materialized (missing predecessor checkpoint on this host)."
+    },
+    {
+      "step": "C4 — Complete remediation",
+      "result": "COMPLETE",
+      "evidence": "4 commits: 24158ca3 (fixture plan digest rebind), bc23312c (replay provenance contract), 84574899 (ImportError fallback), 3280c3d3 (verify coverage live-source identities). Windows native reader from remote (e1df32d2 lineage) verified locally (16+4 native tests). Focused suite 479 passed / 0 failed."
+    },
+    {
+      "step": "C5 — Verify liveness",
+      "result": "PASS_EXERCISED",
+      "evidence": "Native G1 admission 92 passed; work evidence 134 passed; fixture replay+suite 23 passed; source reconcile 7 passed; replay_fixture 201 passed; replay provenance 20 passed; verify functions 21 passed. Note: these are unit/validator tests, not live native pilot proof."
+    }
+  ],
+  "g3_blocker_disposition": {
+    "grant_file": ".gwc/tasks/SCRUM-781/g2/q0-g4-activation-grant.json",
+    "class": "UNVERIFIED_CHRONOLOGICALLY_IMPOSSIBLE",
+    "reason": "materialized_at 2026-11-02T10:38:04.183123Z precedes issued_at 2026-11-02T11:30:00Z, which cannot be valid under the grant provenance contract.",
+    "action": "Preserved unchanged. Must be reconciled through the canonical authority source; must NOT be relied upon or silently repaired.",
+    "precedes_live_activation": true,
+    "authority_boundary": "G4 merge grant is NOT native successor activation authority; separate effect authority required before any live activation. activate_successor_plan public API exposes only DRY_RUN and SANDBOX_COMMIT."
+  },
+  "test_results": {
+    "focus_suite": "479 passed, 0 failed (14 files)",
+    "native_windows_reader": "16 passed + 4 subtests",
+    "replay_fixture_and_source_reconcile": "201 passed (was 135 failed)"
+  },
+  "evidence_claim_corrections": [
+    "Synthetic unit-test fixtures (replay_provenance_semantics, verify_functions_coverage helpers) are validator-behavior tests; they are NOT genuine native LOAD_PROOF or native admission evidence.",
+    "C3 claim corrected: plan-receipt builder/validator passed with genuine live-source binding; native LOAD_PROOF is not claimed from those tests.",
+    "Windows native reader is verified fail-closed on this host; equivalent POSIX backend path not re-verified here."
+  ],
+  "remaining_open_items": [
+    "G4 activation grant UNVERIFIED — cannot be used as activation authority; needs Controller/canonical reconciliation.",
+    "Native successor genesis materialization requires valid predecessor checkpoint readable on this host (Mac-path checkpoint absent).",
+    "UR.G6 evidence_gap remains: Q0_ACCEPTANCE_RECEIPT, CLOSURE_RECEIPT, HANDOFF_RECEIPT not present; open gate.",
+    "Separate effect authority required before live activation; no live mode in activate_successor_plan.",
+    "Child D Native Pilot remains HOLD pending Child C capacity review + separate pilot authority."
+  ],
+  "next_legal_action": "Preserve PR #619 Draft. Re-review after this report v2 correction on exact head. Do not mark ready or merge while CHANGES_REQUIRED. Do not use the chronologically-impossible G4 grant as authority. Child D stays HOLD."
+}
