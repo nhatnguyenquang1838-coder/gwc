@@ -13,8 +13,8 @@
   "status_summary": "Q0 / SCRUM-781 Child C remediation hoàn tất, PR #619 MERGED, G3 PASS, G4 merge authority APPROVED. MoA Child D review unanimous BLOCK (no Native Pilot authority). G5 status verify FAIL (G4 receipts missing on PR comments) -> G5/G6 deployment HOLD (separate authority required, not automatic).",
   "sections": {
     "child_a_post_merge_requalification": {
-      "status": "ACCEPTED",
-      "note": "134 Windows env failures accepted (O_NOFOLLOW/dir_fd), not product defects. Windows native reader fix verified locally (16+4 tests); source reconcile + replay fixture 201 passed (was 135 failed)."
+        "status": "RESOLVED_VERIFIED",
+        "note": "Windows native reader fix (commits cb3c5532..e1df32d2 + ImportError fallback 84574899) MERGED and verified locally: native reader 16+4 tests pass, replay_fixture + source_reconcile 201 passed (was 135 failed). NO product defects. Earlier 'ACCEPTED 134 env failures' was stale/pre-fix; the failures are now FIXED, not accepted."
     },
     "child_b_authority_provenance": {
       "status": "PARTIAL",
