@@ -1,0 +1,10 @@
+{
+  "acceptance_receipt_ref": "sha256:daa3acdb4a47711cb3d9ba3deabf45128893b036a0205d8c6604b2e727474f28",
+  "artifact_type": "closure-receipt",
+  "closed_at": "2026-11-03T03:05:30Z",
+  "closure_outcome": "ACCEPTED",
+  "gate": "UR.G6",
+  "receipt_digest": "sha256:96d77de5ea832695356846af1a7deccc76e0a8d888968898e7a9fb4b45ca309c",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "schema_version": "1.0"
+}
