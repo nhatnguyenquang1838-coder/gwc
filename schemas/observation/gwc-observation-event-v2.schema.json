@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gwc.dev/schemas/observation/gwc-observation-event-v2.schema.json",
+  "title": "GWC Universal v2 DWO Observation Event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_id","schema_version","event_id","run_id","sequence","occurred_at","source","runtime","event_type","outcome","actor","authority_ref","evidence_refs","payload","source_digest"],
+  "properties": {
+    "schema_id": {"const": "gwc.observation-event/v2"},
+    "schema_version": {"const": 2},
+    "event_id": {"type": "string", "minLength": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "sequence": {"type": "integer", "minimum": 0},
+    "occurred_at": {"type": "string", "minLength": 1},
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["system","repository","sha"],
+      "properties": {
+        "system": {"const": "gwc"},
+        "repository": {"type": "string", "minLength": 1},
+        "sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "runtime": {
+      "type": "object", "additionalProperties": false,
+      "required": ["epoch","profile","gate","state","node_id","typed_next"],
+      "properties": {
+        "epoch": {"type": "string", "minLength": 1},
+        "profile": {
+          "type": "object", "additionalProperties": false,
+          "required": ["id","version"],
+          "properties": {"id": {"const": "gwc.universal-run.v2"}, "version": {"const": 2}}
+        },
+        "gate": {"enum": ["UR.G0","UR.G1","UR.G2","UR.G3","UR.G4","UR.G5","UR.G6"]},
+        "state": {"enum": ["NOT_STARTED","ACTIVE","WAITING","BLOCKED","PASSED","FAILED"]},
+        "node_id": {"type": ["string","null"]},
+        "typed_next": {"type": ["string","null"]}
+      }
+    },
+    "event_type": {"enum": ["RUN_CREATED","RUN_STATE_CHANGED"]},
+    "outcome": {"type": "string", "minLength": 1},
+    "actor": {"type": "object"},
+    "authority_ref": {"type": ["string","null"]},
+    "evidence_refs": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "payload": {"type": "object"},
+    "source_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}
