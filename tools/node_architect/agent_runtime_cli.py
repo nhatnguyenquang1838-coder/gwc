@@ -258,6 +258,16 @@ def main(argv: list[str] | None = None) -> int:
         decision = controller.consume_executor_receipt(
             receipt, evidence_artifacts=_load_evidence_artifacts(args.evidence_artifacts)
         )
+        # Native observation is a post-decision projection. It may persist/send
+        # its own outbox work but can never alter the already-decided Universal
+        # cursor, authority, effects, or CLI success disposition.
+        from .observation_publisher import observe_controller_decision_from_env
+        observation_projection = observe_controller_decision_from_env(
+            decision=decision,
+            runtime_plan=controller.runtime_plan,
+            runtime_epoch=profile["runtime_epoch"],
+            node_id=str(assignment.get("node_id") or "") or None,
+        )
         result = {
             "status": "UNIVERSAL_RUN_NODE_COMPLETE" if receipt.get("host_status") == "ACTION_COMPLETE" else "UNIVERSAL_RUN_NODE_BLOCKED",
             "runtime_family": "UNIVERSAL_V2",
@@ -266,6 +276,7 @@ def main(argv: list[str] | None = None) -> int:
             "run_id": assignment["run_id"],
             "executor_receipt": receipt,
             "controller_decision": decision,
+            "observation_projection": observation_projection,
             "authority_granted": False,
             "executed_effects": [],
         }
