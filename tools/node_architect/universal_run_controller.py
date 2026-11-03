@@ -210,6 +210,39 @@ class UniversalController:
         self.run_state = dict(run_state)
         self.node_allocation = dict(node_allocation)
         self._assignment: dict[str, Any] | None = None
+        self._last_observation_projection: dict[str, Any] | None = None
+
+    @property
+    def last_observation_projection(self) -> dict[str, Any] | None:
+        """Last downstream observation result; never part of Controller authority."""
+        return copy.deepcopy(self._last_observation_projection)
+
+    def _observe_committed_transition(self, decision: Mapping[str, Any]) -> None:
+        """Best-effort post-transition observer shared by every Controller path.
+
+        The Controller has already committed its in-memory successor before this
+        hook runs. Observation failures are captured as projection status and
+        never roll back/advance the Universal cursor.
+        """
+        try:
+            from .observation_publisher import observe_controller_decision_from_env
+            refs = self.node_allocation.get("provenance", {}).get("source_refs", [])
+            node_id = str(refs[0]) if isinstance(refs, list) and refs else None
+            result = observe_controller_decision_from_env(
+                decision=decision,
+                runtime_plan=self.runtime_plan,
+                runtime_epoch=self.profile["runtime_epoch"],
+                node_id=node_id,
+            )
+        except Exception as exc:  # projection must never own the canonical cursor
+            result = {
+                "status": "DEGRADED",
+                "reason_code": "DWO_OBSERVATION_PROJECTION_FAILED",
+                "error_class": type(exc).__name__,
+                "authority_granted": False,
+                "executed_effects": [],
+            }
+        self._last_observation_projection = dict(result)
 
     @classmethod
     def from_manifest(cls, *, profile: Mapping[str, Any], manifest: Mapping[str, Any]) -> "UniversalController":
@@ -511,6 +544,7 @@ class UniversalController:
         }
         self.run_state = successor
         self._assignment = None
+        self._observe_committed_transition(decision)
         return decision
     def complete_controller_owned_gate(
         self,
@@ -774,6 +808,7 @@ class UniversalController:
         }
         self.run_state = successor
         self._assignment = None
+        self._observe_committed_transition(decision)
         return decision
 
     def record_historical_controller_evidence(

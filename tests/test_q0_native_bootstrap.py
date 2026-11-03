@@ -85,3 +85,24 @@ def test_real_g0_g1_continuation_assigns_g2_to_executor(tmp_path):
     assert g1["next_gate"] == "UR.G2"
     assert g1["next_owner"] == "EXECUTOR"
     assert controller.assign_current_action()["actor"] == "EXECUTOR"
+
+
+
+def test_bootstrap_observation_runs_after_materialization(tmp_path, monkeypatch):
+    from tools.node_architect import observation_publisher
+    from tools.node_architect.q0_native_bootstrap import build_native_q0_bootstrap, materialize_native_q0_bootstrap
+
+    seen = {}
+    monkeypatch.setattr(
+        observation_publisher,
+        "observe_run_state_from_env",
+        lambda **kwargs: seen.update(kwargs) or {"status": "OBSERVED", "authority_granted": False, "executed_effects": []},
+    )
+    binding = build_native_q0_bootstrap(**_inputs())
+    path = tmp_path / "native-genesis-observed.json"
+    result = materialize_native_q0_bootstrap(binding=binding, path=path)
+
+    assert path.is_file()
+    assert seen["run_state"]["sequence"] == 1
+    assert seen["run_state"]["active_gate"] == "UR.G0"
+    assert result["observation_projection"]["status"] == "OBSERVED"

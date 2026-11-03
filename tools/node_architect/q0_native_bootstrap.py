@@ -105,6 +105,27 @@ def materialize_native_q0_bootstrap(*, binding: Mapping[str, Any], path: str | P
                                         node_allocation=controller.node_allocation)
     payload = _canonical_bytes(document) + b"\n"
     file_sha, replay = _write_immutable(Path(path), payload, conflict_code="Q0_BOOTSTRAP_EXISTING_NATIVE_STATE")
+    # Genesis observation is emitted only after durable checkpoint materialization.
+    # Projection failure is downstream-only and never changes bootstrap authority.
+    try:
+        from .observation_publisher import observe_run_state_from_env
+        refs = controller.node_allocation.get("provenance", {}).get("source_refs", [])
+        node_id = str(refs[0]) if isinstance(refs, list) and refs else None
+        observation_projection = observe_run_state_from_env(
+            run_state=state,
+            runtime_plan=controller.runtime_plan,
+            runtime_epoch=controller.profile["runtime_epoch"],
+            node_id=node_id,
+        )
+    except Exception as exc:
+        observation_projection = {
+            "status": "DEGRADED",
+            "reason_code": "DWO_OBSERVATION_PROJECTION_FAILED",
+            "error_class": type(exc).__name__,
+            "authority_granted": False,
+            "executed_effects": [],
+        }
     return {"path": str(path), "file_sha256": file_sha, "checkpoint_digest": document["checkpoint_digest"],
             "state_digest": state["state_digest"], "sequence": 1, "active_gate": "UR.G0",
-            "idempotent_replay": replay, "authority_granted": False, "executed_effects": []}
+            "idempotent_replay": replay, "observation_projection": observation_projection,
+            "authority_granted": False, "executed_effects": []}

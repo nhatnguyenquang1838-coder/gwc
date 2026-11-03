@@ -258,6 +258,9 @@ def main(argv: list[str] | None = None) -> int:
         decision = controller.consume_executor_receipt(
             receipt, evidence_artifacts=_load_evidence_artifacts(args.evidence_artifacts)
         )
+        # Observation is emitted by the canonical Controller transition seam,
+        # including Controller-owned gate completion paths outside this CLI.
+        observation_projection = controller.last_observation_projection
         result = {
             "status": "UNIVERSAL_RUN_NODE_COMPLETE" if receipt.get("host_status") == "ACTION_COMPLETE" else "UNIVERSAL_RUN_NODE_BLOCKED",
             "runtime_family": "UNIVERSAL_V2",
@@ -266,6 +269,7 @@ def main(argv: list[str] | None = None) -> int:
             "run_id": assignment["run_id"],
             "executor_receipt": receipt,
             "controller_decision": decision,
+            "observation_projection": observation_projection,
             "authority_granted": False,
             "executed_effects": [],
         }

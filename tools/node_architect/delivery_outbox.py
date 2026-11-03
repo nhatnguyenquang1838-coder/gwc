@@ -23,7 +23,7 @@ import math
 import sqlite3
 import time
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 SCHEMA_VERSION = "1.0"
 ARTIFACT_TYPE = "delivery-outbox-record"
@@ -79,6 +79,9 @@ CREATE TABLE IF NOT EXISTS delivery_outbox (
     canonical_state_digest TEXT NOT NULL,
     delivery_generation INTEGER NOT NULL DEFAULT 1,
     event_payload_digest TEXT NOT NULL,
+    event_payload_json TEXT,
+    source_run_id TEXT,
+    source_sequence INTEGER,
     destination_policy_digest TEXT NOT NULL,
     destination_id TEXT NOT NULL,
     state TEXT NOT NULL,
@@ -204,12 +207,30 @@ def _semantic_event_id(projection_target: str, event_source: str | None,
     })
 
 
+def _ensure_outbox_extensions(conn: sqlite3.Connection) -> None:
+    """Add observation-delivery columns to pre-existing v1 stores without rewrite."""
+    columns = {str(row["name"]) for row in conn.execute("PRAGMA table_info(delivery_outbox)").fetchall()}
+    additions = {
+        "event_payload_json": "TEXT",
+        "source_run_id": "TEXT",
+        "source_sequence": "INTEGER",
+    }
+    for name, sql_type in additions.items():
+        if name not in columns:
+            conn.execute(f"ALTER TABLE delivery_outbox ADD COLUMN {name} {sql_type}")
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_delivery_outbox_run_sequence "
+        "ON delivery_outbox(source_run_id, source_sequence, created_at)"
+    )
+
+
 def init_store(path: Path) -> None:
-    """Create schema if absent (idempotent). Fail-closed on store error."""
+    """Create/upgrade schema idempotently. Fail closed on store error."""
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
         with _session(path) as conn:
             conn.executescript(_SCHEMA_SQL)
+            _ensure_outbox_extensions(conn)
     except sqlite3.Error as exc:
         raise OutboxStoreUnavailable(OUTBOX_STORE_UNAVAILABLE) from exc
 
@@ -218,8 +239,9 @@ def _readback_digest(conn: sqlite3.Connection, path: Path) -> str:
     """Fail-closed integrity readback of the canonical store."""
     rows = conn.execute(
         "SELECT projection_target, event_source, event_id, canonical_state_digest, "
-        "delivery_generation, event_payload_digest, destination_policy_digest, "
-        "destination_id, state, attempt_no FROM delivery_outbox"
+        "delivery_generation, event_payload_digest, event_payload_json, source_run_id, "
+        "source_sequence, destination_policy_digest, destination_id, state, attempt_no "
+        "FROM delivery_outbox"
     ).fetchall()
     return _digest([tuple(r) for r in rows])
 
@@ -243,6 +265,9 @@ def enqueue(
     canonical_state_digest: str,
     event_payload_digest: str,
     destination_policy_digest: str,
+    event_payload: Mapping[str, Any] | None = None,
+    source_run_id: str | None = None,
+    source_sequence: int | None = None,
     destination_id: str,
     delivery_generation: int = 1,
     max_attempts: int = DEFAULT_MAX_ATTEMPTS,
@@ -264,6 +289,16 @@ def enqueue(
         if event_source != expected:
             raise OutboxConflict(EVENT_SOURCE_BINDING_CONFLICT)
 
+    if (source_run_id is None) != (source_sequence is None):
+        raise OutboxConflict("DELIVERY_SOURCE_ORDER_BINDING_INCOMPLETE")
+    if source_sequence is not None and (
+        not isinstance(source_sequence, int) or isinstance(source_sequence, bool) or source_sequence < 0
+    ):
+        raise OutboxConflict("DELIVERY_SOURCE_SEQUENCE_INVALID")
+    payload_json = _canonical_json(dict(event_payload)) if event_payload is not None else None
+    if event_payload is not None and _digest(dict(event_payload)) != event_payload_digest:
+        raise OutboxConflict("EVENT_PAYLOAD_DIGEST_MISMATCH")
+
     now = _now()
     rec = {
         "schema_version": SCHEMA_VERSION,
@@ -275,6 +310,9 @@ def enqueue(
         "event_id": event_id,
         "canonical_state_digest": canonical_state_digest,
         "event_payload_digest": event_payload_digest,
+        "event_payload_json": payload_json,
+        "source_run_id": source_run_id,
+        "source_sequence": source_sequence,
         "destination_policy_digest": destination_policy_digest,
         "destination_id": destination_id,
         "delivery_generation": delivery_generation,
@@ -295,14 +333,15 @@ def enqueue(
                 conn.execute(
                     "INSERT INTO delivery_outbox (projection_target, event_source, event_id, "
                     "canonical_state_digest, delivery_generation, event_payload_digest, "
-                    "destination_policy_digest, destination_id, state, attempt_no, next_attempt_at, "
-                    "reason_class, max_attempts, max_age_s, backoff_ms, jitter_ms, lease_holder, "
-                    "lease_expires_at, created_at, updated_at, lineage_json) "
-                    "VALUES (?,?,?,?,?,?,?,?,?,?,NULL,NULL,?,?,?,?,NULL,NULL,?,?,'[]')",
+                    "event_payload_json, source_run_id, source_sequence, destination_policy_digest, "
+                    "destination_id, state, attempt_no, next_attempt_at, reason_class, max_attempts, "
+                    "max_age_s, backoff_ms, jitter_ms, lease_holder, lease_expires_at, created_at, "
+                    "updated_at, lineage_json) "
+                    "VALUES (?,?,?,?,?,?,?,?,?,?,?, ?,?,NULL,NULL,?,?,?,?,NULL,NULL,?,?,'[]')",
                     (projection_target, event_source, event_id, canonical_state_digest,
-                     delivery_generation, event_payload_digest, destination_policy_digest,
-                     destination_id, PENDING, 0, max_attempts, max_age_s, backoff_ms, jitter_ms,
-                     now, now),
+                     delivery_generation, event_payload_digest, payload_json, source_run_id,
+                     source_sequence, destination_policy_digest, destination_id, PENDING, 0,
+                     max_attempts, max_age_s, backoff_ms, jitter_ms, now, now),
                 )
             except sqlite3.IntegrityError as exc:
                 raise OutboxConflict("DELIVERY_IDENTITY_ALREADY_ENQUEUED") from exc
@@ -311,6 +350,87 @@ def enqueue(
     except (sqlite3.Error, OutboxStoreUnavailable) as exc:
         raise OutboxStoreUnavailable(OUTBOX_STORE_UNAVAILABLE) from exc
     return rec
+
+
+def get_record(
+    path: Path,
+    *,
+    projection_target: str,
+    event_source: str | None,
+    event_id: str,
+    canonical_state_digest: str,
+    delivery_generation: int,
+) -> dict[str, Any] | None:
+    """Read one exact outbox row without changing delivery state."""
+    try:
+        with _session(path, read_only=True) as conn:
+            row = conn.execute(
+                "SELECT * FROM delivery_outbox WHERE projection_target=? AND event_source IS ? "
+                "AND event_id=? AND canonical_state_digest=? AND delivery_generation=?",
+                (projection_target, event_source, event_id, canonical_state_digest, delivery_generation),
+            ).fetchone()
+            if row is None:
+                return None
+            result = dict(row)
+            result["semantic_event_id"] = _semantic_event_id(
+                result["projection_target"], result["event_source"],
+                result["event_id"], result["canonical_state_digest"],
+            )
+            return result
+    except sqlite3.Error as exc:
+        raise OutboxStoreUnavailable(OUTBOX_STORE_UNAVAILABLE) from exc
+
+
+def next_ready_ordered(path: Path, *, now: float | None = None) -> dict[str, Any] | None:
+    """Return the next durable observation row without allowing same-run overtaking.
+
+    A later source sequence stays blocked while any earlier same-run row remains
+    unresolved, even when that earlier row is backing off. Different runs may
+    continue independently.
+    """
+    current = _now() if now is None else float(now)
+    terminal = (ACK_CONFIRMED, DEAD_LETTERED, PERMANENT_FAILURE, SUPERSEDED)
+    try:
+        with _session(path, read_only=True) as conn:
+            row = conn.execute(
+                """
+                SELECT o.*
+                FROM delivery_outbox o
+                WHERE o.event_payload_json IS NOT NULL
+                  AND o.source_run_id IS NOT NULL
+                  AND o.source_sequence IS NOT NULL
+                  AND o.state IN ('PENDING','IN_FLIGHT','ACK_UNKNOWN','RETRY_SCHEDULED')
+                  AND (o.next_attempt_at IS NULL OR o.next_attempt_at <= ?)
+                  AND (o.lease_holder IS NULL OR o.lease_expires_at <= ?)
+                  AND NOT EXISTS (
+                    SELECT 1
+                    FROM delivery_outbox p
+                    WHERE p.source_run_id = o.source_run_id
+                      AND p.source_sequence IS NOT NULL
+                      AND p.state NOT IN (?,?,?,?)
+                      AND (
+                        p.source_sequence < o.source_sequence
+                        OR (
+                          p.source_sequence = o.source_sequence
+                          AND p.created_at < o.created_at
+                        )
+                      )
+                  )
+                ORDER BY o.created_at ASC, o.source_run_id ASC, o.source_sequence ASC
+                LIMIT 1
+                """,
+                (current, current, *terminal),
+            ).fetchone()
+            if row is None:
+                return None
+            result = dict(row)
+            result["semantic_event_id"] = _semantic_event_id(
+                result["projection_target"], result["event_source"],
+                result["event_id"], result["canonical_state_digest"],
+            )
+            return result
+    except sqlite3.Error as exc:
+        raise OutboxStoreUnavailable(OUTBOX_STORE_UNAVAILABLE) from exc
 
 
 def acquire_lease(
@@ -476,7 +596,10 @@ def record_attempt(
         raise OutboxStoreUnavailable(OUTBOX_STORE_UNAVAILABLE) from exc
 
 
-def verify_ack(path: Path, *, ack: dict[str, Any], worker_id: str) -> tuple[bool, str]:
+def verify_ack(
+    path: Path, *, ack: dict[str, Any], worker_id: str,
+    verifier: Callable[[dict[str, Any]], bool] | None = None,
+) -> tuple[bool, str]:
     """ACK_VERIFIED 5-way binding + freshness + replay resistance (SCRUM-533 L2.2).
 
     A bare 2xx or caller-supplied signature marker is never authentication.
@@ -534,7 +657,65 @@ def verify_ack(path: Path, *, ack: dict[str, Any], worker_id: str) -> tuple[bool
         row["canonical_state_digest"], row["delivery_generation"],
     ), worker_id=worker_id)["lease_holder"]:
         return False, OUTBOX_LEASE_LOST
-    return False, "ACK_VERIFIER_UNAVAILABLE"
+    if verifier is None:
+        return False, "ACK_VERIFIER_UNAVAILABLE"
+    try:
+        authenticated = verifier(dict(ack))
+    except Exception:
+        return False, "ACK_NOT_AUTHENTICATED"
+    if authenticated is not True:
+        return False, "ACK_NOT_AUTHENTICATED"
+    return True, "ACK_VERIFIED"
+
+
+def confirm_ack(
+    path: Path, *, ack: dict[str, Any], worker_id: str,
+    verifier: Callable[[dict[str, Any]], bool],
+) -> dict[str, Any]:
+    """Verify one receiver ACK and atomically move IN_FLIGHT -> ACK_CONFIRMED.
+
+    Generic transition(..., ACK_CONFIRMED) intentionally remains unavailable,
+    so no caller can bypass receiver authentication.
+    """
+    verified, code = verify_ack(path, ack=ack, worker_id=worker_id, verifier=verifier)
+    if not verified:
+        raise OutboxConflict(code)
+    try:
+        with _session(path) as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            row = conn.execute(
+                "SELECT * FROM delivery_outbox WHERE event_id=? "
+                "ORDER BY delivery_generation DESC LIMIT 1",
+                (ack.get("event_id"),),
+            ).fetchone()
+            if row is None:
+                raise OutboxConflict("DELIVERY_RECORD_NOT_FOUND")
+            key = (
+                row["projection_target"], row["event_source"], row["event_id"],
+                row["canonical_state_digest"], row["delivery_generation"],
+            )
+            leased = _verify_lease(path, key=key, worker_id=worker_id)
+            if leased["state"] != IN_FLIGHT:
+                raise OutboxConflict(OUTBOX_ILLEGAL_TRANSITION)
+            now = _now()
+            updated = conn.execute(
+                "UPDATE delivery_outbox SET state=?, reason_class=?, "
+                "lease_holder=NULL, lease_expires_at=NULL, updated_at=? "
+                "WHERE projection_target=? AND event_source IS ? AND event_id=? "
+                "AND canonical_state_digest=? AND delivery_generation=? "
+                "AND state=? AND lease_holder=? AND lease_expires_at=? AND lease_expires_at>?",
+                (
+                    ACK_CONFIRMED, "ACK_VERIFIED", now, *key, IN_FLIGHT,
+                    worker_id, leased["lease_expires_at"], now,
+                ),
+            )
+            if updated.rowcount != 1:
+                raise OutboxConflict(OUTBOX_LEASE_LOST)
+            expected = _readback_digest(conn, path)
+        _readback_after_write(path, expected)
+    except (sqlite3.Error, OutboxStoreUnavailable) as exc:
+        raise OutboxStoreUnavailable(OUTBOX_STORE_UNAVAILABLE) from exc
+    return {"state": ACK_CONFIRMED, "reason_class": "ACK_VERIFIED"}
 
 
 def discover_restart(path: Path) -> list[dict[str, Any]]:

@@ -1401,3 +1401,42 @@ def test_recovery_replan_cursor_validates_with_universal_controller():
     assert assignment["actor"] == "EXECUTOR"
     assert assignment["gate"] == "UR.G2"
     assert state["typed_next"] == "EXECUTE_Q0_R7_UR_G2_REPLAY_PROBE"
+
+
+
+def test_executor_transition_uses_shared_observation_seam(monkeypatch):
+    from tools.node_architect import observation_publisher
+    from tools.node_architect.universal_run_controller import UniversalController
+
+    seen = {}
+    monkeypatch.setattr(
+        observation_publisher,
+        "observe_controller_decision_from_env",
+        lambda **kwargs: seen.update(kwargs) or {"status": "OBSERVED", "authority_granted": False, "executed_effects": []},
+    )
+    profile, plan, state, allocation = _make_v2_binding()
+    controller = UniversalController(profile=profile, runtime_plan=plan, run_state=state, node_allocation=allocation)
+    assignment = controller.assign_current_action()
+    decision = controller.consume_executor_receipt(_g2_executor_receipt(profile, assignment))
+
+    assert seen["decision"]["transition_receipt"]["transition_ref"] == decision["transition_receipt"]["transition_ref"]
+    assert controller.last_observation_projection["status"] == "OBSERVED"
+
+
+def test_controller_owned_transition_uses_same_observation_seam(monkeypatch):
+    from tools.node_architect import observation_publisher
+    from tools.node_architect.universal_run_controller import UniversalController
+
+    seen = {}
+    monkeypatch.setattr(
+        observation_publisher,
+        "observe_controller_decision_from_env",
+        lambda **kwargs: seen.update(kwargs) or {"status": "OBSERVED", "authority_granted": False, "executed_effects": []},
+    )
+    profile, plan, state, allocation = _make_controller_owned_g4_binding()
+    controller = UniversalController(profile=profile, runtime_plan=plan, run_state=state, node_allocation=allocation)
+    controller.assign_current_action()
+    decision = controller.complete_controller_owned_gate(evidence={"integration_outcome": "IN_PLACE"})
+
+    assert seen["decision"]["transition_receipt"]["transition_ref"] == decision["transition_receipt"]["transition_ref"]
+    assert controller.last_observation_projection["status"] == "OBSERVED"
