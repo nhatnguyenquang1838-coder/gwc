@@ -90,6 +90,7 @@ def send_event(
     secret: str,
     key_id: str,
     delivery_generation: int,
+    source_id: str = SOURCE_ID,
     timeout_s: float = 15.0,
 ) -> tuple[dict[str, Any], str, str]:
     raw, request_digest, payload_digest = build_request(
@@ -98,7 +99,7 @@ def send_event(
     timestamp = int(time.time())
     headers = {
         "Content-Type": "application/json",
-        "X-DWO-Source-Id": SOURCE_ID,
+        "X-DWO-Source-Id": source_id,
         "X-DWO-Key-Id": key_id,
         "X-DWO-Timestamp": str(timestamp),
         "X-DWO-Request-Digest": request_digest,
