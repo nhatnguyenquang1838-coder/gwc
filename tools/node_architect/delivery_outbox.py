@@ -371,7 +371,14 @@ def get_record(
                 "AND event_id=? AND canonical_state_digest=? AND delivery_generation=?",
                 (projection_target, event_source, event_id, canonical_state_digest, delivery_generation),
             ).fetchone()
-            return dict(row) if row is not None else None
+            if row is None:
+                return None
+            result = dict(row)
+            result["semantic_event_id"] = _semantic_event_id(
+                result["projection_target"], result["event_source"],
+                result["event_id"], result["canonical_state_digest"],
+            )
+            return result
     except sqlite3.Error as exc:
         raise OutboxStoreUnavailable(OUTBOX_STORE_UNAVAILABLE) from exc
 
@@ -416,7 +423,14 @@ def next_ready_ordered(path: Path, *, now: float | None = None) -> dict[str, Any
                 """,
                 (current, current, *terminal),
             ).fetchone()
-            return dict(row) if row is not None else None
+            if row is None:
+                return None
+            result = dict(row)
+            result["semantic_event_id"] = _semantic_event_id(
+                result["projection_target"], result["event_source"],
+                result["event_id"], result["canonical_state_digest"],
+            )
+            return result
     except sqlite3.Error as exc:
         raise OutboxStoreUnavailable(OUTBOX_STORE_UNAVAILABLE) from exc
 
