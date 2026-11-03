@@ -105,6 +105,8 @@ def send_event(
         "X-DWO-Signature": request_signature(
             secret, timestamp=timestamp, request_digest=request_digest
         ),
+        # HTTPS bearer secret; DWO stores only its SHA-256 hash.
+        "X-DWO-Machine-Token": secret,
     }
     request = urllib.request.Request(endpoint, data=raw, headers=headers, method="POST")
     try:
