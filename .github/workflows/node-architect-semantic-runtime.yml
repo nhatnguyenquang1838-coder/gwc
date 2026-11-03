@@ -43,6 +43,7 @@ jobs:
             tests/test_delivery_outbox.py \
             tests/test_observation_event_v2.py \
             tests/test_dwo_observation_delivery.py \
+            tests/test_dwo_observation_runtime_projection.py \
             > semantic-runtime-pytest.txt 2>&1
           status=$?
           cat semantic-runtime-pytest.txt
