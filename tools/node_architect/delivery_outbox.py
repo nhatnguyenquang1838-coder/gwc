@@ -23,7 +23,7 @@ import math
 import sqlite3
 import time
 from pathlib import Path
-from typing import Any, Callable, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 SCHEMA_VERSION = "1.0"
 ARTIFACT_TYPE = "delivery-outbox-record"
@@ -99,8 +99,6 @@ CREATE TABLE IF NOT EXISTS delivery_outbox (
     lineage_json TEXT NOT NULL DEFAULT '[]',
     PRIMARY KEY (projection_target, event_source, event_id, canonical_state_digest, delivery_generation)
 );
-CREATE INDEX IF NOT EXISTS idx_delivery_outbox_run_sequence
-    ON delivery_outbox(source_run_id, source_sequence, created_at);
 CREATE TABLE IF NOT EXISTS delivery_outbox_attempts (
     attempt_id TEXT PRIMARY KEY,
     semantic_event_id TEXT NOT NULL,
