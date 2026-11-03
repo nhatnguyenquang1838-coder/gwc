@@ -8,7 +8,7 @@ def _state():
         lifecycle_profile={"id":"gwc.universal-run.v2","version":2},
         run_manifest_ref="manifest:R1", run_manifest_digest="a"*64,
         state_revision=1, predecessor_state_ref=None, predecessor_state_digest=None,
-        sequence=0, active_gate="UR.G0",
+        sequence=1, active_gate="UR.G0",
         gate_states={"UR.G0":"ACTIVE","UR.G1":"NOT_STARTED","UR.G2":"NOT_STARTED","UR.G3":"NOT_STARTED","UR.G4":"NOT_STARTED","UR.G5":"NOT_STARTED","UR.G6":"NOT_STARTED"},
         terminal_state="OPEN",
         execution_refs={"runtime_plan_ref":"plan:R1","runtime_plan_digest":"b"*64,"cursor_ref":"cursor:R1"},
