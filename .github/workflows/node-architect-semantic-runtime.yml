@@ -40,6 +40,9 @@ jobs:
             tests/test_scrum_566_w13_live_runtime_bridge.py \
             tests/test_shadow_orchestrator.py \
             tests/test_shadow_81_qualification.py \
+            tests/test_delivery_outbox.py \
+            tests/test_observation_event_v2.py \
+            tests/test_dwo_observation_delivery.py \
             > semantic-runtime-pytest.txt 2>&1
           status=$?
           cat semantic-runtime-pytest.txt
