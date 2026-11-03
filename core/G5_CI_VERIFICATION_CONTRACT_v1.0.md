@@ -56,15 +56,18 @@ The `g4-g5-evidence` workflow emits two bot receipt comments that G5 depends on:
 - `<!-- gwc:g4-merge-proof ... -->` — published by the `g4-merge-proof` job
   after the PR is merged, binding the merge event to the G4 receipt.
 
-**Ordering rule: post the human `APPROVE G4` comment while the PR is OPEN, before merging.**
+**Ordering rule: agent posts the human `APPROVE G4` command on the PR while it is OPEN and Ready for Review, BEFORE merging.**
 
 ```text
 1. PR opened & Ready for Review (not Draft)
-2. Human posts: APPROVE G4 <approval_id> <scope_hash_prefix> <expiry>
+2. Agent posts: APPROVE G4 <approval_id> <scope_hash_prefix> <expiry>
+   (commenter = human approver identity)
    --> workflow emits gwc:g4-authority-receipt bot comment
-3. PR merged into main
+3. Agent reads back the gwc:g4-authority-receipt bot comment
+4. Agent merges PR into main
    --> workflow emits gwc:g4-merge-proof bot comment
-4. G5 status workflow passes (authority receipt + merge proof both present)
+5. Agent reads back gwc:g4-merge-proof
+6. G5 status workflow passes (authority receipt + merge proof both present)
 ```
 
 **Wrong order (Case C — historical approval unverifiable):** merge the PR first,
