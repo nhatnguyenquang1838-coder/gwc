@@ -23,7 +23,7 @@ import math
 import sqlite3
 import time
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any, Callable, Sequence
 
 SCHEMA_VERSION = "1.0"
 ARTIFACT_TYPE = "delivery-outbox-record"
@@ -476,7 +476,10 @@ def record_attempt(
         raise OutboxStoreUnavailable(OUTBOX_STORE_UNAVAILABLE) from exc
 
 
-def verify_ack(path: Path, *, ack: dict[str, Any], worker_id: str) -> tuple[bool, str]:
+def verify_ack(
+    path: Path, *, ack: dict[str, Any], worker_id: str,
+    verifier: Callable[[dict[str, Any]], bool] | None = None,
+) -> tuple[bool, str]:
     """ACK_VERIFIED 5-way binding + freshness + replay resistance (SCRUM-533 L2.2).
 
     A bare 2xx or caller-supplied signature marker is never authentication.
@@ -534,7 +537,65 @@ def verify_ack(path: Path, *, ack: dict[str, Any], worker_id: str) -> tuple[bool
         row["canonical_state_digest"], row["delivery_generation"],
     ), worker_id=worker_id)["lease_holder"]:
         return False, OUTBOX_LEASE_LOST
-    return False, "ACK_VERIFIER_UNAVAILABLE"
+    if verifier is None:
+        return False, "ACK_VERIFIER_UNAVAILABLE"
+    try:
+        authenticated = verifier(dict(ack))
+    except Exception:
+        return False, "ACK_NOT_AUTHENTICATED"
+    if authenticated is not True:
+        return False, "ACK_NOT_AUTHENTICATED"
+    return True, "ACK_VERIFIED"
+
+
+def confirm_ack(
+    path: Path, *, ack: dict[str, Any], worker_id: str,
+    verifier: Callable[[dict[str, Any]], bool],
+) -> dict[str, Any]:
+    """Verify one receiver ACK and atomically move IN_FLIGHT -> ACK_CONFIRMED.
+
+    Generic transition(..., ACK_CONFIRMED) intentionally remains unavailable,
+    so no caller can bypass receiver authentication.
+    """
+    verified, code = verify_ack(path, ack=ack, worker_id=worker_id, verifier=verifier)
+    if not verified:
+        raise OutboxConflict(code)
+    try:
+        with _session(path) as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            row = conn.execute(
+                "SELECT * FROM delivery_outbox WHERE event_id=? "
+                "ORDER BY delivery_generation DESC LIMIT 1",
+                (ack.get("event_id"),),
+            ).fetchone()
+            if row is None:
+                raise OutboxConflict("DELIVERY_RECORD_NOT_FOUND")
+            key = (
+                row["projection_target"], row["event_source"], row["event_id"],
+                row["canonical_state_digest"], row["delivery_generation"],
+            )
+            leased = _verify_lease(path, key=key, worker_id=worker_id)
+            if leased["state"] != IN_FLIGHT:
+                raise OutboxConflict(OUTBOX_ILLEGAL_TRANSITION)
+            now = _now()
+            updated = conn.execute(
+                "UPDATE delivery_outbox SET state=?, reason_class=?, "
+                "lease_holder=NULL, lease_expires_at=NULL, updated_at=? "
+                "WHERE projection_target=? AND event_source IS ? AND event_id=? "
+                "AND canonical_state_digest=? AND delivery_generation=? "
+                "AND state=? AND lease_holder=? AND lease_expires_at=? AND lease_expires_at>?",
+                (
+                    ACK_CONFIRMED, "ACK_VERIFIED", now, *key, IN_FLIGHT,
+                    worker_id, leased["lease_expires_at"], now,
+                ),
+            )
+            if updated.rowcount != 1:
+                raise OutboxConflict(OUTBOX_LEASE_LOST)
+            expected = _readback_digest(conn, path)
+        _readback_after_write(path, expected)
+    except (sqlite3.Error, OutboxStoreUnavailable) as exc:
+        raise OutboxStoreUnavailable(OUTBOX_STORE_UNAVAILABLE) from exc
+    return {"state": ACK_CONFIRMED, "reason_class": "ACK_VERIFIED"}
 
 
 def discover_restart(path: Path) -> list[dict[str, Any]]:
