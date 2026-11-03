@@ -27,8 +27,8 @@ Q0_INTEGRATION_GATE = "UR.G4"
 LOGIN_TARGET = "LOGIN_R00_PLUS"
 SHA40 = re.compile(r"^[0-9a-f]{40}$")
 SHA256 = re.compile(r"^sha256:[0-9a-f]{64}$")
-SUPPORTED_Q0_CERTIFICATION_SCHEMA_VERSIONS = ("1.0", "1.1")
-CURRENT_Q0_CERTIFICATION_SCHEMA_VERSION = "1.1"
+SUPPORTED_Q0_CERTIFICATION_SCHEMA_VERSIONS = ("1.0", "1.1", "1.2")
+CURRENT_Q0_CERTIFICATION_SCHEMA_VERSION = "1.2"
 
 MANDATORY_QUALIFICATION_ENTRIES = (
     "fresh_boot", "default_route", "runtime_plan", "node_allocation",
@@ -722,13 +722,17 @@ def _validate_replay_provenance(replay_provenance: Any) -> dict[str, Any]:
     required_text = ("subject", "scenario_id", "observed_prestate_ref", "observed_error_ref", "defect_class")
     _require(all(isinstance(provenance.get(key), str) and bool(provenance[key].strip()) for key in required_text), "REPLAY_PROVENANCE_REQUIRED")
     subject = provenance["subject"]
-    _require(subject in {"ORIGINAL_DWO", "APPROVED_DISTINCT_CONTROLLED"}, "REPLAY_PROVENANCE_SUBJECT_INVALID")
-    _require(provenance["defect_class"] in {"GENUINE_GWC_RUNTIME_DEFECT", "INJECTED_FAULT_RESILIENCE"}, "REPLAY_PROVENANCE_DEFECT_CLASS_INVALID")
+    _require(subject in {"ORIGINAL_DWO", "APPROVED_DISTINCT_CONTROLLED", "SAFE_FORWARD_NO_INCIDENT"}, "REPLAY_PROVENANCE_SUBJECT_INVALID")
+    _require(provenance["defect_class"] in {"GENUINE_GWC_RUNTIME_DEFECT", "INJECTED_FAULT_RESILIENCE", "NO_ACTIVE_RUNTIME_DEFECT"}, "REPLAY_PROVENANCE_DEFECT_CLASS_INVALID")
     original_replayed = provenance.get("original_incident_replayed")
     _require(type(original_replayed) is bool, "REPLAY_PROVENANCE_ORIGINAL_FLAG_REQUIRED")
     if subject == "APPROVED_DISTINCT_CONTROLLED":
         _require(isinstance(provenance.get("authorization_ref"), str) and bool(provenance["authorization_ref"].strip()), "REPLAY_PROVENANCE_AUTHORIZATION_REQUIRED")
         _require(original_replayed is False, "REPLAY_PROVENANCE_SUBJECT_MISMATCH")
+    elif subject == "SAFE_FORWARD_NO_INCIDENT":
+        _require(provenance["defect_class"] == "NO_ACTIVE_RUNTIME_DEFECT", "REPLAY_PROVENANCE_DEFECT_CLASS_MISMATCH")
+        _require(original_replayed is False, "REPLAY_PROVENANCE_SUBJECT_MISMATCH")
+        _require(not provenance.get("authorization_ref"), "REPLAY_PROVENANCE_AUTHORIZATION_FORBIDDEN")
     else:
         _require(original_replayed is True, "REPLAY_PROVENANCE_SUBJECT_MISMATCH")
     provenance_digest = provenance.get("provenance_digest")
@@ -867,18 +871,28 @@ def certify_q0_runtime(
     _require(loaded_runtime_identity == candidate_sha, "RUNTIME_IDENTITY_DRIFT")
     _require(bool(load_proof_ref), "LOAD_PROOF_REQUIRED")
     _validate_matrix_digest(qualification_matrix)
-    _require(bool(incident_replay_refs), "ORIGINAL_INCIDENT_REPLAY_REQUIRED")
     validated_replay_provenance = _validate_replay_provenance(replay_provenance)
-    _require(replay_result == "PASS" and replay_exact_readback is True, "ORIGINAL_INCIDENT_REPLAY_FAILED")
     matrix_results = qualification_matrix.get("results")
     _require(isinstance(matrix_results, Mapping), "QUALIFICATION_MATRIX_INCOMPLETE")
     self_fix_result = matrix_results.get("self_fix_replay")
-    if validated_replay_provenance["defect_class"] == "INJECTED_FAULT_RESILIENCE":
+    defect_class = validated_replay_provenance["defect_class"]
+    if defect_class == "NO_ACTIVE_RUNTIME_DEFECT":
+        _require(not incident_replay_refs, "SAFE_FORWARD_INCIDENT_REFS_FORBIDDEN")
+        _require(replay_result == "NOT_APPLICABLE" and replay_exact_readback is False,
+                 "SAFE_FORWARD_REPLAY_MUST_BE_NOT_APPLICABLE")
+        _require(not previous_failure_state and not first_state_beyond_failure,
+                 "SAFE_FORWARD_FAILURE_STATE_FORBIDDEN")
+        _require(bool(forward_progress_refs), "FORWARD_PROGRESS_REQUIRED")
+    elif defect_class == "INJECTED_FAULT_RESILIENCE":
         _require(self_fix_result != "PASS", "SELF_FIX_REPLAY_REQUIRES_GENUINE_DEFECT")
         _require(False, "INJECTED_FAULT_CANNOT_SATISFY_SELF_FIX_REPLAY")
+    else:
+        _require(bool(incident_replay_refs), "ORIGINAL_INCIDENT_REPLAY_REQUIRED")
+        _require(replay_result == "PASS" and replay_exact_readback is True, "ORIGINAL_INCIDENT_REPLAY_FAILED")
+        _require(bool(previous_failure_state) and bool(first_state_beyond_failure)
+                 and first_state_beyond_failure != previous_failure_state, "FORWARD_PROGRESS_REQUIRED")
+        _require(bool(forward_progress_refs), "FORWARD_PROGRESS_REQUIRED")
     _validate_matrix(qualification_matrix)
-    _require(bool(previous_failure_state) and bool(first_state_beyond_failure) and first_state_beyond_failure != previous_failure_state, "FORWARD_PROGRESS_REQUIRED")
-    _require(bool(forward_progress_refs), "FORWARD_PROGRESS_REQUIRED")
     _require(bool(broader_regression_refs) and broader_regression_result == "PASS", "BROADER_REGRESSION_REQUIRED")
     _require(not list(stale_dependent_state or []), "STALE_DEPENDENT_STATE_REMAINS")
     _require(isinstance(created_by, Mapping) and bool(created_by.get("id")), "Q0_CREATOR_REQUIRED")
@@ -944,8 +958,8 @@ def verify_q0_certification(receipt: Mapping[str, Any]) -> bool:
         version = receipt.get("schema_version")
         if version not in SUPPORTED_Q0_CERTIFICATION_SCHEMA_VERSIONS:
             return False
-        if version == "1.1":
-            _validate_replay_provenance(receipt.get("replay_provenance"))
+        if version in {"1.1", "1.2"}:
+            validated_replay_provenance = _validate_replay_provenance(receipt.get("replay_provenance"))
         elif "replay_provenance" in receipt:
             return False
         valid = (
@@ -959,6 +973,26 @@ def verify_q0_certification(receipt: Mapping[str, Any]) -> bool:
         )
         if not valid or version == "1.0":
             return valid
+        if version == "1.2":
+            defect_class = validated_replay_provenance["defect_class"]
+            if defect_class == "NO_ACTIVE_RUNTIME_DEFECT":
+                if (list(receipt.get("incident_replay_refs") or [])
+                        or receipt.get("replay_result") != "NOT_APPLICABLE"
+                        or receipt.get("replay_exact_readback") is not False
+                        or bool(receipt.get("previous_failure_state"))
+                        or bool(receipt.get("first_state_beyond_failure"))
+                        or not list(receipt.get("forward_progress_refs") or [])):
+                    return False
+            elif defect_class == "INJECTED_FAULT_RESILIENCE":
+                return False
+            elif (not list(receipt.get("incident_replay_refs") or [])
+                  or receipt.get("replay_result") != "PASS"
+                  or receipt.get("replay_exact_readback") is not True
+                  or not bool(receipt.get("previous_failure_state"))
+                  or not bool(receipt.get("first_state_beyond_failure"))
+                  or receipt.get("first_state_beyond_failure") == receipt.get("previous_failure_state")
+                  or not list(receipt.get("forward_progress_refs") or [])):
+                return False
         load_proof = receipt.get("load_proof_evidence")
         if not isinstance(load_proof, Mapping):
             return False

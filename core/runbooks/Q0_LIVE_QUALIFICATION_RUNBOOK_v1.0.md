@@ -34,8 +34,10 @@ If a probe finds `GWC_RUNTIME_DEFECT`, freeze the product/consumer child and ent
 
 ## Runtime defect self-fix loop
 
+This loop is conditional. Enter it only when the current qualification run observes a genuine GWC runtime defect. Absence of an incident is a valid safe-forward condition and MUST NOT trigger fault hunting, synthetic incident creation, or a qualification HOLD.
+
 ```text
-REPRODUCE_ORIGINAL_FAILURE
+FREEZE_OBSERVED_CURRENT_FAILURE
 → RED_REGRESSION
 → CREATE_ISOLATED_DEFECT_BRANCH_FROM_Q0_BASELINE
 → MINIMAL_BOUNDED_FIX
@@ -127,15 +129,17 @@ Potentially stale surfaces include:
 
 If the changed source is a material dependency of an immutable RuntimePlan, create a new plan revision; never silently mutate the prior plan.
 
-## Original-incident replay
+## Conditional defect replay and safe-forward qualification
 
-Replay is not equivalent to rerunning a unit test.
+Replay is not equivalent to rerunning a unit test and is required only when the current qualification run has observed a genuine runtime defect that must be remediated.
 
-It MUST preserve the semantic preconditions and original failure boundary while using the newly loaded runtime identity. Acceptance requires:
+When a genuine defect exists, replay MUST preserve its semantic preconditions and observed failure boundary while using the newly loaded runtime identity. Acceptance of that remediation requires:
 
-1. the old failure no longer occurs;
+1. the observed failure no longer occurs;
 2. exact readback matches the contract;
 3. execution reaches at least one legal state beyond the previous failure point.
+
+When no genuine runtime defect is observed, qualification MUST continue on the safe-forward path. It MUST NOT search for, manufacture, or inject an incident merely to satisfy certification evidence. Safe-forward certification records explicit `SAFE_FORWARD_NO_INCIDENT / NO_ACTIVE_RUNTIME_DEFECT` provenance, no incident replay refs, no fabricated failure state, and positive forward-progress evidence from the normal qualification matrix.
 
 ### Sealed replay provenance and subject distinction
 
@@ -152,16 +156,22 @@ other.
 `ORIGINAL_DWO` requires `original_incident_replayed: true`. A deliberately
 controlled distinct scenario requires `authorization_ref` and
 `original_incident_replayed: false`; it cannot be presented as the original
-DWO incident. `incident_replay_refs` remains required and an empty list still
-fails with `ORIGINAL_INCIDENT_REPLAY_REQUIRED`.
+DWO incident. `incident_replay_refs` is required only for a genuine observed
+defect replay.
 
-The mandatory matrix entry `self_fix_replay` may be `PASS` only for
-`GENUINE_GWC_RUNTIME_DEFECT`. A scenario classified
-`INJECTED_FAULT_RESILIENCE` cannot satisfy that matrix entry: claiming `PASS`
-fails with `SELF_FIX_REPLAY_REQUIRES_GENUINE_DEFECT`, and a non-`PASS` result
-fails closed with `INJECTED_FAULT_CANNOT_SATISFY_SELF_FIX_REPLAY` because the
-complete mandatory matrix requires every entry to pass. Controlled injected
-fault tests therefore cannot certify as Q0 self-fix proof.
+`SAFE_FORWARD_NO_INCIDENT` requires `defect_class:
+NO_ACTIVE_RUNTIME_DEFECT`, `original_incident_replayed: false`, empty
+`incident_replay_refs`, `replay_result: NOT_APPLICABLE`, and no fabricated
+previous/next failure states. It still requires exact load identity, complete
+qualification matrix evidence, positive normal forward-progress refs, broader
+regression, and exact target validation.
+
+The mandatory matrix entry `self_fix_replay` verifies that the self-remediation
+route remains functional. If a genuine runtime defect is observed, PASS requires
+real load/replay evidence for that defect. If no qualifying defect occurs, PASS
+may be supported by deterministic contract/regression evidence without claiming
+an incident occurred. `INJECTED_FAULT_RESILIENCE` remains non-certifying as
+genuine self-fix evidence and MUST NOT be used merely to manufacture a RED path.
 
 The verifier supports sealed schema versions `1.0` and `1.1`. Historical `1.0`
 receipts remain verifiable without provenance; a `1.1` receipt must include
@@ -197,7 +207,7 @@ Q0 MUST cover, when applicable:
 - failed exact readback prevents cursor advancement;
 - continuation uses legal typed NEXT and does not deadlock on compatibility-only WAIT vocabulary;
 - restart recovery resumes from durable current state rather than stale conversation state;
-- self-fix proves load + original-incident replay;
+- self-remediation capability is verified; genuine defect load/replay is required only when a qualifying defect is actually observed;
 - stale source/plan/evidence fails closed;
 - replay/idempotency is deterministic;
 - at least one real defect path is exercised end-to-end when a qualifying defect exists.
@@ -257,10 +267,14 @@ Q0 certification is distinct from lifecycle progression and effect authority.
 A `Q0CertificationReceipt` may certify only a complete mandatory qualification
 matrix with no unresolved defects, exact candidate/loaded-source SHA equality,
 load proof bound to activation + runtime session/process + loaded profile digest
-and per-module/instruction SHA-256 identities, passing original-incident replay
-with exact readback and forward progress, passing broader regression, and a
-complete recursive plan/work DAG. Success is `CAMPAIGN_READY_RUNTIME / L3`
-bound to `certified_q0_sha`.
+and per-module/instruction SHA-256 identities, positive forward progress,
+passing broader regression, and a complete recursive plan/work DAG. When a
+genuine runtime defect was observed, its remediation additionally requires
+passing replay with exact readback beyond the observed failure. When no genuine
+defect was observed, explicit safe-forward no-incident provenance replaces that
+conditional replay evidence; absence of an incident is not a certification
+blocker. Success is `CAMPAIGN_READY_RUNTIME / L3` bound to
+`certified_q0_sha`.
 
 Formal Q0 acceptance occurs at `UR.G6`, not `UR.G4`. A native
 `Q0AcceptanceRequest` / `Q0AcceptanceDecisionReceipt` binds the exact certified

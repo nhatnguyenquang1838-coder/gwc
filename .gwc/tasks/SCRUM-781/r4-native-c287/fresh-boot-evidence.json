@@ -1,0 +1,26 @@
+{
+  "artifacts": {
+    "controller-assignment.json": "sha256:4eafbcbb99128d956f93e1b9d47e0491b9e4428a70846db84313fe8e52010075",
+    "controller-run-state.json": "sha256:2768792e9e299c4e22297378d9c9363089480ba872a313b63ab0ca5c5279f17a",
+    "logical-run-state.json": "sha256:a6e79e9c0cbd0a45afd8188879e2874d5da39f449b1a39a7de397a5d0dbcf425",
+    "node-allocation.json": "sha256:06b5d22ca37da35dee0d35606395d3611d4a46b8c159cfb8967d74331acfa092",
+    "run-manifest.json": "sha256:17225f1050c5934576e93f5e2e942760c0f46662e461f84cd48517220c4bd709",
+    "runtime-plan.json": "sha256:f94baa4a533b3e7ab027b0c40ba3f91fa86725403a9bdf144c257072dcb4277d"
+  },
+  "controller_actor": "CONTROLLER",
+  "effect_authority": "NONE",
+  "executor_wakeup_allowed": false,
+  "native_action": "q0_understand",
+  "receipt_digest": "sha256:d6f7bd2430f7b95b697d2d45faa19c93923320543d7da5324b81e3d5925255fb",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "schema_id": "dw.scrum781.fresh-ur-g0-boot-evidence/v1",
+  "source_branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+  "source_repository": "nhatnguyenquang1838-coder/gwc",
+  "source_sha": "ab11541dfc1ec9569d0b97961b19a0a855f26245",
+  "stage": "UR.G0",
+  "status": "UR_G0_NATIVE_ASSIGNMENT_VERIFIED",
+  "taskcontroller_boot_issue": 595,
+  "taskcontroller_mailbox_event_created": false,
+  "timestamp": "2026-11-02T19:16:27Z",
+  "understanding_receipt_issued": false
+}

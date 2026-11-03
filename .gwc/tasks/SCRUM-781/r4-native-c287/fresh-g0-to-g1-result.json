@@ -1,0 +1,21 @@
+{
+  "actor": "CONTROLLER",
+  "artifacts": {
+    "g0-to-g1-transition.json": "sha256:20ab7b05ef7dcb08a5d2bc38898c081ba36a33266113dacd07fd63f26a7e20c8",
+    "g0-understanding-receipt.json": "sha256:a61724193b97620c343f656924bdb09d55101cfa0e72495b6b393993935b4e89",
+    "g1-controller-assignment.json": "sha256:8d32805da056c205558e371c1f74daabf0409b19a1d760715f4f65ca7f2e3460",
+    "g1-controller-run-state.json": "sha256:dc95c555497b7d1e5e7274271dda14975b1e869c07f5158c7dd1d7400474ba18"
+  },
+  "authority_granted": false,
+  "current_action": "q0_plan_decompose",
+  "current_gate": "UR.G1",
+  "executor_admission_required_for_transition": false,
+  "previous_gate": "UR.G0",
+  "receipt_digest": "sha256:ac6050f010d12288b2bf0e11ce5ec669473515a3f14125d4dc88810a9839e607",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "schema_id": "dw.scrum781.fresh-g0-to-g1-result/v1",
+  "source_sha": "ab11541dfc1ec9569d0b97961b19a0a855f26245",
+  "status": "G0_PASSED_G1_CONTROLLER_ASSIGNED",
+  "taskcontroller_mailbox_dispatched": false,
+  "understanding_receipt_digest": "sha256:e22a3c16ab57e4ee0b64659f9c1c00d45526393a6af2c8f336a0d966226eb8ca"
+}

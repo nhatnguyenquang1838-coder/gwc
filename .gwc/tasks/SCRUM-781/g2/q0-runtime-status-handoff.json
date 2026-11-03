@@ -1,0 +1,47 @@
+{
+  "schema_id": "dw.gwc.q0.runtime-status-handoff.v1",
+  "schema_version": 1,
+  "artifact_type": "q0-runtime-status-handoff",
+  "handoff_id": "gw0-q0-status-20261103-update",
+  "created_at": "2026-11-02T18:53:45.044040Z",
+  "created_by": "DWA",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+  "head_sha": "9885d6a4",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "main_head_sha": "031f6ebc",
+  "status_summary": "Q0 / SCRUM-781 Child C remediation hoàn tất, PR #619 MERGED, G3 PASS, G4 merge authority APPROVED. MoA Child D review unanimous BLOCK (no Native Pilot authority). G5 status verify FAIL (G4 receipts missing on PR comments) -> G5/G6 deployment HOLD (separate authority required, not automatic).",
+  "sections": {
+    "child_a_post_merge_requalification": {
+        "status": "RESOLVED_VERIFIED",
+        "note": "Windows native reader fix (commits cb3c5532..e1df32d2 + ImportError fallback 84574899) MERGED and verified locally: native reader 16+4 tests pass, replay_fixture + source_reconcile 201 passed (was 135 failed). NO product defects. Earlier 'ACCEPTED 134 env failures' was stale/pre-fix; the failures are now FIXED, not accepted."
+    },
+    "child_b_authority_provenance": {
+      "status": "PARTIAL",
+      "note": "G4 merge approval v2 APPROVED for PR #619. G4 grant cũ g4_q0_g4_native_activation_20261102 UNVERIFIED (chronologically impossible) - preserved, not repaired, not used. PR #615 evidence had no trusted GitHub approval event."
+    },
+    "child_c_r3_native_capability": {
+      "status": "READY_FOR_G3_REVIEW_AND_REVIEWED",
+      "g3_review": "PASS",
+      "note": "Source-binding drift correction + Windows native reader + replay provenance contract fixes. 479 passed/0 failed core. G3.2 review PASS after 1 change-required round. Native G1 receipt build/validate passed (genuine live-source); sandbox genesis not materialized (missing predecessor checkpoint on this host). Successor plan remains PROPOSED_NOT_ACTIVATED."
+    },
+    "child_d_moa_review": {
+      "status": "BLOCKED_HOLD",
+      "verdict": "UNANIMOUS_BLOCK",
+      "note": "3 independent reviewers: R1 (no pilot authority), R2 (13/13 matrix not PASS, qualification_results empty), R3 (UR.G6 receipts open, original DWO NOT_REPRODUCED). Do not start Native Pilot. Precisely missing: separate pilot scope/authority, native G1 admission bound to successor, 3 UR.G6 receipts, Controller reconcile of seq7 state."
+    },
+    "g5_g6_deployment_release": {
+      "status": "HOLD",
+      "note": "G5 read-only status verify FAILED on main 031f6ebc: 'G5 requires trusted G4 authority and GitHub merge-proof receipts' - PR #619 lacks gwc:g4-authority-receipt and gwc:g4-merge-proof comments because G4 was approved via chat+file, not GitHub comment mechanism. Manual deploy/release requires separate APPROVE G5/APPROVE G6. Not automatic per user constraint."
+    }
+  },
+  "open_items": [
+    "G5 evidence chain gap: PR #619 no gwc:g4-authority-receipt / gwc:g4-merge-proof comments; needs GitHub-comment G4 approval or G5 HOLD declaration",
+    "G4 grant cũ UNVERIFIED (chronologically impossible) - preserved, not used",
+    "UR.G6 evidence_gap: Q0_ACCEPTANCE_RECEIPT, CLOSURE_RECEIPT, HANDOFF_RECEIPT open",
+    "Child D HOLD: no Native Pilot scope/authority, 13/13 matrix not PASS, original DWO NOT_REPRODUCED",
+    "Successor plan PROPOSED_NOT_ACTIVATED: native G1 admission + separate effect authority required",
+    "progress-summary.json (UR.G3/seq4) stale vs checkpoint seq7 (UR.G6) - Controller reconcile"
+  ],
+  "next_legal_action": "Controller disposition: (1) reconcile seq7 state + approve 13-entry matrix evidence; (2) xác nhận Child C capacity; (3) cấp separate Native Pilot scope/authority nếu muốn Child D; (4) G5/G6 HOLD until separate deploy/release authority. DWA không tự kickoff pilot/deploy."
+}

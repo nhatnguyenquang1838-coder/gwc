@@ -1,0 +1,47 @@
+{
+  "activation_id": "sf-load:r4:activation-final",
+  "candidate_sha": "d2e659cebabfa49700745a4fd8168c773f1a5b25",
+  "committed_module_sha256": "957abddaba437b01d4b9df997bceebe0db0a6a00867215358e6e10b0f4fe6f1c",
+  "files": [
+    {
+      "committed_module_sha256": "957abddaba437b01d4b9df997bceebe0db0a6a00867215358e6e10b0f4fe6f1c",
+      "disk_sha256": "957abddaba437b01d4b9df997bceebe0db0a6a00867215358e6e10b0f4fe6f1c",
+      "head_sha256": "957abddaba437b01d4b9df997bceebe0db0a6a00867215358e6e10b0f4fe6f1c",
+      "match": true,
+      "path": "tools/node_architect/q0_qualification.py"
+    },
+    {
+      "committed_module_sha256": "e0a768ea48716f207a935536f78ead6b4af8ae279c10901ddcdb2462d0def758",
+      "disk_sha256": "e0a768ea48716f207a935536f78ead6b4af8ae279c10901ddcdb2462d0def758",
+      "head_sha256": "e0a768ea48716f207a935536f78ead6b4af8ae279c10901ddcdb2462d0def758",
+      "match": true,
+      "path": "tools/node_architect/q0_python_env.py"
+    },
+    {
+      "committed_module_sha256": "5adde437967ee88bb2939c8b206867db396a6b4e2825ad8f25b01eae312ae1b6",
+      "disk_sha256": "5adde437967ee88bb2939c8b206867db396a6b4e2825ad8f25b01eae312ae1b6",
+      "head_sha256": "5adde437967ee88bb2939c8b206867db396a6b4e2825ad8f25b01eae312ae1b6",
+      "match": true,
+      "path": "tools/node_architect/q0_work_evidence.py"
+    }
+  ],
+  "head_sha": "d2e659cebabfa49700745a4fd8168c773f1a5b25",
+  "load_proof_ref": "evidence:native-load/sf-r4-final-20261103",
+  "loaded_at_ns": 1793648242069491000,
+  "loaded_module_identities": {
+    "tools/node_architect/q0_python_env.py": "sha256:e0a768ea48716f207a935536f78ead6b4af8ae279c10901ddcdb2462d0def758",
+    "tools/node_architect/q0_qualification.py": "sha256:957abddaba437b01d4b9df997bceebe0db0a6a00867215358e6e10b0f4fe6f1c",
+    "tools/node_architect/q0_work_evidence.py": "sha256:5adde437967ee88bb2939c8b206867db396a6b4e2825ad8f25b01eae312ae1b6"
+  },
+  "loaded_profile_digest": "sha256:2a37d580c26305b74f742f45d25f4caeafae35da043a3b1307b2aedeac34932c",
+  "loaded_source_sha": "d2e659cebabfa49700745a4fd8168c773f1a5b25",
+  "module_identities": {
+    "tools/node_architect/q0_python_env.py": "sha256:e0a768ea48716f207a935536f78ead6b4af8ae279c10901ddcdb2462d0def758",
+    "tools/node_architect/q0_qualification.py": "sha256:957abddaba437b01d4b9df997bceebe0db0a6a00867215358e6e10b0f4fe6f1c",
+    "tools/node_architect/q0_work_evidence.py": "sha256:5adde437967ee88bb2939c8b206867db396a6b4e2825ad8f25b01eae312ae1b6"
+  },
+  "proof_type": "NATIVE_LOAD_PROOF",
+  "runtime_process_id": "3760",
+  "runtime_session_id": "local-b4b8b1d8cddeb20e46765a478156c2a1904962d6b32239f16f2140dbdbbc6de2",
+  "source_root": "D:\\Projects\\DW-SuperApps.worktrees\\gwc\\SCRUM-781-q0-fresh-20261010-r1"
+}
