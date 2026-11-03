@@ -26,6 +26,7 @@ def publish_run_state(
     machine_secret: str,
     key_id: str,
     worker_id: str,
+    source_id: str = "gwc-main",
     delivery_generation: int = 1,
     destination_policy: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
@@ -69,6 +70,7 @@ def publish_run_state(
             secret=machine_secret,
             key_id=key_id,
             delivery_generation=delivery_generation,
+            source_id=source_id,
         )
         delivery_outbox.record_attempt(
             outbox_path,
