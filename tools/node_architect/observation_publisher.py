@@ -357,6 +357,33 @@ def _disabled_or_incomplete() -> tuple[dict[str, str] | None, dict[str, Any] | N
     return values, None
 
 
+def drain_observation_outbox_from_env(*, max_items: int = DEFAULT_DRAIN_LIMIT) -> dict[str, Any]:
+    """Drain durable observation rows after process restart or on a sidecar tick."""
+    values, early = _disabled_or_incomplete()
+    if early is not None:
+        return early
+    assert values is not None
+    try:
+        result = drain_observation_outbox(
+            outbox_path=Path(values["outbox_path"]),
+            endpoint=values["endpoint"],
+            machine_secret=values["machine_secret"],
+            key_id=values["key_id"],
+            source_id=values["source_id"],
+            worker_id=os.getenv("GWC_DWO_WORKER_ID", f"dwo-observation-worker:{os.getpid()}"),
+            max_items=max_items,
+        )
+    except Exception as exc:
+        return {
+            "status": "DEGRADED",
+            "reason_code": "DWO_OBSERVATION_DRAIN_FAILED",
+            "error_class": type(exc).__name__,
+            "authority_granted": False,
+            "executed_effects": [],
+        }
+    return {**result, "authority_granted": False, "executed_effects": []}
+
+
 def observe_run_state_from_env(
     *,
     run_state: Mapping[str, Any],
