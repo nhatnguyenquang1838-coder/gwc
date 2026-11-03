@@ -110,3 +110,34 @@ def test_projection_failure_never_owns_universal_cursor(monkeypatch, tmp_path):
     assert result["reason_code"] == "DWO_OBSERVATION_PROJECTION_FAILED"
     assert result["authority_granted"] is False
     assert result["executed_effects"] == []
+
+
+
+def test_restart_drainer_uses_runtime_config_without_authority(monkeypatch, tmp_path):
+    from tools.node_architect import observation_publisher
+
+    values = {
+        "GWC_DWO_OBSERVATION_ENDPOINT": "https://dwo.example/ingest",
+        "GWC_DWO_MACHINE_SECRET": "x" * 32,
+        "GWC_DWO_KEY_ID": "dev-key",
+        "GWC_DWO_SOURCE_ID": "gwc-main",
+        "GWC_DWO_OUTBOX_PATH": str(tmp_path / "outbox.sqlite"),
+        "GWC_DWO_WORKER_ID": "unit-worker",
+    }
+    for key, value in values.items():
+        monkeypatch.setenv(key, value)
+
+    seen = {}
+    monkeypatch.setattr(
+        observation_publisher,
+        "drain_observation_outbox",
+        lambda **kwargs: seen.update(kwargs) or {"status": "DRAINED", "attempted": 1, "results": []},
+    )
+    result = observation_publisher.drain_observation_outbox_from_env(max_items=7)
+
+    assert seen["worker_id"] == "unit-worker"
+    assert seen["max_items"] == 7
+    assert seen["source_id"] == "gwc-main"
+    assert result["status"] == "DRAINED"
+    assert result["authority_granted"] is False
+    assert result["executed_effects"] == []
