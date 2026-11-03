@@ -47,6 +47,43 @@ Authority rules:
 - Jira and Slack are `projection_only`; they never replace the GitHub authority, merge event, or Actions artifact.
 - Evidence is never committed back to the merged branch and never delivered through a recursive evidence PR.
 
+## G4 → G5 evidence ordering (critical)
+
+The `g4-g5-evidence` workflow emits two bot receipt comments that G5 depends on:
+
+- `<!-- gwc:g4-authority-receipt ... -->` — published by the `g4-authority` job
+  when an `APPROVE G4 ...` comment is posted on an **open** PR Ready for Review.
+- `<!-- gwc:g4-merge-proof ... -->` — published by the `g4-merge-proof` job
+  after the PR is merged, binding the merge event to the G4 receipt.
+
+**Ordering rule: agent posts the human `APPROVE G4` command on the PR while it is OPEN and Ready for Review, BEFORE merging.**
+
+```text
+1. PR opened & Ready for Review (not Draft)
+2. Agent posts: APPROVE G4 <approval_id> <scope_hash_prefix> <expiry>
+   (commenter = human approver identity)
+   --> workflow emits gwc:g4-authority-receipt bot comment
+3. Agent reads back the gwc:g4-authority-receipt bot comment
+4. Agent merges PR into main
+   --> workflow emits gwc:g4-merge-proof bot comment
+5. Agent reads back gwc:g4-merge-proof
+6. G5 status workflow passes (authority receipt + merge proof both present)
+```
+
+**Wrong order (Case C — historical approval unverifiable):** merge the PR first,
+then post the APPROVE comment. The `g4-authority` job checks `pr.state === 'open'`
+and emits nothing on a closed/merged PR. No `gwc:g4-authority-receipt` or
+`gwc:g4-merge-proof` comments exist → G5 status FAILURE even though local grant
+evidence is APPROVED/consumed. This occurred on PR #615, #619, and #620.
+
+If Case C has already occurred:
+- The local grant file (APPROVED/consumed) and human APPROVE comment remain
+  valid evidence but do **not** satisfy the GitHub workflow evidence chain.
+- G5 deployment/release cannot proceed through the normal workflow until a new
+  G4 authority receipt + merge proof are emitted on a fresh PR.
+- Do not fabricate receipts or backdate comments. Obtain separate deploy/release
+  authority for the current state.
+
 The executable workflow is `.github/workflows/g4-g5-evidence.yml`.
 It validates G4 comment authority, records merge proof, observes the required
 post-merge workflows for the exact merge SHA, uploads the canonical G5 artifact,
