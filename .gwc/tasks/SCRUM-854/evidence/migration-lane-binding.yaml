@@ -1,0 +1,12 @@
+task_id: SCRUM-854
+lane_id: gwc-v2/universal-development
+lane_epoch: scrum-854-ud-e1-20261103
+branch_role: UNIVERSAL_DEVELOPMENT
+repository: nhatnguyenquang1838-coder/gwc
+resolved_ref: refs/heads/migration/gwc-v2-universal-development
+origin_main_sha: 93cbe8fecaca432d7565c5acb9f462e8a4b90070
+incorporated_main_sha: 93cbe8fecaca432d7565c5acb9f462e8a4b90070
+authority_plane_ref: main
+authority_plane_sha: 203ec9d0afd65be83f6dc2c8307acdfeeff43472
+bootstrap_parent_sha: 93cbe8fecaca432d7565c5acb9f462e8a4b90070
+binding_digest: sha256:7bb50eff2fef257cd0ca619c0e92a6c2317d9c3a9b7ea07de02cb9b4c74fc6e2
