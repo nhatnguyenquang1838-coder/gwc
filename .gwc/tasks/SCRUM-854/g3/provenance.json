@@ -1,0 +1,15 @@
+{
+  "implementation_head_sha": "2e6d8a39d9314419cdeb0c6bfc866ec2d69aa996",
+  "implementation_scope_hash": "sha256:d36f3bac5504e02d95ea91ad0124afec9a1d71d7670bd2a789c8e335442b3134",
+  "g2_approval_id": "g2_scrum-854_557afc46088ab0f0",
+  "g2_validation": "VALID; FIRST_SEEN",
+  "g2_activation": "ACTIVE",
+  "g2_canonical_validator": "PASS; issues=[]",
+  "g3_authority_source": "Current explicit user instruction",
+  "verbatim_user_instruction": "dừng sai, tiếp tục G3 Draft PR và Independant Review, dừng ở G4 HITL Approval request",
+  "preserved_g2_packet": true,
+  "g3_evidence_only_prefix": ".gwc/tasks/SCRUM-854/g3/",
+  "reviewer_profile": "gwc",
+  "g4_authority_granted": false,
+  "merge_performed": false
+}

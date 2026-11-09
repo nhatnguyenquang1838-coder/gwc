@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -32,6 +33,11 @@ from tools.node_architect.gate_state_resolution import (
 from tools.node_architect.risk_classification import render_risk_classification
 
 _DIGEST = re.compile(r"^sha256:[0-9a-f]{64}$")
+# UTC with lossless datetime precision; reject non-RFC3339 ISO shortcuts.
+_UTC_OBSERVATION = re.compile(
+    r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}"
+    r"(?:\.[0-9]{1,6})?(?:Z|\+00:00)"
+)
 _EARLY = ("G0_CONTEXT", "G1_ALIGNMENT")
 _ALLOWED_MISSING = ("G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA")
 _RISK_PRODUCER_KEYS = frozenset(
@@ -51,6 +57,45 @@ class G2PreparationBlocked(ValueError):
 def _require(condition: bool, code: str) -> None:
     if not condition:
         raise G2PreparationBlocked(code)
+
+
+def _head_binding_valid(
+    *, scope: Mapping[str, Any], readback: object, task_id: str,
+    repository: str, current_base_sha: str, issued_at: str,
+) -> bool:
+    """Accept an initial head or an explicit, fresh continuation observation.
+
+    The caller supplies this observation from its trusted read-only transport.
+    Shape/freshness checks do not authenticate that transport or grant authority;
+    the exact head is still scope/request-bound and must be re-read at activation.
+    """
+    head = scope.get("head_sha")
+    if readback is None:
+        return head == current_base_sha  # Preserve the initial-bootstrap contract.
+    fields = {"task_id", "repository", "branch", "authority_base_sha", "head_sha", "observed_at"}
+    if not isinstance(readback, dict) or set(readback) != fields:
+        return False
+    if (
+        not isinstance(head, str) or re.fullmatch(r"[0-9a-f]{40}", head) is None
+        or readback["task_id"] != task_id
+        or readback["repository"] != repository
+        or readback["branch"] != scope.get("working_branch")
+        or readback["authority_base_sha"] != current_base_sha
+        or readback["head_sha"] != head
+    ):
+        return False
+    if any(not isinstance(value, str) or _UTC_OBSERVATION.fullmatch(value) is None
+           for value in (readback["observed_at"], issued_at)):
+        return False
+    try:
+        observed = datetime.fromisoformat(readback["observed_at"].replace("Z", "+00:00"))
+        issued = datetime.fromisoformat(issued_at.replace("Z", "+00:00"))
+        if observed.utcoffset() != timedelta(0) or issued.utcoffset() != timedelta(0):
+            return False
+        age = issued - observed
+    except (AttributeError, TypeError, ValueError, OverflowError):
+        return False
+    return timedelta(0) <= age <= timedelta(minutes=5)
 
 
 def prepare_g2_approval(
@@ -73,6 +118,7 @@ def prepare_g2_approval(
     bounded_read_paths: list[str] | None = None,
     gate_policy: dict[str, Any] | None = None,
     prior_resolution: dict[str, Any] | None = None,
+    working_branch_readback: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build a human approval request + NON-EXECUTABLE pending envelope.
 
@@ -101,7 +147,11 @@ def prepare_g2_approval(
         and scope_identity.get("base_sha") == current_base_sha
         and scope_identity.get("risk_class") == risk_profile.get("risk_level")
         and bool(scope_identity.get("working_branch"))
-        and scope_identity.get("head_sha") == current_base_sha
+        and _head_binding_valid(
+            scope=scope_identity, readback=working_branch_readback,
+            task_id=task_id, repository=repository,
+            current_base_sha=current_base_sha, issued_at=issued_at,
+        )
         and _DIGEST.fullmatch(str(scope_identity.get("scope_hash"))) is not None,
         "G2_PREP_SCOPE_BINDING_INVALID",
     )
