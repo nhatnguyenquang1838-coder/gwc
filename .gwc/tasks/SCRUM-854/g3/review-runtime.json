@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "hermes",
+    "chat",
+    "--oneshot",
+    "-Q",
+    "--provider",
+    "openai-codex",
+    "-m",
+    "gpt-6.1-sol",
+    "--reasoning",
+    "high",
+    "--source",
+    "tool",
+    "--pass-session-id",
+    "--run-budget",
+    "480",
+    "--max-turns",
+    "30",
+    "--query-file",
+    "D:\\HermesData\\cache\\scratch\\scrum854-g3-continuation\\independent-review-brief.md"
+  ],
+  "cwd": "D:/Projects/gwc-854-g3-review-r1",
+  "profile": "gwc",
+  "cli_exit_code": 0,
+  "session_id": "local-b170bbab5252f65b38dcbabd846612ddff8b7a067b94adf5b439ca8fb5a5df09",
+  "actual_model": "gpt-6.1-sol",
+  "actual_provider": "openai-codex",
+  "fallback_active": false,
+  "structured_reply": true,
+  "decision": "pass"
+}

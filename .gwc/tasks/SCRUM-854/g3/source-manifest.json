@@ -1,0 +1,16 @@
+{
+  "implementation_head_sha": "2e6d8a39d9314419cdeb0c6bfc866ec2d69aa996",
+  "source_sha256": {
+    "tests/test_scrum854_g2_continuation_preparation.py": "39de56a7dd33446c536f894271b3009b58abe2d580f3a8a8551000db236e04bd",
+    "tools/node_architect/g2_approval_preparation.py": "13b1076310c36a05b1051de9b18dbb75a5da541498dddc2e3bafc49c8f63f154"
+  },
+  "evidence_sha256": {
+    "delivery-record.yaml": "38a7b13f5ac354bdf0ebfb9baad0b33259272d209c3f4431d2a91ed50570a441",
+    "independent-review.json": "8196eb2b628748e7b778cabde70da7b65f89ca35a99d0e77606eddfac574074b",
+    "review-runtime.json": "6b8023662c6414cb5f6f4551dd92c84b53b25464eb94c46718993f726d918af4",
+    "implementation-validation.json": "3201aedbaa2e4e719bbd0861d5fded0978a4d8d10d2458864fb1b02227f5724f",
+    "implementation-validation.log": "f78828a18485afc847a83650bd9dfbae91f04e295a29d07b3215dadd25dd6b60",
+    "implementation-ci.json": "24626c9d2a30889c6ce386dfbffbda87e8ecc94b59f293b9858dcdb898f439c1",
+    "provenance.json": "4103b322d54b13382b2cf556c90c2d552ec49cac5a614c4e479134b227b7c8d7"
+  }
+}
